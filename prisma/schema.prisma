@@ -198,14 +198,13 @@ model plan {
   image_url         String
   price             Int
   currency          String         @db.VarChar(10)
-  due_date          DateTime       @db.Date
   plan_benefit      plan_benefit[]
   user              user[]
 }
 
 model tag {
   tag_id        Int             @id @default(autoincrement())
-  name          String          @db.VarChar(255)
+  name          String          @unique @db.VarChar(255)
   ai_output_tag ai_output_tag[]
   article_tag   article_tag[]
   course_tag    course_tag[]
