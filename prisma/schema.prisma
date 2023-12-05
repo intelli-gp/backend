@@ -259,6 +259,7 @@ model user {
   plan_id           Int
   renewal_date      DateTime         @db.Date
   subscription_date DateTime         @db.Date
+  hashed_refresh_token String?       @db.VarChar(100)
   ai_output         ai_output[]
   article           article[]
   group_user        group_user[]
