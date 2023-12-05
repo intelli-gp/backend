@@ -31,8 +31,8 @@ export class AuthService {
 
   async issueRefreshToken(payload: TokenPayload): Promise<string> {
     const refreshToken = await this.jwt.signAsync(payload, {
-      expiresIn: '15m',
-      secret: this.config.get('ACCESS_TOKEN_SECRET'),
+      expiresIn: '7d',
+      secret: this.config.get('REFRESH_TOKEN_SECRET'),
     });
     return refreshToken;
   }
@@ -104,6 +104,7 @@ export class AuthService {
         email: loginDto.email,
       },
     });
+    console.log(user);
     if (!user) throw new ForbiddenException('Access Denied');
 
     const isMatching = await bcrypt.compare(loginDto.password, user.password);
