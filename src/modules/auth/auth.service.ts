@@ -10,6 +10,7 @@ import { LoginDto } from './dto/login.dto';
 import { hashS10 } from 'src/utils/bcrypt';
 import { SignUpDto } from './dto/signup.dto';
 import { MailsService } from '../mails/mails.service';
+import { Profile } from 'passport-google-oauth20';
 // import { Profile } from 'passport-google-oauth20';
 
 @Injectable()
@@ -82,21 +83,30 @@ export class AuthService {
     return user;
   }
 
-  async validateGoogleUser() {
-    // const user: user = {
-    //   user_id: 2,
-    //   username: profile.displayName,
-    //   email: profile._json.email,
-    //   password: '',
-    //   dob: new Date(),
-    //   points: 0,
-    //   phone_number: '',
-    //   image: profile._json.profile,
-    //   level_id: 1,
-    //   plan_id: 1,
-    //   renewal_date: new Date(),
-    //   subscription_date: new Date(),
-    // };
+  async validateGoogleUser(userProfile: Profile): Promise<user> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: userProfile._json.email,
+      },
+    });
+    if (user) return user;
+
+    // TODO: discuss the plan and level assumption
+    return await this.prisma.user.create({
+      data: {
+        username: userProfile.displayName,
+        email: userProfile._json.email,
+        password: await hashS10(crypto.randomUUID()),
+        dob: null,
+        points: 0,
+        phone_number: null,
+        image: userProfile._json.profile,
+        level_id: 1,
+        plan_id: 1,
+        renewal_date: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+        subscription_date: new Date(),
+      } as user,
+    });
   }
   async refreshTokens(refreshToken: string, userId: number): Promise<Tokens> {
     const user = await this.validateRefreshToken(refreshToken, userId);
