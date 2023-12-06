@@ -246,10 +246,10 @@ model user {
   username          String           @unique @db.VarChar(30)
   email             String           @unique @db.VarChar(100)
   password          String           @db.VarChar(100)
-  dob               DateTime         @db.Date
+  dob               DateTime?         @db.Date
   points            Int              @default(0)
   full_name         String           @db.VarChar(100)
-  phone_number      String           @db.VarChar(50)
+  phone_number      String?           @db.VarChar(50)
   image             String?
   level_id          Int
   plan_id           Int
