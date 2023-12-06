@@ -7,6 +7,8 @@ import { ConfigService } from '@nestjs/config';
 import { Tokens } from './types/tokens';
 import { user } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
+import { hashS10 } from 'src/utils/bcrypt';
+// import { Profile } from 'passport-google-oauth20';
 
 @Injectable()
 export class AuthService {
@@ -15,11 +17,6 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
   ) {}
-
-  async hashS10(value: string) {
-    const salt = await bcrypt.genSalt(10);
-    return await bcrypt.hash(value, salt);
-  }
 
   async issueAccessToken(payload: TokenPayload): Promise<string> {
     const accessToken = await this.jwt.signAsync(payload, {
@@ -51,7 +48,7 @@ export class AuthService {
     payload: TokenPayload,
     refreshToken: string,
   ): Promise<user> {
-    const hashedRefreshToken = await this.hashS10(refreshToken);
+    const hashedRefreshToken = await hashS10(refreshToken);
     return await this.prisma.user.update({
       where: {
         user_id: payload.userId,
@@ -80,6 +77,23 @@ export class AuthService {
     if (!isMatching) throw new ForbiddenException('Access Denied');
 
     return user;
+  }
+
+  async validateGoogleUser() {
+    // const user: user = {
+    //   user_id: 2,
+    //   username: profile.displayName,
+    //   email: profile._json.email,
+    //   password: '',
+    //   dob: new Date(),
+    //   points: 0,
+    //   phone_number: '',
+    //   image: profile._json.profile,
+    //   level_id: 1,
+    //   plan_id: 1,
+    //   renewal_date: new Date(),
+    //   subscription_date: new Date(),
+    // };
   }
   async refreshTokens(refreshToken: string, userId: number): Promise<Tokens> {
     const user = await this.validateRefreshToken(refreshToken, userId);
@@ -140,7 +154,7 @@ export class AuthService {
     return true;
   }
 
-  async googleLogin() {
+  async googleRedirect() {
     // TODO: implement
   }
 }
