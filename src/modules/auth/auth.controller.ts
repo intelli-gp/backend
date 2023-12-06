@@ -22,9 +22,11 @@ import { SerializedUser } from 'src/utils/serialized-types/serialized-user';
 import { SignUpDto } from './dto/signup.dto';
 import { GooglePayload } from './types/google.payload';
 import { LinkedinGuard } from './guards/linkedin.guard';
+import { ApiTags } from '@nestjs/swagger';
 // import { user } from '@prisma/client';
 
 @Controller('auth')
+@ApiTags('Auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
