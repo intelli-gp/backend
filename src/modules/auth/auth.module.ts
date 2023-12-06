@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { GoogleStrategy } from './strategy/google.strategy';
 import { AccessJwtStrategy } from './strategy/access.jwt.strategy';
 import { RefreshJwtStrategy } from './strategy/refresh.jwt.strategy';
+import { MailsService } from '../mails/mails.service';
 
 @Module({
   imports: [JwtModule.register({})],
@@ -13,6 +14,7 @@ import { RefreshJwtStrategy } from './strategy/refresh.jwt.strategy';
     GoogleStrategy,
     AccessJwtStrategy,
     RefreshJwtStrategy,
+    MailsService,
   ],
   controllers: [AuthController],
 })

@@ -18,11 +18,29 @@ import {
 } from 'src/utils/response.handler';
 import { GetCurrentUser, Public } from './ParamDecortator';
 import { GoogleGuard } from './guards/google.guard';
+import { SerializedUser } from 'src/utils/serialized-types/serialized-user';
+import { SignUpDto } from './dto/signup.dto';
 // import { user } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Post('signup')
+  async signUp(@Body() signUpDto: SignUpDto) {
+    const data = (await this.authService.signUp(signUpDto)).data;
+
+    if (data)
+      return {
+        message: 'We sent you a verification mail',
+        data: new SerializedUser(data),
+      };
+    else
+      return {
+        message: 'something went wrong',
+        data,
+      };
+  }
 
   @Public()
   @Post('refresh')

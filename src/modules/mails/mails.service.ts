@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailsService {
+  constructor(private readonly config: ConfigService) {}
   async sendMail(to: string, subject: string, text: string) {
     console.log(nodemailer);
     let transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.MAIL_USERNAME, // generated brevo user
-        pass: process.env.MAIL_PASSWORD, // generated brevo password
+        user: this.config.get('MAIL_USERNAME'), // generated brevo user
+        pass: this.config.get('MAIL_PASSWORD'), // generated brevo password
       },
     });
 
