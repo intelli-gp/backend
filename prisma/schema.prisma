@@ -247,12 +247,12 @@ model user {
   email             String           @unique @db.VarChar(100)
   password          String           @db.VarChar(100)
   dob               DateTime?         @db.Date
-  points            Int              @default(0)
+  points            Int?              @default(0)
   full_name         String           @db.VarChar(100)
   phone_number      String?           @db.VarChar(50)
   image             String?
-  level_id          Int
-  plan_id           Int
+  level_id          Int              @default(1)
+  plan_id           Int               
   renewal_date      DateTime         @db.Date
   subscription_date DateTime         @db.Date
   hashed_refresh_token String?       @db.VarChar(100)
