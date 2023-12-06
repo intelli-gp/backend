@@ -1,14 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { SignUpDto } from './dto/signup.dto';
 import { encode } from 'src/utils/bcrypt';
 import { MailsService } from 'src/mails/mails.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly mailService: MailsService,
+    @Inject(CACHE_MANAGER) private readonly cacheService: Cache,
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
@@ -57,25 +61,37 @@ export class AuthService {
           data: await Promise.all(userTags),
         });
 
+        const randomUUID = uuid();
+
+        await this.cacheService.set(user.username, randomUUID, 15 * 1000);
+
         await this.mailService.sendMail(
           user.email,
-          'Welcome',
           'Welcome to our website',
+          1,
+          { username: user.username, token: randomUUID },
         );
 
         return user;
       })
-      .catch((err) => {});
+      .catch((err) => {
+        console.log(err.code, '\n', err.meta.target[0]);
+      });
 
-    if (user) {
-      return { message: 'We sent you a verification mail', data: user };
-    } else {
-      return { message: 'something went wrong', data: null };
-    }
+    if (user) return user;
+    else return null;
   }
 
   private makeFullName(fname: string, lname: string) {
     return fname.trim() + ' ' + lname.trim();
   }
 
+  async verify(username: string, token: string): Promise<boolean> {
+    const cachedToken: string = await this.cacheService.get(username);
+
+    if (cachedToken === token) {
+      await this.cacheService.del(username);
+      return true;
+    } else return false;
+  }
 }

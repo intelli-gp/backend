@@ -2,6 +2,8 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Get,
+  Param,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
@@ -14,9 +16,14 @@ import { SerializedUser } from 'src/utils/serialized-types/serialized-user';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Get('test')
+  async test() {
+    return 'hello';
+  }
+
   @Post('signup')
   async signUp(@Body() signUpDto: SignUpDto) {
-    const data = (await this.authService.signUp(signUpDto)).data;
+    const data = await this.authService.signUp(signUpDto);
 
     if (data)
       return {
@@ -28,5 +35,14 @@ export class AuthController {
         message: 'something went wrong',
         data,
       };
+  }
+
+  @Get('verify/:username/:token')
+  async verify(
+    @Param('username') username: string,
+    @Param('token') token: string,
+  ) {
+    if (this.authService.verify(username, token)) return { message: 'ok' };
+    return { message: 'not ok' };
   }
 }
