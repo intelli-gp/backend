@@ -28,9 +28,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     // TODO: write logic and type of profile
     // check if user exists
     // if not create
-    const user = await this.authService.validateGoogleUser(profile);
+    const validationData = await this.authService.validateGoogleUser(profile);
     console.log('PRint out the scope here');
     console.log(profile);
-    return user;
+    return validationData;
   }
 }

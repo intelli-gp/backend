@@ -20,6 +20,7 @@ import { GetCurrentUser, Public } from './ParamDecortator';
 import { GoogleGuard } from './guards/google.guard';
 import { SerializedUser } from 'src/utils/serialized-types/serialized-user';
 import { SignUpDto } from './dto/signup.dto';
+import { GooglePayload } from './types/google.payload';
 // import { user } from '@prisma/client';
 
 @Controller('auth')
@@ -85,24 +86,8 @@ export class AuthController {
   @Get('google/callback')
   async googleCallback(
     @Res({ passthrough: true }) res,
-    @GetCurrentUser() user: UserType,
+    @GetCurrentUser() user: GooglePayload,
   ) {
-    // TODO: do it correctly by logging in here
-    console.log('here in google callback');
-    const tokens = await this.authService.loginLocal({
-      email: user.email,
-      password: user.password,
-    });
-    console.log({ tokens });
-    // TODO: redirect to front end server
-    // redirect to front end with access token in url maybe hashed not return
-    const frontendUrl = 'haha.com';
-
-    // put the rt in token
-    sendRefreshToken(res, tokens.refreshToken);
-    return sendSuccessResponse({
-      access_token: tokens.accessToken,
-      url: frontendUrl,
-    });
+    await this.authService.googleRedirect(user, res);
   }
 }

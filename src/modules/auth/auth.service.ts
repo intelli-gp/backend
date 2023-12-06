@@ -11,6 +11,9 @@ import { hashS10 } from 'src/utils/bcrypt';
 import { SignUpDto } from './dto/signup.dto';
 import { MailsService } from '../mails/mails.service';
 import { Profile } from 'passport-google-oauth20';
+import { GooglePayload } from './types/google.payload';
+import { Response } from 'express';
+import { sendRefreshToken } from 'src/utils/response.handler';
 // import { Profile } from 'passport-google-oauth20';
 
 @Injectable()
@@ -83,30 +86,26 @@ export class AuthService {
     return user;
   }
 
-  async validateGoogleUser(userProfile: Profile): Promise<user> {
+  async validateGoogleUser(userProfile: Profile): Promise<GooglePayload> {
     const user = await this.prisma.user.findUnique({
       where: {
         email: userProfile._json.email,
       },
     });
-    if (user) return user;
+    if (user) return { user, state: 'login' };
 
     // TODO: discuss the plan and level assumption
-    return await this.prisma.user.create({
+    const incompleteUserData = await this.prisma.user.create({
       data: {
         username: userProfile.displayName,
+        full_name:
+          userProfile._json.given_name + ' ' + userProfile._json.family_name,
         email: userProfile._json.email,
-        password: await hashS10(crypto.randomUUID()),
-        dob: null,
         points: 0,
-        phone_number: null,
         image: userProfile._json.profile,
-        level_id: 1,
-        plan_id: 1,
-        renewal_date: new Date(new Date().setMonth(new Date().getMonth() + 1)),
-        subscription_date: new Date(),
       } as user,
     });
+    return { user: incompleteUserData, state: 'signup' };
   }
   async refreshTokens(refreshToken: string, userId: number): Promise<Tokens> {
     const user = await this.validateRefreshToken(refreshToken, userId);
@@ -167,8 +166,34 @@ export class AuthService {
     return true;
   }
 
-  async googleRedirect() {
-    // TODO: implement
+  async googleLogin(userData: user, res: Response) {
+    console.log('here in google callback');
+    const tokens = await this.loginLocal({
+      email: userData.email,
+      password: userData.password,
+    });
+    console.log({ tokens });
+
+    sendRefreshToken(res, tokens.refreshToken);
+
+    res.redirect(
+      this.config.get('FRONT_URL') + '/?token=' + tokens.accessToken,
+    );
+  }
+
+  async googleSignup(incompleteUserData: user, res: Response) {
+    res.redirect(
+      this.config.get('FRONT_URL') +
+        '/?userData=' +
+        JSON.stringify(incompleteUserData),
+    );
+  }
+  async googleRedirect(payloadData: GooglePayload, res: Response) {
+    if (payloadData.state === 'login') {
+      return await this.googleLogin(payloadData.user, res);
+    } else if (payloadData.state === 'signup') {
+      return await this.googleSignup(payloadData.user, res);
+    }
   }
 
   async signUp(signUpDto: SignUpDto) {
