@@ -23,6 +23,7 @@ import { SignUpDto } from './dto/signup.dto';
 import { GooglePayload } from './types/google.payload';
 import { LinkedinGuard } from './guards/linkedin.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { RtGuard } from './guards/refresh.jwt.guard';
 // import { user } from '@prisma/client';
 
 @Controller('auth')
@@ -48,6 +49,7 @@ export class AuthController {
   }
 
   @Public()
+  @UseGuards(RtGuard)
   @Post('refresh')
   @HttpCode(HttpStatus.CREATED)
   async refresh(
