@@ -30,6 +30,7 @@ import { ApiTags } from '@nestjs/swagger';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('signup')
   async signUp(@Body() signUpDto: SignUpDto) {
     const data = (await this.authService.signUp(signUpDto)).data;
