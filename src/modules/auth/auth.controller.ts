@@ -65,12 +65,13 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Res({ passthrough: true }) res, @Body() loginDto: LoginDto) {
-    console.log('here');
-    const tokens = await this.authService.loginLocal(loginDto);
-    console.log('here2');
+    const { tokens, user } = await this.authService.loginLocal(loginDto);
 
     sendRefreshToken(res, tokens.refreshToken);
-    return sendSuccessResponse({ access_token: tokens.accessToken });
+    return sendSuccessResponse({
+      access_token: tokens.accessToken,
+      user: new SerializedUser(user),
+    });
   }
 
   @Post('logout')

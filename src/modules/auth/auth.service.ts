@@ -147,7 +147,7 @@ export class AuthService {
       },
       tokens.refreshToken,
     );
-    return tokens;
+    return { tokens, user };
   }
 
   async logout(userId: number) {
@@ -168,11 +168,10 @@ export class AuthService {
 
   async googleLogin(userData: user, res: Response) {
     console.log('here in google callback');
-    const tokens = await this.loginLocal({
+    const { tokens } = await this.loginLocal({
       email: userData.email,
       password: userData.password,
     });
-    console.log({ tokens });
 
     sendRefreshToken(res, tokens.refreshToken);
 
