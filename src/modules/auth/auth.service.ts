@@ -95,16 +95,14 @@ export class AuthService {
     if (user) return { user, state: 'login' };
 
     // TODO: discuss the plan and level assumption
-    const incompleteUserData = await this.prisma.user.create({
-      data: {
-        username: userProfile.displayName,
-        full_name:
-          userProfile._json.given_name + ' ' + userProfile._json.family_name,
-        email: userProfile._json.email,
-        points: 0,
-        image: userProfile._json.profile,
-      } as user,
-    });
+    const incompleteUserData = {
+      username: userProfile.displayName,
+      full_name:
+        userProfile._json.given_name + ' ' + userProfile._json.family_name,
+      email: userProfile._json.email,
+      points: 0,
+      image: userProfile._json.profile,
+    } as user;
     return { user: incompleteUserData, state: 'signup' };
   }
   async refreshTokens(refreshToken: string, userId: number): Promise<Tokens> {
