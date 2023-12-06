@@ -6,6 +6,7 @@ import { GoogleStrategy } from './strategy/google.strategy';
 import { AccessJwtStrategy } from './strategy/access.jwt.strategy';
 import { RefreshJwtStrategy } from './strategy/refresh.jwt.strategy';
 import { MailsService } from '../mails/mails.service';
+import { LinkedinStrategy } from './strategy/linkedin.strategy';
 
 @Module({
   imports: [JwtModule.register({})],
@@ -14,6 +15,7 @@ import { MailsService } from '../mails/mails.service';
     GoogleStrategy,
     AccessJwtStrategy,
     RefreshJwtStrategy,
+    LinkedinStrategy,
     MailsService,
   ],
   controllers: [AuthController],

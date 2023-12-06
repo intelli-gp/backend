@@ -21,6 +21,7 @@ import { GoogleGuard } from './guards/google.guard';
 import { SerializedUser } from 'src/utils/serialized-types/serialized-user';
 import { SignUpDto } from './dto/signup.dto';
 import { GooglePayload } from './types/google.payload';
+import { LinkedinGuard } from './guards/linkedin.guard';
 // import { user } from '@prisma/client';
 
 @Controller('auth')
@@ -89,5 +90,17 @@ export class AuthController {
     @GetCurrentUser() user: GooglePayload,
   ) {
     await this.authService.googleRedirect(user, res);
+  }
+
+  @Public()
+  @UseGuards(LinkedinGuard)
+  @Get('login/linkedin')
+  linkedinLogin() {}
+
+  @Public()
+  @UseGuards(LinkedinGuard)
+  @Get('linkedin/callback')
+  async linkedinCallback() {
+    return 'linkedin login ';
   }
 }
