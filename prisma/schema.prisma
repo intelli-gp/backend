@@ -10,8 +10,8 @@ datasource db {
 model ai_output_tag {
   ai_output_id Int
   tag_id       Int
-  ai_output    ai_output @relation(fields: [ai_output_id], references: [ai_output_id], onDelete: NoAction, onUpdate: NoAction)
-  tag          tag       @relation(fields: [tag_id], references: [tag_id], onDelete: NoAction, onUpdate: NoAction)
+  ai_output    ai_output @relation(fields: [ai_output_id], references: [ai_output_id], onDelete: Cascade, onUpdate: Cascade)
+  tag          tag       @relation(fields: [tag_id], references: [tag_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([ai_output_id, tag_id])
 }
@@ -23,14 +23,14 @@ model ai_output {
   image_url     String          @db.VarChar(255)
   user_id       Int
   ai_output_tag ai_output_tag[]
-  user          user            @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  user          user            @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model article_tag {
   article_id Int
   tag_id     Int
-  article    article @relation(fields: [article_id], references: [article_id], onDelete: NoAction, onUpdate: NoAction)
-  tag        tag     @relation(fields: [tag_id], references: [tag_id], onDelete: NoAction, onUpdate: NoAction)
+  article    article @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
+  tag        tag     @relation(fields: [tag_id], references: [tag_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([article_id, tag_id])
 }
@@ -43,7 +43,7 @@ model article {
   cover_image_url  String?            @db.VarChar(255)
   user_id          Int
   article_tag      article_tag[]
-  user             user               @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  user             user               @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   articles_content articles_content[]
 }
 
@@ -53,7 +53,7 @@ model articles_content {
   created_at DateTime  @db.Date
   updated_at DateTime? @db.Date
   value      String
-  article    article   @relation(fields: [article_id], references: [article_id], onDelete: NoAction, onUpdate: NoAction)
+  article    article   @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([article_id, content_id])
 }
@@ -64,7 +64,7 @@ model attachment {
   photo_url     String? @db.VarChar(255)
   video_url     String? @db.VarChar(255)
   location      String? @db.VarChar(255)
-  message       message @relation(fields: [message_id], references: [message_id], onDelete: NoAction, onUpdate: NoAction)
+  message       message @relation(fields: [message_id], references: [message_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model badges {
@@ -79,8 +79,8 @@ model badges {
 model course_tag {
   course_id Int
   tag_id    Int
-  course    course @relation(fields: [course_id], references: [course_id], onDelete: NoAction, onUpdate: NoAction)
-  tag       tag    @relation(fields: [tag_id], references: [tag_id], onDelete: NoAction, onUpdate: NoAction)
+  course    course @relation(fields: [course_id], references: [course_id], onDelete: Cascade, onUpdate: Cascade)
+  tag       tag    @relation(fields: [tag_id], references: [tag_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([course_id, tag_id])
 }
@@ -98,8 +98,8 @@ model course {
 model group_tag {
   group_id Int
   tag_id   Int
-  group    group @relation(fields: [group_id], references: [group_id], onDelete: NoAction, onUpdate: NoAction)
-  tag      tag   @relation(fields: [tag_id], references: [tag_id], onDelete: NoAction, onUpdate: NoAction)
+  group    group @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
+  tag      tag   @relation(fields: [tag_id], references: [tag_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([group_id, tag_id])
 }
@@ -110,8 +110,8 @@ model group_user {
   type      String    @db.VarChar(255)
   joined_at DateTime  @db.Date
   left_at   DateTime? @db.Date
-  group     group     @relation(fields: [group_id], references: [group_id], onDelete: NoAction, onUpdate: NoAction)
-  user      user      @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  group     group     @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
+  user      user      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([group_id, user_id])
 }
@@ -125,7 +125,7 @@ model group {
   created_by      Int
   group_tag       group_tag[]
   group_user      group_user[]
-  user            user         @relation(fields: [created_by], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  user            user         @relation(fields: [created_by], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   message         message[]
 }
 
@@ -142,7 +142,7 @@ model message_ai {
   content       String   @db.VarChar(255)
   created_at    DateTime @db.Date
   user_id       Int
-  user          user     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  user          user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model message {
@@ -153,8 +153,8 @@ model message {
   created_at DateTime     @db.Date
   updated_at DateTime     @db.Date
   attachment attachment[]
-  group      group        @relation(fields: [group_id], references: [group_id], onDelete: NoAction, onUpdate: NoAction)
-  user       user         @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  group      group        @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
+  user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model notification {
@@ -164,7 +164,7 @@ model notification {
   created_at      DateTime @db.Date
   seen            Boolean
   user_id         Int
-  user            user     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  user            user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model payment_method {
@@ -174,7 +174,7 @@ model payment_method {
   holder_name String   @db.VarChar(100)
   expiry_date DateTime @db.Date
   user_id     Int
-  user        user     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  user        user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model plan_benefit {
@@ -184,7 +184,7 @@ model plan_benefit {
   hourly_ai_messages     Int
   groups_created         Int
   monthly_planner_helper Int
-  plan                   plan @relation(fields: [plan_id], references: [plan_id], onDelete: NoAction, onUpdate: NoAction)
+  plan                   plan @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([plan_id, plan_benefit_id])
 }
@@ -219,15 +219,15 @@ model task {
   due_date    DateTime @db.Date
   user_id     Int
   status      String   @db.VarChar(255)
-  user        user     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  user        user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model user_badge {
   user_id     Int
   badge_id    Int
   unlock_date DateTime @db.Date
-  badges      badges   @relation(fields: [badge_id], references: [badge_id], onDelete: NoAction, onUpdate: NoAction)
-  user        user     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  badges      badges   @relation(fields: [badge_id], references: [badge_id], onDelete: Cascade, onUpdate: Cascade)
+  user        user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([user_id, badge_id])
 }
@@ -235,8 +235,8 @@ model user_badge {
 model user_tag {
   user_id Int
   tag_id  Int
-  tag     tag  @relation(fields: [tag_id], references: [tag_id], onDelete: NoAction, onUpdate: NoAction)
-  user    user @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  tag     tag  @relation(fields: [tag_id], references: [tag_id], onDelete: Cascade, onUpdate: Cascade)
+  user    user @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([user_id, tag_id])
 }
@@ -266,6 +266,6 @@ model user {
   task              task[]
   user_badge        user_badge[]
   user_tag          user_tag[]
-  level             level            @relation(fields: [level_id], references: [level_id], onDelete: NoAction, onUpdate: NoAction)
-  plan              plan             @relation(fields: [plan_id], references: [plan_id], onDelete: NoAction, onUpdate: NoAction)
+  level             level            @relation(fields: [level_id], references: [level_id], onDelete: Cascade, onUpdate: Cascade)
+  plan              plan             @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
 }

@@ -16,6 +16,17 @@ export class AuthController {
 
   @Post('signup')
   async signUp(@Body() signUpDto: SignUpDto) {
-    return new SerializedUser(await this.authService.signUp(signUpDto));
+    const data = (await this.authService.signUp(signUpDto)).data;
+
+    if (data)
+      return {
+        message: 'We sent you a verification mail',
+        data: new SerializedUser(data),
+      };
+    else
+      return {
+        message: 'something went wrong',
+        data,
+      };
   }
 }

@@ -199,7 +199,6 @@ CREATE TABLE "plan" (
     "image_url" TEXT NOT NULL,
     "price" INTEGER NOT NULL,
     "currency" VARCHAR(10) NOT NULL,
-    "due_date" DATE NOT NULL,
 
     CONSTRAINT "plan_pkey" PRIMARY KEY ("plan_id")
 );
@@ -259,6 +258,9 @@ CREATE TABLE "user" (
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("user_id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tag_name_key" ON "tag"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_username_key" ON "user"("username");
@@ -349,4 +351,3 @@ ALTER TABLE "user" ADD CONSTRAINT "user_level_id_fkey" FOREIGN KEY ("level_id") 
 
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_plan_id_fkey" FOREIGN KEY ("plan_id") REFERENCES "plan"("plan_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-
