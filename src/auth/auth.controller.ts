@@ -12,7 +12,6 @@ import { AuthService } from './auth.service';
 import { SerializedUser } from 'src/utils/serialized-types/serialized-user';
 
 @Controller('auth')
-@UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -24,11 +23,24 @@ export class AuthController {
   @Post('signup')
   async signUp(@Body() signUpDto: SignUpDto) {
     const data = await this.authService.signUp(signUpDto);
+    if (data.data)
+      return {
+        message: 'We sent you a verification mail',
+      };
+    else return { message: data.message };
+  }
 
+  @Get('verify/:username/:token')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async verify(
+    @Param('username') username: string,
+    @Param('token') token: string,
+  ) {
+    const data = await this.authService.verify(username, token);
     if (data)
       return {
         message: 'We sent you a verification mail',
-        data: new SerializedUser(data),
+        data: new SerializedUser(data.user),
       };
     else
       return {
@@ -37,12 +49,28 @@ export class AuthController {
       };
   }
 
-  @Get('verify/:username/:token')
-  async verify(
+  @Get('reset-password/:username')
+  async resetPassword(@Param('username') username: string) {
+    const data = await this.authService.resetPassword(username);
+    if (data)
+      return {
+        message: 'We sent you a mail press the link there',
+      };
+    else return { message: 'something went wrong' };
+  }
+
+  @Post('reset-password/:username/:token')
+  async resetPasswordConfirm(
     @Param('username') username: string,
     @Param('token') token: string,
+    @Body('password') password: string,
   ) {
-    if (this.authService.verify(username, token)) return { message: 'ok' };
-    return { message: 'not ok' };
+    const data = await this.authService.resetPasswordConfirm(
+      username,
+      token,
+      password,
+    );
+    if (data) return { message: 'Password changed successfully', data };
+    else return { message: 'something went wrong' };
   }
 }

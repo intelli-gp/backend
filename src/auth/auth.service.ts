@@ -16,6 +16,13 @@ export class AuthService {
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
+    if (
+      await this.prismaService.user.findUnique({
+        where: { username: signUpDto.username },
+      })
+    )
+      return { message: 'Username already exists', data: null };
+
     const fullName = this.makeFullName(signUpDto.fname, signUpDto.lname);
     const password = await encode(signUpDto.password);
     const renewal_date = new Date(
@@ -36,7 +43,41 @@ export class AuthService {
       plan_id: 1,
     };
 
-    const tags = signUpDto.interests.map((tag) => ({
+    const randomUUID = uuid();
+
+    await this.cacheService.set(
+      userData.username,
+      { user: userData, token: randomUUID, interests: signUpDto.interests },
+      15 * 1000 * 60,
+    );
+
+    await this.mailService.sendMail(
+      userData.email,
+      'Welcome to our website',
+      1,
+      {
+        username: userData.username,
+        token: randomUUID,
+      },
+    );
+    return {
+      message: 'We sent you a verification mail',
+      data: userData.username,
+    };
+  }
+
+  private makeFullName(fname: string, lname: string) {
+    return fname.trim() + ' ' + lname.trim();
+  }
+
+  async verify(username: string, token: string) {
+    const cachedData: any = await this.cacheService.get(username);
+
+    if (!cachedData || cachedData.token !== token) return false;
+
+    const userData = cachedData.user;
+
+    const tags = cachedData.interests.map((tag) => ({
       name: tag.trim().toLowerCase(),
     }));
 
@@ -61,37 +102,67 @@ export class AuthService {
           data: await Promise.all(userTags),
         });
 
-        const randomUUID = uuid();
-
-        await this.cacheService.set(user.username, randomUUID, 15 * 1000);
-
         await this.mailService.sendMail(
           user.email,
           'Welcome to our website',
-          1,
-          { username: user.username, token: randomUUID },
+          3,
+          { username: null, token: null },
         );
 
+        await this.cacheService.del(username);
         return user;
       })
       .catch((err) => {
-        console.log(err.code, '\n', err.meta.target[0]);
+        console.log(err);
       });
 
-    if (user) return user;
-    else return null;
+    return user ? { user } : null;
   }
 
-  private makeFullName(fname: string, lname: string) {
-    return fname.trim() + ' ' + lname.trim();
+  async resetPassword(username: string): Promise<boolean> {
+    const user = await this.prismaService.user.findUnique({
+      where: { username },
+    });
+
+    if (user) {
+      const randomUUID = uuid();
+
+      await this.cacheService.set(user.username, randomUUID, 15 * 1000 * 60);
+
+      await this.mailService.sendMail(user.email, 'Reset your password', 2, {
+        username: user.username,
+        token: randomUUID,
+      });
+
+      return true;
+    } else return false;
   }
 
-  async verify(username: string, token: string): Promise<boolean> {
+  async resetPasswordConfirm(
+    username: string,
+    token: string,
+    password: string,
+  ) {
     const cachedToken: string = await this.cacheService.get(username);
 
     if (cachedToken === token) {
       await this.cacheService.del(username);
-      return true;
-    } else return false;
+
+      const hashedPassword = await encode(password);
+
+      const user = await this.prismaService.user.update({
+        where: { username },
+        data: { password: hashedPassword },
+      });
+
+      await this.mailService.sendMail(
+        user.email,
+        'Password changed successfully',
+        4,
+        { username: null, token: null },
+      );
+
+      return user;
+    } else return null;
   }
 }
