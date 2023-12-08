@@ -29,7 +29,7 @@ export class AuthService {
       email: signUpDto.email,
       phone_number: signUpDto.phoneNumber,
       dob: new Date(signUpDto.dob),
-      image_url: signUpDto.image,
+      image: signUpDto.image,
       renewal_date: renewal_date,
       subscription_date: new Date(),
       level_id: 1,
