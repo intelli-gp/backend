@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { SerializedUser } from 'src/utils/serialized-types/serialized-user';
 
 @Controller('auth')
+@UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -26,26 +27,24 @@ export class AuthController {
     if (data.data)
       return {
         message: 'We sent you a verification mail',
+        data: new SerializedUser(data.data),
       };
-    else return { message: data.message };
+    else return { message: data.message, data: null };
   }
 
   @Get('verify/:username/:token')
-  @UseInterceptors(ClassSerializerInterceptor)
   async verify(
     @Param('username') username: string,
     @Param('token') token: string,
   ) {
-    const data = await this.authService.verify(username, token);
-    if (data)
+    const verified = await this.authService.verify(username, token);
+    if (verified)
       return {
         message: 'We sent you a verification mail',
-        data: new SerializedUser(data.user),
       };
     else
       return {
         message: 'something went wrong',
-        data,
       };
   }
 

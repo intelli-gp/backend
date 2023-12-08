@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { SignUpDto } from './dto/signup.dto';
 import { encode } from 'src/utils/bcrypt';
-import { MailsService } from 'src/mails/mails.service';
+import { MailsService } from 'src/modules/mails/mails.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { v4 as uuid } from 'uuid';
@@ -16,13 +16,6 @@ export class AuthService {
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
-    if (
-      await this.prismaService.user.findUnique({
-        where: { username: signUpDto.username },
-      })
-    )
-      return { message: 'Username already exists', data: null };
-
     const fullName = this.makeFullName(signUpDto.fname, signUpDto.lname);
     const password = await encode(signUpDto.password);
     const renewal_date = new Date(
@@ -43,13 +36,13 @@ export class AuthService {
       plan_id: 1,
     };
 
+    const user = await this.prismaService.user.create({
+      data: { ...userData },
+    });
+
     const randomUUID = uuid();
 
-    await this.cacheService.set(
-      userData.username,
-      { user: userData, token: randomUUID, interests: signUpDto.interests },
-      15 * 1000 * 60,
-    );
+    await this.cacheService.set(userData.username, randomUUID, 15 * 1000 * 60);
 
     await this.mailService.sendMail(
       userData.email,
@@ -60,9 +53,10 @@ export class AuthService {
         token: randomUUID,
       },
     );
+
     return {
       message: 'We sent you a verification mail',
-      data: userData.username,
+      data: user,
     };
   }
 
@@ -70,53 +64,23 @@ export class AuthService {
     return fname.trim() + ' ' + lname.trim();
   }
 
-  async verify(username: string, token: string) {
-    const cachedData: any = await this.cacheService.get(username);
+  async verify(username: string, token: string): Promise<boolean> {
+    const cachedToken: string = await this.cacheService.get(username);
 
-    if (!cachedData || cachedData.token !== token) return false;
+    if (!cachedToken || cachedToken !== token) return false;
 
-    const userData = cachedData.user;
+    const user = await this.prismaService.user.update({
+      where: { username },
+      data: { active: true },
+    });
 
-    const tags = cachedData.interests.map((tag) => ({
-      name: tag.trim().toLowerCase(),
-    }));
+    await this.cacheService.del(username);
 
-    const user = await this.prismaService
-      .$transaction(async (prisma) => {
-        const user = await prisma.user.create({
-          data: { ...userData },
-        });
-
-        await prisma.tag.createMany({
-          data: tags,
-          skipDuplicates: true,
-        });
-
-        const userTags = await tags.map(async (tag) => ({
-          tag_id: (await prisma.tag.findFirst({ where: { name: tag.name } }))
-            .tag_id,
-          user_id: user.user_id,
-        }));
-
-        await prisma.user_tag.createMany({
-          data: await Promise.all(userTags),
-        });
-
-        await this.mailService.sendMail(
-          user.email,
-          'Welcome to our website',
-          3,
-          { username: null, token: null },
-        );
-
-        await this.cacheService.del(username);
-        return user;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    return user ? { user } : null;
+    await this.mailService.sendMail(user.email, 'Welcome to our website', 3, {
+      username: null,
+      token: null,
+    });
+    return true;
   }
 
   async resetPassword(username: string): Promise<boolean> {

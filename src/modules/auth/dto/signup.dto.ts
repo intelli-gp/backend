@@ -1,13 +1,10 @@
 import {
-  IsArray,
   IsDate,
   IsEmail,
   IsNotEmpty,
   IsPhoneNumber,
-  IsString,
   IsUrl,
   MinLength,
-  ValidateNested,
 } from 'class-validator';
 
 export class SignUpDto {
@@ -41,10 +38,4 @@ export class SignUpDto {
 
   @IsUrl()
   image: string;
-
-  @IsNotEmpty()
-  @IsArray()
-  @ValidateNested()
-  @IsString({ each: true })
-  interests: string[];
 }

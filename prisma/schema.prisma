@@ -251,10 +251,11 @@ model user {
   full_name         String           @db.VarChar(100)
   phone_number      String           @db.VarChar(50)
   image             String?
-  level_id          Int
-  plan_id           Int
+  level_id          Int              @default(1)
+  plan_id           Int              @default(1)
   renewal_date      DateTime         @db.Date
   subscription_date DateTime         @db.Date
+  active            Boolean          @default(false)
   ai_output         ai_output[]
   article           article[]
   group_user        group_user[]
