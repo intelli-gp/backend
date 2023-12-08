@@ -16,21 +16,22 @@ export class AuthService {
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
-    const fullName = this.makeFullName(signUpDto.fname, signUpDto.lname);
+    const full_name = this.makeFullName(signUpDto.fname, signUpDto.lname);
     const password = await encode(signUpDto.password);
+    const image = signUpDto.image ? new URL(signUpDto.image).toString() : null;
     const renewal_date = new Date(
       new Date().setMonth(new Date().getMonth() + 1),
     );
 
     const userData = {
       password,
-      full_name: fullName,
+      full_name,
+      image,
+      renewal_date,
       username: signUpDto.username,
       email: signUpDto.email,
       phone_number: signUpDto.phoneNumber,
       dob: new Date(signUpDto.dob),
-      image: signUpDto.image,
-      renewal_date: renewal_date,
       subscription_date: new Date(),
       level_id: 1,
       plan_id: 1,

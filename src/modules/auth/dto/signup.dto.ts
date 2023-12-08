@@ -36,6 +36,5 @@ export class SignUpDto {
   @IsDate()
   dob: Date;
 
-  @IsUrl()
   image: string;
 }

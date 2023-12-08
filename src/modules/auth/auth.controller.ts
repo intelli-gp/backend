@@ -69,7 +69,11 @@ export class AuthController {
       token,
       password,
     );
-    if (data) return { message: 'Password changed successfully', data };
+    if (data)
+      return {
+        message: 'Password changed successfully',
+        data: new SerializedUser(data),
+      };
     else return { message: 'something went wrong' };
   }
 }
