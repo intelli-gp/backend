@@ -4,7 +4,6 @@ import {
   IsEmail,
   IsNotEmpty,
   IsPhoneNumber,
-  IsUrl,
   MinLength,
 } from 'class-validator';
 
@@ -44,18 +43,6 @@ export class SignUpDto {
   @IsDate()
   dob: Date;
 
-<<<<<<< HEAD
-  image: string;
-=======
   @ApiProperty({ required: true, example: 'https://image.com' })
-  @IsUrl()
   image: string;
-
-  @ApiProperty({ required: true, example: ['interest1', 'interest2'] })
-  @IsNotEmpty()
-  @IsArray()
-  @ValidateNested()
-  @IsString({ each: true })
-  interests: string[];
->>>>>>> feat-local/google-auth
 }
