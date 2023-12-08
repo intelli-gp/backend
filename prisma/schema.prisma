@@ -242,31 +242,33 @@ model user_tag {
 }
 
 model user {
-  user_id           Int              @id @default(autoincrement())
-  username          String           @unique @db.VarChar(30)
-  email             String           @unique @db.VarChar(100)
-  password          String           @db.VarChar(100)
-  dob               DateTime         @db.Date
-  points            Int              @default(0)
-  full_name         String           @db.VarChar(100)
-  phone_number      String           @db.VarChar(50)
-  image             String?
-  level_id          Int              @default(1)
-  plan_id           Int              @default(1)
-  renewal_date      DateTime         @db.Date
-  subscription_date DateTime         @db.Date
-  active            Boolean          @default(false)
-  ai_output         ai_output[]
-  article           article[]
-  group_user        group_user[]
-  group             group[]
-  message_ai        message_ai[]
-  message           message[]
-  notification      notification[]
-  payment_method    payment_method[]
-  task              task[]
-  user_badge        user_badge[]
-  user_tag          user_tag[]
-  level             level            @relation(fields: [level_id], references: [level_id], onDelete: Cascade, onUpdate: Cascade)
-  plan              plan             @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
+  user_id              Int       @id @default(autoincrement())
+  username             String    @unique @db.VarChar(30)
+  email                String    @unique @db.VarChar(100)
+  password             String    @db.VarChar(100)
+  dob                  DateTime? @db.Date
+  points               Int?      @default(0)
+  full_name            String    @db.VarChar(100)
+  phone_number         String?   @db.VarChar(50)
+  image                String?
+  level_id             Int       @default(1)
+  plan_id              Int       @default(1)
+  renewal_date         DateTime  @db.Date
+  subscription_date    DateTime  @db.Date
+  active               Boolean   @default(false)
+  hashed_refresh_token String?   @db.VarChar(100)
+
+  ai_output      ai_output[]
+  article        article[]
+  group_user     group_user[]
+  group          group[]
+  message_ai     message_ai[]
+  message        message[]
+  notification   notification[]
+  payment_method payment_method[]
+  task           task[]
+  user_badge     user_badge[]
+  user_tag       user_tag[]
+  level          level            @relation(fields: [level_id], references: [level_id], onDelete: Cascade, onUpdate: Cascade)
+  plan           plan             @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
 }
