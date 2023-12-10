@@ -25,3 +25,31 @@ export class PrismaFilter<T> implements ExceptionFilter {
     });
   }
 }
+
+@Catch(HttpException)
+export class BrokenLinkFilter<T> implements ExceptionFilter {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const status = exception.getStatus();
+
+    response.status(status).json({
+      statusCode: status,
+      data: { message: exception.getResponse()['message'] },
+    });
+  }
+}
+
+@Catch(HttpException)
+export class NotFoundFilter<T> implements ExceptionFilter {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const status = exception.getStatus();
+
+    response.status(status).json({
+      statusCode: status,
+      data: { message: exception.getResponse()['message'] },
+    });
+  }
+}
