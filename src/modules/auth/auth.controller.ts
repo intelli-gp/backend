@@ -45,6 +45,7 @@ export class AuthController {
     else return { message: data.message, data: null };
   }
 
+  @Public()
   @Get('verify/:username/:token')
   async verify(
     @Param('username') username: string,
@@ -61,6 +62,7 @@ export class AuthController {
       };
   }
 
+  @Public()
   @Get('reset-password/:username')
   async resetPassword(@Param('username') username: string) {
     const data = await this.authService.resetPassword(username);
@@ -71,6 +73,7 @@ export class AuthController {
     else return { message: 'something went wrong' };
   }
 
+  @Public()
   @Post('reset-password/:username/:token')
   async resetPasswordConfirm(
     @Param('username') username: string,
