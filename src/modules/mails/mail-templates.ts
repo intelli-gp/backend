@@ -236,6 +236,7 @@ export default class templates {
   }
   static reset_password(data: { email: string; token: string }): string {
     const { email, token } = data;
+    const targetUrl = `${process.env.FRONT_URL}/#/auth/reset-password?email=${email}&token=${token}`;
     return `
 <!DOCTYPE html>
   <html>
@@ -390,7 +391,7 @@ export default class templates {
             <!-- start copy -->
             <tr>
               <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                <p style="margin: 0;">Tap the button below to reset your password. If you didn't reset password with <a href="${process.env.SERVER_URL}/api/auth/reset/${email}/${token}">Paste</a>, you can safely delete this email.</p>
+                <p style="margin: 0;">Tap the button below to reset your password. If you didn't reset password with <a href=${targetUrl}>Paste</a>, you can safely delete this email.</p>
               </td>
             </tr>
             <!-- end copy -->
@@ -404,7 +405,7 @@ export default class templates {
                       <table border="0" cellpadding="0" cellspacing="0">
                         <tr>
                           <td align="center" bgcolor="#1a82e2" style="border-radius: 6px;">
-                            <a href="${process.env.SERVER_URL}/api/auth/reset-password/${email}/${token}" target="_blank" style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;">Reset your password</a>
+                            <a href=${targetUrl} target="_blank" style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;">Reset your password</a>
                           </td>
                         </tr>
                       </table>
@@ -419,7 +420,7 @@ export default class templates {
             <tr>
               <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
                 <p style="margin: 0;">If that doesn't work, copy and paste the following link in your browser:</p>
-                <p style="margin: 0;"><a href="${process.env.SERVER_URL}/api/auth/reset-password/${email}/${token}" target="_blank">${process.env.SERVER_URL}/api/auth/reset-password/${email}/${token}</a></p>
+                <p style="margin: 0;"><a href=${targetUrl} target="_blank">${targetUrl}</a></p>
               </td>
             </tr>
             <!-- end copy -->
