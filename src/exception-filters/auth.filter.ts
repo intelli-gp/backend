@@ -13,15 +13,10 @@ export class PrismaFilter<T> implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
-    const resData = exception.getResponse();
-    console.log(resData);
 
     response.status(status).json({
       statusCode: status,
-      data: {
-        message: PrismaErrors[resData['errorCode']],
-        field: resData['errorTarget'][0],
-      },
+      data: exception.getResponse(),
     });
   }
 }
