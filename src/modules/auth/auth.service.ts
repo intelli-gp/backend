@@ -229,28 +229,26 @@ export class AuthService {
       plan_id: 1,
     };
 
-    const user = await this.prismaService.user.create({
-      data: { ...userData },
-    });
+    const transaction = await this.prismaService
+      .$transaction(async (prisma) => {
+        const user = await prisma.user.create({
+          data: { ...userData },
+        });
 
-    const randomUUID = uuid();
+        await this.sendVerificationMail(userData.username, userData.email);
 
-    await this.cacheService.set(userData.username, randomUUID, 15 * 1000 * 60);
+        return { message: 'Verification mail sent', user };
+      })
+      .catch((err) => {
+        console.log(err);
 
-    await this.mailService.sendMail(
-      userData.email,
-      'Welcome to our website',
-      1,
-      {
-        username: userData.username,
-        token: randomUUID,
-      },
-    );
+        return {
+          errorCode: err.code,
+          errorTarget: err.meta.target,
+        };
+      });
 
-    return {
-      message: 'We sent you a verification mail',
-      data: user,
-    };
+    return transaction;
   }
 
   private makeFullName(fname: string, lname: string) {
@@ -276,18 +274,19 @@ export class AuthService {
     return true;
   }
 
-  async resetPassword(username: string): Promise<boolean> {
+  async resetPassword(email: string): Promise<boolean> {
     const user = await this.prismaService.user.findUnique({
-      where: { username },
+      where: { email },
     });
+    console.log(email);
 
     if (user) {
       const randomUUID = uuid();
 
-      await this.cacheService.set(user.username, randomUUID, 15 * 60 * 1000);
+      await this.cacheService.set(user.email, randomUUID, 15 * 60 * 1000);
 
-      await this.mailService.sendMail(user.email, 'Reset your password', 2, {
-        username: user.username,
+      await this.mailService.sendMail(email, 'Reset your password', 2, {
+        email,
         token: randomUUID,
       });
 
@@ -295,20 +294,16 @@ export class AuthService {
     } else return false;
   }
 
-  async resetPasswordConfirm(
-    username: string,
-    token: string,
-    password: string,
-  ) {
-    const cachedToken: string = await this.cacheService.get(username);
+  async resetPasswordConfirm(email: string, token: string, password: string) {
+    const cachedToken: string = await this.cacheService.get(email);
 
     if (cachedToken === token) {
-      await this.cacheService.del(username);
+      await this.cacheService.del(email);
 
       const hashedPassword = await encode(password);
 
       const user = await this.prismaService.user.update({
-        where: { username },
+        where: { email },
         data: { password: hashedPassword },
       });
 
