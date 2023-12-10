@@ -43,6 +43,8 @@ export class AuthController {
 
   @Public()
   @Post('signup')
+  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.BAD_REQUEST)
   @UseFilters(new PrismaFilter())
   async signUp(@Body() signUpDto: SignUpDto) {
     const data: any = await this.authService.signUp(signUpDto);
@@ -51,6 +53,12 @@ export class AuthController {
         data: new SerializedUser(data.user),
       });
     else throw new BadRequestException(data);
+  }
+
+  @Get('send-verification/:username')
+  async resendVerification(@Param('username') username: string) {
+    await this.authService.sendVerificationMail(username, null);
+    return sendSuccessResponse(null);
   }
 
   @Public()
