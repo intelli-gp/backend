@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDate,
+  IsDateString,
   IsEmail,
   IsNotEmpty,
   IsPhoneNumber,
@@ -40,8 +41,8 @@ export class SignUpDto {
 
   @ApiProperty({ required: true, example: '2020-01-01' })
   @IsNotEmpty()
-  @IsDate()
-  dob: Date;
+  @IsDateString()
+  dob: string;
 
   @ApiProperty({ required: true, example: 'https://image.com' })
   image: string;

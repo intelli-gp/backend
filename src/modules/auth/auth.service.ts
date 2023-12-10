@@ -196,6 +196,7 @@ export class AuthService {
         JSON.stringify(incompleteUserData),
     );
   }
+
   async googleRedirect(payloadData: GooglePayload, res: Response) {
     if (payloadData.state === 'login') {
       return await this.googleLogin(payloadData.user, res);
@@ -212,6 +213,8 @@ export class AuthService {
       new Date().setMonth(new Date().getMonth() + 1),
     );
 
+    const dob = new Date(signUpDto.dob);
+
     const userData = {
       password,
       full_name,
@@ -220,7 +223,7 @@ export class AuthService {
       username: signUpDto.username,
       email: signUpDto.email,
       phone_number: signUpDto.phoneNumber,
-      dob: new Date(signUpDto.dob),
+      dob,
       subscription_date: new Date(),
       level_id: 1,
       plan_id: 1,
