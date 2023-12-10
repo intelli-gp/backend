@@ -251,6 +251,26 @@ export class AuthService {
     return transaction;
   }
 
+  async sendVerificationMail(username: string, email: string) {
+    email
+      ? email
+      : (
+          await this.prismaService.user.findUnique({
+            where: { username },
+          })
+        ).email;
+
+    if (email === null) return false;
+    const randomUUID = uuid();
+
+    this.cacheService.set(username, randomUUID, 15 * 60 * 1000);
+
+    this.mailService.sendMail(email, 'Welcome to our website', 1, {
+      username: username,
+      token: randomUUID,
+    });
+  }
+
   private makeFullName(fname: string, lname: string) {
     return fname.trim() + ' ' + lname.trim();
   }
