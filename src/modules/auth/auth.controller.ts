@@ -35,12 +35,16 @@ import {
   PrismaFilter,
 } from 'src/exception-filters/auth.filter';
 import { loginResult } from './types/login.response';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 @ApiTags('Auth')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Public()
   @Post('signup')
@@ -66,11 +70,12 @@ export class AuthController {
   @Get('verify/:email/:token')
   @UseFilters(new BrokenLinkFilter())
   async verify(
+    @Res({ passthrough: true }) res,
     @Param('email') username: string,
     @Param('token') token: string,
   ) {
     const verified = await this.authService.verify(username, token);
-    if (verified) return sendSuccessResponse(null);
+    if (verified) res.redirect(this.config.get('FRONTEND_URL') + '#/app');
     else throw new BadRequestException('broken link');
   }
 
@@ -96,10 +101,7 @@ export class AuthController {
       token,
       password,
     );
-    if (data)
-      return sendSuccessResponse({
-        data: new SerializedUser(data),
-      });
+    if (data) return sendSuccessResponse({});
     else throw new BadRequestException('broken link');
   }
 
