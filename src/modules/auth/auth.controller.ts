@@ -67,15 +67,15 @@ export class AuthController {
   }
 
   @Public()
-  @Get('verify/:email/:token')
+  @Get('verify/:username/:token')
   @UseFilters(new BrokenLinkFilter())
   async verify(
     @Res({ passthrough: true }) res,
-    @Param('email') username: string,
+    @Param('username') username: string,
     @Param('token') token: string,
   ) {
     const verified = await this.authService.verify(username, token);
-    if (verified) res.redirect(this.config.get('FRONTEND_URL') + '#/app');
+    if (verified) res.redirect(this.config.get('FRONT_URL') + '#/app');
     else throw new BadRequestException('broken link');
   }
 
