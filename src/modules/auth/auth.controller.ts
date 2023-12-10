@@ -11,6 +11,9 @@ import {
   ClassSerializerInterceptor,
   UseInterceptors,
   Param,
+  BadRequestException,
+  UseFilters,
+  NotFoundException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -26,6 +29,11 @@ import { GooglePayload } from './types/google.payload';
 import { LinkedinGuard } from './guards/linkedin.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { RtGuard } from './guards/refresh.jwt.guard';
+import {
+  BrokenLinkFilter,
+  NotFoundFilter,
+  PrismaFilter,
+} from 'src/exception-filters/auth.filter';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -35,62 +43,55 @@ export class AuthController {
 
   @Public()
   @Post('signup')
+  @UseFilters(new PrismaFilter())
   async signUp(@Body() signUpDto: SignUpDto) {
-    const data = await this.authService.signUp(signUpDto);
-    if (data.data)
-      return {
-        message: 'We sent you a verification mail',
-        data: new SerializedUser(data.data),
-      };
-    else return { message: data.message, data: null };
+    const data: any = await this.authService.signUp(signUpDto);
+    if (data.user)
+      return sendSuccessResponse({
+        data: new SerializedUser(data.user),
+      });
+    else throw new BadRequestException(data);
   }
 
   @Public()
-  @Get('verify/:username/:token')
+  @Get('verify/:email/:token')
+  @UseFilters(new BrokenLinkFilter())
   async verify(
-    @Param('username') username: string,
+    @Param('email') username: string,
     @Param('token') token: string,
   ) {
     const verified = await this.authService.verify(username, token);
-    if (verified)
-      return {
-        message: 'We sent you a verification mail',
-      };
-    else
-      return {
-        message: 'something went wrong',
-      };
+    if (verified) return sendSuccessResponse(null);
+    else throw new BadRequestException('broken link');
   }
 
   @Public()
-  @Get('reset-password/:username')
-  async resetPassword(@Param('username') username: string) {
-    const data = await this.authService.resetPassword(username);
-    if (data)
-      return {
-        message: 'We sent you a mail press the link there',
-      };
-    else return { message: 'something went wrong' };
+  @Get('reset-password/:email')
+  @UseFilters(new NotFoundFilter())
+  async resetPassword(@Param('email') email: string) {
+    const data = await this.authService.resetPassword(email);
+    if (data) return sendSuccessResponse(null);
+    throw new NotFoundException('email not found');
   }
 
   @Public()
-  @Post('reset-password/:username/:token')
+  @Post('reset-password/:email/:token')
+  @UseFilters(new BrokenLinkFilter())
   async resetPasswordConfirm(
-    @Param('username') username: string,
+    @Param('email') email: string,
     @Param('token') token: string,
     @Body('password') password: string,
   ) {
     const data = await this.authService.resetPasswordConfirm(
-      username,
+      email,
       token,
       password,
     );
     if (data)
-      return {
-        message: 'Password changed successfully',
+      return sendSuccessResponse({
         data: new SerializedUser(data),
-      };
-    else return { message: 'something went wrong' };
+      });
+    else throw new BadRequestException('broken link');
   }
 
   @Public()
