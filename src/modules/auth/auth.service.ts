@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, Inject } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Inject,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -18,6 +23,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { v4 as uuid } from 'uuid';
 import { PrismaErrors } from 'src/exception-filters/types/prisma-errors';
+import { loginResult } from './types/login.response';
 
 @Injectable()
 export class AuthService {
@@ -50,6 +56,13 @@ export class AuthService {
       this.issueAccessToken(payload),
       this.issueRefreshToken(payload),
     ]);
+    await this.updateHashedRefreshToken(
+      {
+        userId: payload.userId,
+        userEmail: payload.userEmail,
+      },
+      refreshToken,
+    );
     return {
       accessToken,
       refreshToken,
@@ -128,7 +141,7 @@ export class AuthService {
     return tokens;
   }
 
-  async loginLocal(loginDto: LoginDto) {
+  async loginLocal(loginDto: LoginDto): Promise<loginResult> {
     const user = await this.prismaService.user.findUnique({
       where: {
         email: loginDto.email,
@@ -146,14 +159,11 @@ export class AuthService {
       userId: user.user_id,
       userEmail: user.email,
     });
-    await this.updateHashedRefreshToken(
-      {
-        userId: user.user_id,
-        userEmail: user.email,
-      },
-      tokens.refreshToken,
-    );
-    return { tokens, user };
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user,
+    };
   }
 
   async logout(userId: number) {
@@ -174,17 +184,17 @@ export class AuthService {
 
   async googleLogin(userData: user, res: Response) {
     console.log('here in google callback');
-    const { tokens } = await this.loginLocal({
-      email: userData.email,
-      password: userData.password,
+    const { accessToken, refreshToken } = await this.issueTokens({
+      userEmail: userData.email,
+      userId: userData.user_id,
     });
 
-    sendRefreshToken(res, tokens.refreshToken);
+    sendRefreshToken(res, refreshToken);
 
     res.redirect(
       this.config.get('FRONT_URL') +
         '#/auth/login/?token=' +
-        tokens.accessToken +
+        accessToken +
         '&user=' +
         JSON.stringify(userData),
     );
@@ -206,7 +216,7 @@ export class AuthService {
     }
   }
 
-  async signUp(signUpDto: SignUpDto) {
+  async signUp(signUpDto: SignUpDto): Promise<loginResult> {
     const full_name = this.makeFullName(signUpDto.fname, signUpDto.lname);
     const password = await encode(signUpDto.password);
     const image = signUpDto.image ? new URL(signUpDto.image).toString() : null;
@@ -228,25 +238,22 @@ export class AuthService {
       level_id: 1,
       plan_id: 1,
     };
-
-    const transaction = await this.prismaService
-      .$transaction(async (prisma) => {
-        const user = await prisma.user.create({
-          data: { ...userData },
-        });
-
-        await this.sendVerificationMail(userData.username, userData.email);
-
-        return { message: 'Verification mail sent', user };
-      })
-      .catch((err) => {
-        return {
-          errorCode: PrismaErrors[err.code] || err.code,
-          errorTarget: err.meta.target,
-        };
+    try {
+      const user = await this.prismaService.user.create({
+        data: { ...userData },
       });
-
-    return transaction;
+      await this.sendVerificationMail(user.username, user.email);
+      const { accessToken, refreshToken } = await this.issueTokens({
+        userId: user.user_id,
+        userEmail: user.email,
+      });
+      return { accessToken, refreshToken, user };
+    } catch (error) {
+      throw new BadRequestException({
+        errorCode: PrismaErrors[error.code] || error.code,
+        errorTarget: error.meta.target,
+      });
+    }
   }
 
   async sendVerificationMail(username: string, email: string) {

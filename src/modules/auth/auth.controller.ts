@@ -34,6 +34,7 @@ import {
   NotFoundFilter,
   PrismaFilter,
 } from 'src/exception-filters/auth.filter';
+import { loginResult } from './types/login.response';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -46,13 +47,13 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @HttpCode(HttpStatus.BAD_REQUEST)
   @UseFilters(new PrismaFilter())
-  async signUp(@Body() signUpDto: SignUpDto) {
-    const data: any = await this.authService.signUp(signUpDto);
-    if (data.user)
-      return sendSuccessResponse({
-        user: new SerializedUser(data.user),
-      });
-    else throw new BadRequestException(data);
+  async signUp(@Res({ passthrough: true }) res, @Body() signUpDto: SignUpDto) {
+    const data: loginResult = await this.authService.signUp(signUpDto);
+    sendRefreshToken(res, data.refreshToken);
+    return sendSuccessResponse({
+      user: new SerializedUser(data.user),
+      access_token: data.accessToken,
+    });
   }
 
   @Get('send-verification/:username')
@@ -121,11 +122,12 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Res({ passthrough: true }) res, @Body() loginDto: LoginDto) {
-    const { tokens, user } = await this.authService.loginLocal(loginDto);
+    const { accessToken, refreshToken, user } =
+      await this.authService.loginLocal(loginDto);
 
-    sendRefreshToken(res, tokens.refreshToken);
+    sendRefreshToken(res, refreshToken);
     return sendSuccessResponse({
-      access_token: tokens.accessToken,
+      access_token: accessToken,
       user: new SerializedUser(user),
     });
   }
