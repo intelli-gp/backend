@@ -50,7 +50,7 @@ export class AuthController {
     const data: any = await this.authService.signUp(signUpDto);
     if (data.user)
       return sendSuccessResponse({
-        data: new SerializedUser(data.user),
+        user: new SerializedUser(data.user),
       });
     else throw new BadRequestException(data);
   }

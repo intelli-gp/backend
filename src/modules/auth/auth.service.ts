@@ -17,6 +17,7 @@ import { sendRefreshToken } from 'src/utils/response.handler';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { v4 as uuid } from 'uuid';
+import { PrismaErrors } from 'src/exception-filters/types/prisma-errors';
 
 @Injectable()
 export class AuthService {
@@ -209,11 +210,10 @@ export class AuthService {
     const full_name = this.makeFullName(signUpDto.fname, signUpDto.lname);
     const password = await encode(signUpDto.password);
     const image = signUpDto.image ? new URL(signUpDto.image).toString() : null;
+    const dob = new Date(signUpDto.dob);
     const renewal_date = new Date(
       new Date().setMonth(new Date().getMonth() + 1),
     );
-
-    const dob = new Date(signUpDto.dob);
 
     const userData = {
       password,
@@ -240,10 +240,8 @@ export class AuthService {
         return { message: 'Verification mail sent', user };
       })
       .catch((err) => {
-        console.log(err);
-
         return {
-          errorCode: err.code,
+          errorCode: PrismaErrors[err.code] || err.code,
           errorTarget: err.meta.target,
         };
       });
