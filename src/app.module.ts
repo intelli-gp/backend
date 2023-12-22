@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 import { APP_GUARD } from '@nestjs/core';
@@ -14,6 +15,7 @@ import { AtGuard } from './modules/auth/guards/access.jwt.guard';
     }),
     PrismaModule,
     AuthModule,
+    UsersModule,
     CacheModule.register({
       isGlobal: true,
       store: redisStore,

@@ -5,10 +5,9 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { PrismaErrors } from './types/prisma-errors';
 
 @Catch(HttpException)
-export class PrismaFilter<T> implements ExceptionFilter {
+export class PrismaFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -22,7 +21,7 @@ export class PrismaFilter<T> implements ExceptionFilter {
 }
 
 @Catch(HttpException)
-export class BrokenLinkFilter<T> implements ExceptionFilter {
+export class BrokenLinkFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -36,7 +35,7 @@ export class BrokenLinkFilter<T> implements ExceptionFilter {
 }
 
 @Catch(HttpException)
-export class NotFoundFilter<T> implements ExceptionFilter {
+export class NotFoundFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

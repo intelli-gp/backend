@@ -1,12 +1,11 @@
 import {
-  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
   HttpCode,
   HttpStatus,
   Param,
-  Post,
+  Patch,
   UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
@@ -20,13 +19,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post('update/:id')
+  @Patch('update/:id')
   @HttpCode(HttpStatus.CREATED)
   @HttpCode(HttpStatus.BAD_REQUEST)
   @UseFilters()
-  async update(@Param('id') id: number, @Body() data: UpdateUserDto) {
+  async update(@Param('id') user_id: number, @Body() data: UpdateUserDto) {
     const updatedUser = new SerializedUser(
-      await this.usersService.updateUser(id, data),
+      await this.usersService.updateUser(+user_id, data),
     );
     return sendSuccessResponse({ data: updatedUser });
   }

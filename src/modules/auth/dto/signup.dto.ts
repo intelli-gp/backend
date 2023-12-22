@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsDate,
   IsDateString,
   IsEmail,
   IsNotEmpty,
   IsPhoneNumber,
+  Matches,
   MinLength,
 } from 'class-validator';
 
@@ -32,6 +32,9 @@ export class SignUpDto {
   @ApiProperty({ required: true, example: 'Testpassword@1234' })
   @IsNotEmpty()
   @MinLength(8)
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$/,
+  )
   password: string;
 
   @ApiProperty({ required: true, example: '+xx1050790880' })

@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsPhoneNumber, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsEmail,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateUserDto {
   @ApiProperty({ required: false, example: 'John32' })
@@ -20,6 +27,7 @@ export class UpdateUserDto {
 
   @ApiProperty({ required: false, example: '+xx1050790880' })
   @IsPhoneNumber()
+  @IsOptional()
   phoneNumber: string;
 
   @ApiProperty({ required: false, example: 'https://image.com' })
@@ -29,5 +37,7 @@ export class UpdateUserDto {
     required: false,
     example: ['gaming', 'programming', 'backend'],
   })
+  @IsArray()
+  @IsString({ each: true })
   interests: string[];
 }
