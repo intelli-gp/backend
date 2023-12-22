@@ -1,8 +1,8 @@
 import {
-  ForbiddenException,
   Injectable,
   Inject,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -93,13 +93,13 @@ export class AuthService {
         user_id: userId,
       },
     });
-    if (!user) throw new ForbiddenException('Access Denied');
+    if (!user) throw new UnauthorizedException('unauthorized user');
 
     const isMatching = await bcrypt.compare(
       refreshToken,
       user.hashed_refresh_token,
     );
-    if (!isMatching) throw new ForbiddenException('Access Denied');
+    if (!isMatching) throw new UnauthorizedException('Action Denied');
 
     return user;
   }
@@ -126,7 +126,7 @@ export class AuthService {
 
   async refreshTokens(refreshToken: string, userId: number): Promise<Tokens> {
     const user = await this.validateRefreshToken(refreshToken, userId);
-    if (!user) throw new ForbiddenException('Access Denied');
+    if (!user) throw new UnauthorizedException('Unauthorized User');
     const tokens = await this.issueTokens({
       userId: user.user_id,
       userEmail: user.email,
@@ -148,11 +148,11 @@ export class AuthService {
       },
     });
     console.log(user);
-    if (!user) throw new ForbiddenException('Access Denied');
+    if (!user) throw new UnauthorizedException('Invalid Credentials');
 
     const isMatching = await bcrypt.compare(loginDto.password, user.password);
     if (!isMatching && !(loginDto.password === user.password)) {
-      throw new ForbiddenException('Access Denied');
+      throw new UnauthorizedException('Invalid Credentials');
     }
 
     const tokens = await this.issueTokens({
