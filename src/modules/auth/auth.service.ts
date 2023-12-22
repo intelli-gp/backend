@@ -119,7 +119,7 @@ export class AuthService {
         userProfile._json.given_name + ' ' + userProfile._json.family_name,
       email: userProfile._json.email,
       points: 0,
-      image: userProfile._json.profile,
+      image: userProfile._json.picture,
     } as user;
     return { user: incompleteUserData, state: 'signup' };
   }
