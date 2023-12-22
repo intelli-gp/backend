@@ -9,11 +9,11 @@ datasource db {
 
 model ai_output_tag {
   ai_output_id Int
-  tag_id       Int
+  tag_name     String
   ai_output    ai_output @relation(fields: [ai_output_id], references: [ai_output_id], onDelete: Cascade, onUpdate: Cascade)
-  tag          tag       @relation(fields: [tag_id], references: [tag_id], onDelete: Cascade, onUpdate: Cascade)
+  tag          tag       @relation(fields: [tag_name], references: [tag_name], onDelete: Cascade, onUpdate: Cascade)
 
-  @@id([ai_output_id, tag_id])
+  @@id([ai_output_id, tag_name])
 }
 
 model ai_output {
@@ -28,11 +28,11 @@ model ai_output {
 
 model article_tag {
   article_id Int
-  tag_id     Int
+  tag_name   String
   article    article @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
-  tag        tag     @relation(fields: [tag_id], references: [tag_id], onDelete: Cascade, onUpdate: Cascade)
+  tag        tag     @relation(fields: [tag_name], references: [tag_name], onDelete: Cascade, onUpdate: Cascade)
 
-  @@id([article_id, tag_id])
+  @@id([article_id, tag_name])
 }
 
 model article {
@@ -78,11 +78,11 @@ model badges {
 
 model course_tag {
   course_id Int
-  tag_id    Int
+  tag_name  String
   course    course @relation(fields: [course_id], references: [course_id], onDelete: Cascade, onUpdate: Cascade)
-  tag       tag    @relation(fields: [tag_id], references: [tag_id], onDelete: Cascade, onUpdate: Cascade)
+  tag       tag    @relation(fields: [tag_name], references: [tag_name], onDelete: Cascade, onUpdate: Cascade)
 
-  @@id([course_id, tag_id])
+  @@id([course_id, tag_name])
 }
 
 model course {
@@ -97,11 +97,11 @@ model course {
 
 model group_tag {
   group_id Int
-  tag_id   Int
-  group    group @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
-  tag      tag   @relation(fields: [tag_id], references: [tag_id], onDelete: Cascade, onUpdate: Cascade)
+  tag_name String
+  group    group  @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
+  tag      tag    @relation(fields: [tag_name], references: [tag_name], onDelete: Cascade, onUpdate: Cascade)
 
-  @@id([group_id, tag_id])
+  @@id([group_id, tag_name])
 }
 
 model group_user {
@@ -203,8 +203,7 @@ model plan {
 }
 
 model tag {
-  tag_id        Int             @id @default(autoincrement())
-  name          String          @unique @db.VarChar(255)
+  tag_name      String          @id @unique @db.VarChar(255) @default("")
   ai_output_tag ai_output_tag[]
   article_tag   article_tag[]
   course_tag    course_tag[]
@@ -233,12 +232,12 @@ model user_badge {
 }
 
 model user_tag {
-  user_id Int
-  tag_id  Int
-  tag     tag  @relation(fields: [tag_id], references: [tag_id], onDelete: Cascade, onUpdate: Cascade)
-  user    user @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  user_id  Int
+  tag_name String
+  tag      tag    @relation(fields: [tag_name], references: [tag_name], onDelete: Cascade, onUpdate: Cascade)
+  user     user   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@id([user_id, tag_id])
+  @@id([user_id, tag_name])
 }
 
 model user {

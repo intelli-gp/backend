@@ -7,6 +7,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 import { APP_GUARD } from '@nestjs/core';
 import { AtGuard } from './modules/auth/guards/access.jwt.guard';
+import { TagsModule } from './modules/tags/tags.module';
 
 @Module({
   imports: [
@@ -22,6 +23,8 @@ import { AtGuard } from './modules/auth/guards/access.jwt.guard';
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
     }),
+    TagsModule,
+    TagsModule,
   ],
   controllers: [],
   providers: [

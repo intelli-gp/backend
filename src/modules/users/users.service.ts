@@ -1,12 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { user } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { encode } from 'src/utils/bcrypt';
+import { TagsService } from '../tags/tags.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly tagsService: TagsService,
+  ) {}
 
   async getUsers(): Promise<user[] | null> {
     return await this.prismaService.user.findMany();
@@ -31,42 +35,25 @@ export class UsersService {
 
     const user = await this.prismaService
       .$transaction(async (prisma) => {
-        const userr = await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
           where: { user_id: id },
         });
 
         if (interests) {
-          const tags = updateUserDto.interests.map((tag) => ({
-            name: tag.trim().toLowerCase(),
-          }));
-
-          await prisma.tag.createMany({
-            data: tags,
-            skipDuplicates: true,
-          });
-
-          const userTags = await tags.map(async (tag) => ({
-            tag_id: (await prisma.tag.findFirst({ where: { name: tag.name } }))
-              .tag_id,
-            user_id: id,
-          }));
-          const x = await Promise.all(userTags);
-          await prisma.user_tag.createMany({
-            data: x,
-            skipDuplicates: true,
-          });
+          await this.tagsService.updateInterests(interests, 'user', id);
         }
 
-        username = username ? username : userr.username;
-        fname = fname ? fname : userr.full_name.split(' ')[0];
-        lname = lname ? lname : userr.full_name.split(' ')[1];
-        email = email ? email : userr.email;
-        phoneNumber = phoneNumber ? phoneNumber : userr.phone_number;
-        image = image ? image : userr.image;
+        username = username ? username : user.username;
+        fname = fname ? fname : user.full_name.split(' ')[0];
+        lname = lname ? lname : user.full_name.split(' ')[1];
+        email = email ? email : user.email;
+        phoneNumber = phoneNumber ? phoneNumber : user.phone_number;
+        image = image ? image : user.image;
 
         const updatedUser = await this.prismaService.user.update({
-          where: { username: username },
+          where: { user_id: id },
           data: {
+            username,
             full_name: fname.trim() + ' ' + lname.trim(),
             email,
             phone_number: phoneNumber,
@@ -78,8 +65,7 @@ export class UsersService {
       })
       .catch((error) => console.log(error));
 
-    if (user) return user;
-    return null;
+    return user ? user : null;
   }
 
   async updatePassword(id, password) {

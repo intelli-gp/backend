@@ -11,18 +11,22 @@ import {
 export class UpdateUserDto {
   @ApiProperty({ required: false, example: 'John32' })
   @MinLength(4)
+  @IsOptional()
   username: string;
 
   @ApiProperty({ required: false, example: 'John' })
   @MinLength(3)
+  @IsOptional()
   fname: string;
 
   @ApiProperty({ required: false, example: 'Doe' })
   @MinLength(3)
+  @IsOptional()
   lname: string;
 
   @ApiProperty({ required: false, example: 'johndoe@gmail.com' })
   @IsEmail()
+  @IsOptional()
   email: string;
 
   @ApiProperty({ required: false, example: '+xx1050790880' })
@@ -31,6 +35,7 @@ export class UpdateUserDto {
   phoneNumber: string;
 
   @ApiProperty({ required: false, example: 'https://image.com' })
+  @IsOptional()
   image: string;
 
   @ApiProperty({
@@ -39,5 +44,6 @@ export class UpdateUserDto {
   })
   @IsArray()
   @IsString({ each: true })
+  @IsOptional()
   interests: string[];
 }

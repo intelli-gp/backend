@@ -3,7 +3,7 @@
 
 # compiled output
 /dist
-/prisma/migrations
+/prisma/migrations/*
 
 # Logs
 logs
