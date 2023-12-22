@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  nestjs:
+    container_name: intelligp-backend-api
+    build: .
+    ports:
+      - ${PORT}:${PORT}
+      - 5555:5555
+
+    depends_on:
+      - redis
+      - postgres
+    command: ["./scripts/start.sh"]
+    networks:
+      - intelligp-network 
+
+
+  redis:
+    container_name: intelligp-redis
+    image: redis:7.2.3-alpine
+    ports:
+      - 6379:6379
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+    networks:
+      - intelligp-network
+
+  postgres:
+    container_name: intelligp-postgres
+    image: postgres:16.1-alpine3.19
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PORT=${DATABASE_PORT}
+      - POSTGRES_USER=${DATABASE_USER_NAME}
+      - POSTGRES_PASSWORD=${DATABASE_USER_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+    networks:
+      - intelligp-network
+  
+networks:
+  intelligp-network:
+    name: intelligp-network
+
