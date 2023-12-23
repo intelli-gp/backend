@@ -19,9 +19,8 @@ import { GetCurrentUser } from '../auth/ParamDecorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Patch('update/:id')
+  @Patch()
   @HttpCode(HttpStatus.CREATED)
-  @HttpCode(HttpStatus.BAD_REQUEST)
   @UseFilters()
   async update(
     @GetCurrentUser('user_id') user_id: number,
