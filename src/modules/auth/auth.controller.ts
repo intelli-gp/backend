@@ -31,6 +31,12 @@ import { ApiTags } from '@nestjs/swagger';
 import { RtGuard } from './guards/refresh.jwt.guard';
 import { loginResult } from './types/login.response';
 import { ConfigService } from '@nestjs/config';
+import {
+  ResetPasswordDto,
+  VerifyUserDto,
+  ResetPasswordConfirmationParamDto,
+  ResetPasswordConfirmationBodyDto,
+} from './dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -64,18 +70,20 @@ export class AuthController {
   @Get('verify/:username/:token')
   async verify(
     @Res({ passthrough: true }) res,
-    @Param('username') username: string,
-    @Param('token') token: string,
+    @Param() verificationData: VerifyUserDto,
   ) {
-    const verified = await this.authService.verify(username, token);
+    const verified = await this.authService.verify(
+      verificationData.username,
+      verificationData.token,
+    );
     if (verified) res.redirect(this.config.get('FRONT_URL') + '#/app');
     else throw new BadRequestException('broken link');
   }
 
   @Public()
   @Get('reset-password/:email')
-  async resetPassword(@Param('email') email: string) {
-    const data = await this.authService.resetPassword(email);
+  async resetPassword(@Param() resetData: ResetPasswordDto) {
+    const data = await this.authService.resetPassword(resetData.email);
     if (data) return sendSuccessResponse(null);
     throw new NotFoundException('email not found');
   }
@@ -83,14 +91,13 @@ export class AuthController {
   @Public()
   @Post('reset-password/:email/:token')
   async resetPasswordConfirm(
-    @Param('email') email: string,
-    @Param('token') token: string,
-    @Body('password') password: string,
+    @Param() confirmationParamData: ResetPasswordConfirmationParamDto,
+    @Body() confirmationBodyData: ResetPasswordConfirmationBodyDto,
   ) {
     const data = await this.authService.resetPasswordConfirm(
-      email,
-      token,
-      password,
+      confirmationParamData.email,
+      confirmationParamData.token,
+      confirmationBodyData.password,
     );
     if (data) return sendSuccessResponse({});
     else throw new BadRequestException('broken link');
@@ -129,7 +136,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   logout(@Res({ passthrough: true }) res, @GetCurrentUser('user_id') userId) {
     res.clearCookie('refresh_token');
-    return this.authService.logout(userId);
+    return sendSuccessResponse(this.authService.logout(userId));
   }
 
   @Public()
