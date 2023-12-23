@@ -48,9 +48,4 @@ export class SignUpDto {
   @IsNotEmpty()
   @IsDateString()
   dob: string;
-
-  @ApiProperty({ required: true, example: 'https://image.com' })
-  @IsUrl()
-  @IsOptional()
-  image: string;
 }

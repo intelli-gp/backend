@@ -219,7 +219,6 @@ export class AuthService {
   async signUp(signUpDto: SignUpDto): Promise<loginResult> {
     const full_name = this.makeFullName(signUpDto.fname, signUpDto.lname);
     const password = await hashS10(signUpDto.password);
-    const image = signUpDto.image ? new URL(signUpDto.image).toString() : null;
     const dob = new Date(signUpDto.dob);
     const renewal_date = new Date(
       new Date().setMonth(new Date().getMonth() + 1),
@@ -228,7 +227,6 @@ export class AuthService {
     const userData = {
       password,
       full_name,
-      image,
       renewal_date,
       username: signUpDto.username,
       email: signUpDto.email,
