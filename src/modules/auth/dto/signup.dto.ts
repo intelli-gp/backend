@@ -3,6 +3,7 @@ import {
   IsDateString,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsPhoneNumber,
   IsUrl,
   Length,
@@ -50,5 +51,6 @@ export class SignUpDto {
 
   @ApiProperty({ required: true, example: 'https://image.com' })
   @IsUrl()
+  @IsOptional()
   image: string;
 }
