@@ -34,7 +34,7 @@ export class UsersService {
     let { username, fname, lname, email, phoneNumber, image, interests } =
       updateUserDto;
 
-    updateUserDto['full_name'] = fname.trim() + ' ' + lname.trim();
+    // updateUserDto['full_name'] = fname.trim() + ' ' + lname.trim();
 
     const user = await this.prismaService
       .$transaction(async (prisma) => {
@@ -46,20 +46,26 @@ export class UsersService {
           );
         }
 
-        const userDiff = getObjectDiff(updateUserDto, userData);
-        // username = username ? username : user.username;
-        // fname = fname ? fname : user.full_name.split(' ')[0];
-        // lname = lname ? lname : user.full_name.split(' ')[1];
-        // email = email ? email : user.email;
-        // phoneNumber = phoneNumber ? phoneNumber : user.phone_number;
-        // image = image ? image : user.image;
+        // const userDiff = getObjectDiff(updateUserDto, userData);
+        username = username ? username : user.username;
+        fname = fname ? fname : user.full_name.split(' ')[0];
+        lname = lname ? lname : user.full_name.split(' ')[1];
+        email = email ? email : user.email;
+        phoneNumber = phoneNumber ? phoneNumber : user.phone_number;
+        image = image ? image : user.image;
         let updatedUser;
-        if (userDiff) {
+        // if (userDiff) {
           updatedUser = await this.prismaService.user.update({
             where: { user_id: userData.user_id },
-            data: userDiff,
+            data: {
+              username: username,
+              full_name: fname + ' ' + lname,
+              email: email,
+              phone_number: phoneNumber,
+              image: image,
+            },
           });
-        }
+        // }
 
         return updatedUser;
       })
