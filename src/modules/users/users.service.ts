@@ -40,7 +40,7 @@ export class UsersService {
         });
 
         if (interests) {
-          await this.tagsService.updateInterests(interests, 'user', id);
+          await this.tagsService.updateTagsForTables(interests, 'user', id);
         }
 
         username = username ? username : user.username;
