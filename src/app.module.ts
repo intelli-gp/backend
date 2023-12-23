@@ -8,6 +8,7 @@ import * as redisStore from 'cache-manager-redis-store';
 import { APP_GUARD } from '@nestjs/core';
 import { AtGuard } from './modules/auth/guards/access.jwt.guard';
 import { TagsModule } from './modules/tags/tags.module';
+import { StudyPlannerModule } from './modules/study-planner/study-planner.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TagsModule } from './modules/tags/tags.module';
     }),
     TagsModule,
     TagsModule,
+    StudyPlannerModule,
   ],
   controllers: [],
   providers: [
