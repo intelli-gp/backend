@@ -13,6 +13,7 @@ import { SerializedUser } from 'src/utils/serialized-types/serialized-user';
 import { sendSuccessResponse } from 'src/utils/response.handler';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetCurrentUser } from '../auth/ParamDecorator';
+import { user } from '@prisma/client';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -22,12 +23,9 @@ export class UsersController {
   @Patch()
   @HttpCode(HttpStatus.CREATED)
   @UseFilters()
-  async update(
-    @GetCurrentUser('user_id') user_id: number,
-    @Body() data: UpdateUserDto,
-  ) {
+  async update(@GetCurrentUser() userData: user, @Body() data: UpdateUserDto) {
     const updatedUser = new SerializedUser(
-      await this.usersService.updateUser(user_id, data),
+      await this.usersService.updateUser(userData, data),
     );
     return sendSuccessResponse({
       data: updatedUser,
