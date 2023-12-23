@@ -5,9 +5,10 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { AtGuard } from './modules/auth/guards/access.jwt.guard';
 import { TagsModule } from './modules/tags/tags.module';
+import { CustomFilter } from './exception-filters/custom.filter';
 
 @Module({
   imports: [
@@ -27,6 +28,10 @@ import { TagsModule } from './modules/tags/tags.module';
   ],
   controllers: [],
   providers: [
+    {
+      provide: APP_FILTER,
+      useClass: CustomFilter,
+    },
     {
       provide: APP_GUARD,
       useClass: AtGuard,

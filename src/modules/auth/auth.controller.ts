@@ -29,11 +29,6 @@ import { GooglePayload } from './types/google.payload';
 import { LinkedinGuard } from './guards/linkedin.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { RtGuard } from './guards/refresh.jwt.guard';
-import {
-  BrokenLinkFilter,
-  NotFoundFilter,
-  PrismaFilter,
-} from 'src/exception-filters/auth.filter';
 import { loginResult } from './types/login.response';
 import { ConfigService } from '@nestjs/config';
 
@@ -50,7 +45,6 @@ export class AuthController {
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   @HttpCode(HttpStatus.BAD_REQUEST)
-  @UseFilters(new PrismaFilter())
   async signUp(@Res({ passthrough: true }) res, @Body() signUpDto: SignUpDto) {
     const data: loginResult = await this.authService.signUp(signUpDto);
     sendRefreshToken(res, data.refreshToken);
@@ -68,7 +62,6 @@ export class AuthController {
 
   @Public()
   @Get('verify/:username/:token')
-  @UseFilters(new BrokenLinkFilter())
   async verify(
     @Res({ passthrough: true }) res,
     @Param('username') username: string,
@@ -81,7 +74,6 @@ export class AuthController {
 
   @Public()
   @Get('reset-password/:email')
-  @UseFilters(new NotFoundFilter())
   async resetPassword(@Param('email') email: string) {
     const data = await this.authService.resetPassword(email);
     if (data) return sendSuccessResponse(null);
@@ -90,7 +82,6 @@ export class AuthController {
 
   @Public()
   @Post('reset-password/:email/:token')
-  @UseFilters(new BrokenLinkFilter())
   async resetPasswordConfirm(
     @Param('email') email: string,
     @Param('token') token: string,
