@@ -36,7 +36,7 @@ export class TagsService {
       take: limit,
       skip: offset,
     });
-    return tags;
+    return tags.map((tag) => tag.tag_name);
   }
 
   async getSuggestedTags(paginationData?: PaginationDto) {
