@@ -24,7 +24,6 @@ import { TagsModule } from './modules/tags/tags.module';
       port: process.env.REDIS_PORT,
     }),
     TagsModule,
-    TagsModule,
   ],
   controllers: [],
   providers: [

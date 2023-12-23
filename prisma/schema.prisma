@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows"]
 }
 
 datasource db {
@@ -203,7 +204,7 @@ model plan {
 }
 
 model tag {
-  tag_name      String          @id @unique @db.VarChar(255) @default("")
+  tag_name      String          @id @unique @default("") @db.VarChar(255)
   ai_output_tag ai_output_tag[]
   article_tag   article_tag[]
   course_tag    course_tag[]
