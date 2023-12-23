@@ -7,23 +7,23 @@ services:
     ports:
       - ${PORT}:${PORT}
       - 5555:5555
-
+    volumes:
+      - .:/app
     depends_on:
       - redis
       - postgres
-    command: ["./scripts/start.sh"]
-    networks:
-      - intelligp-network 
+    command: './scripts/start.sh'
 
+    networks:
+      - intelligp-network
 
   redis:
     container_name: intelligp-redis
-    image: redis:7.2.3-alpine
+    image: redis
     ports:
       - 6379:6379
     environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PORT=6379
     networks:
       - intelligp-network
 
@@ -39,8 +39,7 @@ services:
       - POSTGRES_DB=${DATABASE_NAME}
     networks:
       - intelligp-network
-  
+
 networks:
   intelligp-network:
     name: intelligp-network
-
