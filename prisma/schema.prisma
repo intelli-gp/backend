@@ -220,6 +220,8 @@ model task {
   user_id     Int
   status      String   @db.VarChar(255)
   user        user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([user_id])
 }
 
 model user_badge {
