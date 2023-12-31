@@ -10,7 +10,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class StudyPlannerController {
   constructor(private readonly studyPlannerService: StudyPlannerService) {}
 
-  @Post('create')
+  @Post()
   @HttpCode(HttpStatus.CREATED)
   @HttpCode(HttpStatus.BAD_REQUEST)
   @ApiOperation({ summary: 'Create a new task' })

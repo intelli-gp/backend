@@ -8,38 +8,53 @@ export class StudyPlannerService {
 
   async createTask(id: number, addTaskDto: AddTaskDto) {
     const start_date = new Date(addTaskDto.startDate);
-    const due_date = new Date(addTaskDto.startDate);
+    const due_date = new Date(addTaskDto.dueDate);
 
     // check if date is valid
-    await this.checkValidDate(id, new Date(start_date), true);
-    await this.checkValidDate(id, new Date(due_date), false);
+    await this.checkValidDate(id, start_date, due_date);
 
-    const task = await this.prismaService.task
-      .create({
-        data: {
-          title: addTaskDto.title,
-          description: addTaskDto.description,
-          start_date,
-          due_date,
-          status: addTaskDto.status,
-          user_id: id,
-        },
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const task = await this.prismaService.task.create({
+      data: {
+        title: addTaskDto.title,
+        description: addTaskDto.description,
+        start_date,
+        due_date,
+        status: addTaskDto.status,
+        user_id: id,
+      },
+    });
 
     if (!task) throw new BadRequestException();
     return task;
   }
 
-  private async checkValidDate(id: number, date: Date, isStartDate: boolean) {
+  private async checkValidDate(id: number, startDate: Date, dueDate: Date) {
+    const start_date = startDate.getTime();
+    const due_date = dueDate.getTime();
+    const currentDate = new Date().getTime();
+
+    // check if start date is before end date
+    if (start_date > due_date)
+      throw new BadRequestException({
+        message: 'Start date cannot be after due date',
+      });
+
+    // check if start date is the same as end date
+    if (start_date === due_date)
+      throw new BadRequestException({
+        message: 'Start date cannot be the same as due date',
+      });
+
     // check if date is not in the past
-    if (date < new Date())
+    if (start_date < currentDate || due_date < currentDate)
       throw new BadRequestException({ message: 'Date cannot be in the past' });
 
     // not more than 1 months in the future
-    if (date > new Date(new Date().setMonth(new Date().getMonth() + 1)))
+    const dateAfterMonth = new Date(
+      new Date().setMonth(new Date().getMonth() + 1),
+    ).getTime();
+
+    if (start_date > dateAfterMonth || due_date > dateAfterMonth)
       throw new BadRequestException({
         message: 'Date cannot be more than 1 months in the future',
       });
@@ -50,9 +65,28 @@ export class StudyPlannerService {
     });
 
     for (const task of tasks) {
-      if (date >= task.start_date && date <= task.due_date)
+      const taskStartDate = task.start_date.getTime();
+      const taskDueDate = task.due_date.getTime();
+      // if start date is in the interval of other task
+      if (start_date >= taskStartDate && start_date <= taskDueDate)
         throw new BadRequestException({
-          message: 'Date cannot be in the interval of other tasks',
+          message: 'start cannot be inside the interval of other tasks',
+        });
+
+      // if end date is in the interval of other task
+      if (due_date >= taskStartDate && due_date <= taskDueDate)
+        throw new BadRequestException({
+          message: 'end date cannot be inside the interval of other tasks',
+        });
+
+      // if some other task interval is inside this interval
+      if (
+        start_date <= taskStartDate &&
+        due_date >= taskStartDate &&
+        due_date >= taskDueDate
+      )
+        throw new BadRequestException({
+          message: 'intervals cannot be inside each other',
         });
     }
   }
