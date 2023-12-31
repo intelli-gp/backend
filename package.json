@@ -8,13 +8,15 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "docker": "nest start",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "nest start --tsc --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
+    "test:unit": "jest -i --no-cache --config ./jest-unit.json",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
@@ -37,7 +39,9 @@
     "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "nest": "^0.1.6",
     "nodemailer": "^6.9.7",
+    "nodemon": "^3.0.2",
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
@@ -46,6 +50,7 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@golevelup/ts-jest": "^0.4.0",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",

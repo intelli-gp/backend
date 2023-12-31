@@ -3,25 +3,30 @@ import {
   IsDateString,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsPhoneNumber,
+  IsUrl,
+  Length,
   Matches,
   MinLength,
 } from 'class-validator';
+import { IsStrongPassword } from 'src/utils/class-validator-decorators/password.decorator';
+import { IsValidUsername } from 'src/utils/class-validator-decorators/username.decorator';
 
 export class SignUpDto {
   @ApiProperty({ required: true, example: 'John32' })
   @IsNotEmpty()
-  @MinLength(4)
+  @IsValidUsername()
   username: string;
 
   @ApiProperty({ required: true, example: 'John' })
   @IsNotEmpty()
-  @MinLength(3)
+  @Length(3, 20)
   fname: string;
 
   @ApiProperty({ required: true, example: 'Doe' })
   @IsNotEmpty()
-  @MinLength(3)
+  @Length(3, 20)
   lname: string;
 
   @ApiProperty({ required: true, example: 'johndoe@gmail.com' })
@@ -31,10 +36,7 @@ export class SignUpDto {
 
   @ApiProperty({ required: true, example: 'Testpassword@1234' })
   @IsNotEmpty()
-  @MinLength(8)
-  @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$@!%&*?])[A-Za-z\d#$@!%&*?]{8,30}$/,
-  )
+  @IsStrongPassword()
   password: string;
 
   @ApiProperty({ required: true, example: '+xx1050790880' })
@@ -46,7 +48,4 @@ export class SignUpDto {
   @IsNotEmpty()
   @IsDateString()
   dob: string;
-
-  @ApiProperty({ required: true, example: 'https://image.com' })
-  image: string;
 }

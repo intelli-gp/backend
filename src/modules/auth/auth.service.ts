@@ -12,7 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { Tokens } from './types/tokens';
 import { user } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
-import { hashS10, encode } from 'src/utils/bcrypt';
+import { hashS10 } from 'src/utils/bcrypt';
 import { SignUpDto } from './dto/signup.dto';
 import { MailsService } from '../mails/mails.service';
 import { Profile } from 'passport-google-oauth20';
@@ -218,8 +218,7 @@ export class AuthService {
 
   async signUp(signUpDto: SignUpDto): Promise<loginResult> {
     const full_name = this.makeFullName(signUpDto.fname, signUpDto.lname);
-    const password = await encode(signUpDto.password);
-    const image = signUpDto.image ? new URL(signUpDto.image).toString() : null;
+    const password = await hashS10(signUpDto.password);
     const dob = new Date(signUpDto.dob);
     const renewal_date = new Date(
       new Date().setMonth(new Date().getMonth() + 1),
@@ -228,7 +227,6 @@ export class AuthService {
     const userData = {
       password,
       full_name,
-      image,
       renewal_date,
       username: signUpDto.username,
       email: signUpDto.email,
@@ -325,7 +323,7 @@ export class AuthService {
     if (cachedToken === token) {
       await this.cacheService.del(email);
 
-      const hashedPassword = await encode(password);
+      const hashedPassword = await hashS10(password);
 
       const user = await this.prismaService.user.update({
         where: { email },

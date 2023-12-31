@@ -29,13 +29,14 @@ import { GooglePayload } from './types/google.payload';
 import { LinkedinGuard } from './guards/linkedin.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { RtGuard } from './guards/refresh.jwt.guard';
-import {
-  BrokenLinkFilter,
-  NotFoundFilter,
-  PrismaFilter,
-} from 'src/exception-filters/auth.filter';
 import { loginResult } from './types/login.response';
 import { ConfigService } from '@nestjs/config';
+import {
+  ResetPasswordDto,
+  VerifyUserDto,
+  ResetPasswordConfirmationParamDto,
+  ResetPasswordConfirmationBodyDto,
+} from './dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -50,7 +51,6 @@ export class AuthController {
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   @HttpCode(HttpStatus.BAD_REQUEST)
-  @UseFilters(new PrismaFilter())
   async signUp(@Res({ passthrough: true }) res, @Body() signUpDto: SignUpDto) {
     const data: loginResult = await this.authService.signUp(signUpDto);
     sendRefreshToken(res, data.refreshToken);
@@ -68,38 +68,36 @@ export class AuthController {
 
   @Public()
   @Get('verify/:username/:token')
-  @UseFilters(new BrokenLinkFilter())
   async verify(
     @Res({ passthrough: true }) res,
-    @Param('username') username: string,
-    @Param('token') token: string,
+    @Param() verificationData: VerifyUserDto,
   ) {
-    const verified = await this.authService.verify(username, token);
+    const verified = await this.authService.verify(
+      verificationData.username,
+      verificationData.token,
+    );
     if (verified) res.redirect(this.config.get('FRONT_URL') + '#/app');
     else throw new BadRequestException('broken link');
   }
 
   @Public()
   @Get('reset-password/:email')
-  @UseFilters(new NotFoundFilter())
-  async resetPassword(@Param('email') email: string) {
-    const data = await this.authService.resetPassword(email);
+  async resetPassword(@Param() resetData: ResetPasswordDto) {
+    const data = await this.authService.resetPassword(resetData.email);
     if (data) return sendSuccessResponse(null);
     throw new NotFoundException('email not found');
   }
 
   @Public()
   @Post('reset-password/:email/:token')
-  @UseFilters(new BrokenLinkFilter())
   async resetPasswordConfirm(
-    @Param('email') email: string,
-    @Param('token') token: string,
-    @Body('password') password: string,
+    @Param() confirmationParamData: ResetPasswordConfirmationParamDto,
+    @Body() confirmationBodyData: ResetPasswordConfirmationBodyDto,
   ) {
     const data = await this.authService.resetPasswordConfirm(
-      email,
-      token,
-      password,
+      confirmationParamData.email,
+      confirmationParamData.token,
+      confirmationBodyData.password,
     );
     if (data) return sendSuccessResponse({});
     else throw new BadRequestException('broken link');
@@ -138,7 +136,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   logout(@Res({ passthrough: true }) res, @GetCurrentUser('user_id') userId) {
     res.clearCookie('refresh_token');
-    return this.authService.logout(userId);
+    return sendSuccessResponse(this.authService.logout(userId));
   }
 
   @Public()
