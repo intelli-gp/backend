@@ -215,7 +215,7 @@ model tag {
 model task {
   task_id     Int      @id @default(autoincrement())
   title       String   @db.VarChar(255)
-  description String
+  description String?
   due_date    DateTime @db.Timestamp
   start_date  DateTime @db.Timestamp
   user_id     Int
