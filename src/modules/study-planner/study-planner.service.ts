@@ -6,6 +6,23 @@ import AddTaskDto from './dto/add-task.dto';
 export class StudyPlannerService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  async getTasks(id: number) {
+    const tasks = await this.prismaService.task.findMany({
+      where: { user_id: id },
+    });
+
+    return tasks;
+  }
+
+  async getTask(id: number, taskId: number) {
+    const task = await this.prismaService.task.findUnique({
+      where: { task_id: taskId },
+    });
+
+    if (!task) throw new BadRequestException();
+    return task;
+  }
+
   async createTask(id: number, addTaskDto: AddTaskDto) {
     const start_date = new Date(addTaskDto.startDate);
     const due_date = new Date(addTaskDto.dueDate);
@@ -27,6 +44,8 @@ export class StudyPlannerService {
     if (!task) throw new BadRequestException();
     return task;
   }
+
+  async updateTask(taskId: number, addTaskDto: AddTaskDto) {}
 
   private async checkValidDate(id: number, startDate: Date, dueDate: Date) {
     const start_date = startDate.getTime();
