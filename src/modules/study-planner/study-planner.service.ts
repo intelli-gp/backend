@@ -102,10 +102,12 @@ export class StudyPlannerService {
         where: { task_id: taskId, user_id: userId },
       })
       .catch((err) => {
+        if (err.code === 'P2025')
+          throw new BadRequestException({ message: "Task doesn't exist" });
         throw new BadRequestException({ error: err });
       });
 
-    if (!task) throw new BadRequestException({ message: 'Task not found' });
+    if (!task) throw new BadRequestException({ message: "Task doesn't exist" });
     return 'Task has been deleted successfully';
   }
 
