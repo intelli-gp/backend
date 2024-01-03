@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import AddTaskDto from './dto/task.dto';
+import AddTaskDto from './dto/create-task.dto';
 import { PaginationDto } from 'src/common/dto';
+import UpdateTaskDto from './dto/update-task.dto';
 
 @Injectable()
 export class StudyPlannerService {
@@ -60,8 +61,12 @@ export class StudyPlannerService {
   }
 
   // TODO: incomplete
-  async updateTask(user_id: number, taskId: number, addTaskDto: AddTaskDto) {
-    const { StartDate, DueDate, Title, Description, Status } = addTaskDto;
+  async updateTask(
+    user_id: number,
+    taskId: number,
+    updateTaskDto: UpdateTaskDto,
+  ) {
+    const { StartDate, DueDate, Title, Description, Status } = updateTaskDto;
     const updatedTaskData = {};
     if ((StartDate && !DueDate) || (!StartDate && DueDate))
       throw new BadRequestException({

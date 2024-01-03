@@ -10,7 +10,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import AddTaskDto from './dto/task.dto';
+import AddTaskDto from './dto/create-task.dto';
 import { StudyPlannerService } from './study-planner.service';
 import { GetCurrentUser } from '../auth/ParamDecorator';
 import { sendSuccessResponse } from 'src/utils/response.handler';
@@ -22,6 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { SerializedTask } from 'src/utils/serialized-types/serialized-task';
 import { PaginationDto } from 'src/common/dto';
+import UpdateTaskDto from './dto/update-task.dto';
 
 // TODO: add swagger example for the return object for each output from each controller
 @Controller('study-planner')
@@ -72,7 +73,7 @@ export class StudyPlannerController {
   @ApiBadRequestResponse({
     description: 'Bad request. request parameters have something wrong',
   })
-  // TODO: Pipe need to return custome error message
+  // TODO: Pipe need to return custom error message
   async getTaskById(
     @GetCurrentUser('user_id') userId,
     @Param(
@@ -116,16 +117,31 @@ export class StudyPlannerController {
     );
   }
 
-  // TODO: incomplete
-  @Patch(':task-id')
+  // TODO: Pipe need to return custom error message
+  @Patch(':task_id')
+  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.BAD_REQUEST)
+  @ApiOperation({ summary: 'Update a task' })
+  @ApiOkResponse({ description: 'Task has been successfully updated' })
+  @ApiBadRequestResponse({
+    description: 'Bad request. request parameters have something wrong',
+  })
   async updateTask(
     @GetCurrentUser('user_id') userId,
-    @Param('task-id') taskId: number,
-    @Body() addTaskDto: AddTaskDto,
+    @Param(
+      'task_id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    taskId: number,
+    @Body() updateTaskDto: UpdateTaskDto,
   ) {
     return sendSuccessResponse(
       new SerializedTask(
-        await this.studyPlannerService.updateTask(userId, taskId, addTaskDto),
+        await this.studyPlannerService.updateTask(
+          userId,
+          taskId,
+          updateTaskDto,
+        ),
       ),
     );
   }
