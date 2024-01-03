@@ -60,9 +60,8 @@ export class StudyPlannerService {
     return task;
   }
 
-  // TODO: incomplete
   async updateTask(
-    user_id: number,
+    userId: number,
     taskId: number,
     updateTaskDto: UpdateTaskDto,
   ) {
@@ -74,11 +73,7 @@ export class StudyPlannerService {
       });
     else if (StartDate && DueDate) {
       // check if both dates are valid
-      await this.checkValidDate(
-        user_id,
-        new Date(StartDate),
-        new Date(DueDate),
-      );
+      await this.checkValidDate(userId, new Date(StartDate), new Date(DueDate));
       updatedTaskData['start_date'] = new Date(StartDate);
       updatedTaskData['due_date'] = new Date(DueDate);
     }
@@ -88,15 +83,19 @@ export class StudyPlannerService {
     if (Status) updatedTaskData['status'] = Status;
     const task = await this.prismaService.task
       .update({
-        where: { task_id: taskId },
+        where: { task_id: taskId, user_id: userId },
         data: updatedTaskData,
       })
       .catch((err) => {
+        if (err.code === 'P2025')
+          throw new BadRequestException({ message: "Task doesn't exist" });
         throw new BadRequestException({ error: err });
       });
 
+    if (!task) throw new BadRequestException({ message: 'Task not found' });
     return task;
   }
+
 
   private async checkValidDate(id: number, startDate: Date, dueDate: Date) {
     const start_date = startDate.getTime();
