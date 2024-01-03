@@ -1,51 +1,63 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import AddTaskDto from './dto/add-task.dto';
+import AddTaskDto from './dto/task.dto';
+import { PaginationDto } from 'src/common/dto';
 
 @Injectable()
 export class StudyPlannerService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getTasks(id: number) {
-    const tasks = await this.prismaService.task.findMany({
-      where: { user_id: id },
-    });
+  async getTasks(id: number, paginatedData: PaginationDto) {
+    const tasks = await this.prismaService.task
+      .findMany({
+        where: { user_id: id },
+        take: paginatedData.limit,
+        skip: paginatedData.offset,
+      })
+      .catch((err) => {
+        throw new BadRequestException({ error: err });
+      });
 
     return tasks;
   }
 
-  async getTask(id: number, taskId: number) {
-    const task = await this.prismaService.task.findUnique({
-      where: { task_id: taskId },
-    });
+  async getTask(userId: number, taskId: number) {
+    const task = await this.prismaService.task
+      .findUnique({
+        where: { task_id: taskId, user_id: userId },
+      })
+      .catch((err) => {
+        throw new BadRequestException({ error: err });
+      });
 
-    if (!task) throw new BadRequestException();
+    if (!task) throw new BadRequestException({ message: 'Task not found' });
     return task;
   }
 
   async createTask(id: number, addTaskDto: AddTaskDto) {
-    const start_date = new Date(addTaskDto.startDate);
-    const due_date = new Date(addTaskDto.dueDate);
+    const start_date = new Date(addTaskDto.StartDate);
+    const due_date = new Date(addTaskDto.DueDate);
 
-    // check if date is valid
+    // check if both dates are valid
     await this.checkValidDate(id, start_date, due_date);
 
-    const task = await this.prismaService.task.create({
-      data: {
-        title: addTaskDto.title,
-        description: addTaskDto.description,
-        start_date,
-        due_date,
-        status: addTaskDto.status,
-        user_id: id,
-      },
-    });
+    const task = await this.prismaService.task
+      .create({
+        data: {
+          title: addTaskDto.Title,
+          description: addTaskDto.Description,
+          start_date,
+          due_date,
+          status: addTaskDto.Status,
+          user_id: id,
+        },
+      })
+      .catch((err) => {
+        throw new BadRequestException({ error: err });
+      });
 
-    if (!task) throw new BadRequestException();
     return task;
   }
-
-  async updateTask(taskId: number, addTaskDto: AddTaskDto) {}
 
   private async checkValidDate(id: number, startDate: Date, dueDate: Date) {
     const start_date = startDate.getTime();

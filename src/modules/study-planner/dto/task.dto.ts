@@ -10,7 +10,7 @@ export default class AddTaskDto {
   })
   @IsNotEmpty()
   @MaxLength(255)
-  title: string;
+  Title: string;
 
   @ApiProperty({
     description: 'The description of the task',
@@ -19,7 +19,7 @@ export default class AddTaskDto {
     example: 'task 1 for CS256 assignment',
   })
   @IsOptional()
-  description: string;
+  Description: string;
 
   @ApiProperty({
     description: 'The start date of the task in the format yyyy-mm-ddThh:mm',
@@ -31,7 +31,7 @@ export default class AddTaskDto {
     message: 'Invalid date format. Must be in the format yyyy-mm-ddThh:mm',
   })
   @IsNotEmpty()
-  startDate: string;
+  StartDate: string;
 
   @ApiProperty({
     description: 'The due date of the task in the format yyyy-mm-ddThh:mm',
@@ -43,7 +43,7 @@ export default class AddTaskDto {
     message: 'Invalid date format. Must be in the format yyyy-mm-ddThh:mm',
   })
   @IsNotEmpty()
-  dueDate: string;
+  DueDate: string;
 
   @ApiProperty({
     description: 'The status of the task',
@@ -53,5 +53,5 @@ export default class AddTaskDto {
   })
   @IsNotEmpty()
   @MaxLength(255)
-  status: string;
+  Status: string;
 }
