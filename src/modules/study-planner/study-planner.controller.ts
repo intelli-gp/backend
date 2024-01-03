@@ -146,4 +146,26 @@ export class StudyPlannerController {
       ),
     );
   }
+
+  // TODO: Pipe need to return custom error message
+  @Delete(':task_id')
+  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.BAD_REQUEST)
+  @ApiOperation({ summary: 'Delete a task' })
+  @ApiOkResponse({ description: 'Task has been successfully deleted' })
+  @ApiBadRequestResponse({
+    description: 'Bad request. request parameters have something wrong',
+  })
+  async deleteTask(
+    @GetCurrentUser('user_id') userId,
+    @Param(
+      'task_id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    taskId: number,
+  ) {
+    return sendSuccessResponse(
+      await this.studyPlannerService.deleteTask(userId, taskId),
+    );
+  }
 }

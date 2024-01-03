@@ -96,6 +96,18 @@ export class StudyPlannerService {
     return task;
   }
 
+  async deleteTask(userId: any, taskId: number) {
+    const task = await this.prismaService.task
+      .delete({
+        where: { task_id: taskId, user_id: userId },
+      })
+      .catch((err) => {
+        throw new BadRequestException({ error: err });
+      });
+
+    if (!task) throw new BadRequestException({ message: 'Task not found' });
+    return 'Task has been deleted successfully';
+  }
 
   private async checkValidDate(id: number, startDate: Date, dueDate: Date) {
     const start_date = startDate.getTime();
