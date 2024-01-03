@@ -72,6 +72,7 @@ export class StudyPlannerController {
   @ApiBadRequestResponse({
     description: 'Bad request. request parameters have something wrong',
   })
+  // TODO: Pipe need to return custome error message
   async getTaskById(
     @GetCurrentUser('user_id') userId,
     @Param(
@@ -111,6 +112,20 @@ export class StudyPlannerController {
     return sendSuccessResponse(
       new SerializedTask(
         await this.studyPlannerService.createTask(id, addTaskDto),
+      ),
+    );
+  }
+
+  // TODO: incomplete
+  @Patch(':task-id')
+  async updateTask(
+    @GetCurrentUser('user_id') userId,
+    @Param('task-id') taskId: number,
+    @Body() addTaskDto: AddTaskDto,
+  ) {
+    return sendSuccessResponse(
+      new SerializedTask(
+        await this.studyPlannerService.updateTask(userId, taskId, addTaskDto),
       ),
     );
   }

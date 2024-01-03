@@ -59,6 +59,40 @@ export class StudyPlannerService {
     return task;
   }
 
+  // TODO: incomplete
+  async updateTask(user_id: number, taskId: number, addTaskDto: AddTaskDto) {
+    const { StartDate, DueDate, Title, Description, Status } = addTaskDto;
+    const updatedTaskData = {};
+    if ((StartDate && !DueDate) || (!StartDate && DueDate))
+      throw new BadRequestException({
+        message: 'when some date is to be updated, the other must be provided',
+      });
+    else if (StartDate && DueDate) {
+      // check if both dates are valid
+      await this.checkValidDate(
+        user_id,
+        new Date(StartDate),
+        new Date(DueDate),
+      );
+      updatedTaskData['start_date'] = new Date(StartDate);
+      updatedTaskData['due_date'] = new Date(DueDate);
+    }
+
+    if (Title) updatedTaskData['title'] = Title;
+    if (Description) updatedTaskData['description'] = Description;
+    if (Status) updatedTaskData['status'] = Status;
+    const task = await this.prismaService.task
+      .update({
+        where: { task_id: taskId },
+        data: updatedTaskData,
+      })
+      .catch((err) => {
+        throw new BadRequestException({ error: err });
+      });
+
+    return task;
+  }
+
   private async checkValidDate(id: number, startDate: Date, dueDate: Date) {
     const start_date = startDate.getTime();
     const due_date = dueDate.getTime();
