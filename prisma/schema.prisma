@@ -241,6 +241,16 @@ model user_tag {
   @@id([user_id, tag_name])
 }
 
+model user_follower {
+  user_id     Int
+  follower_id Int
+
+  user     user @relation(name: "followed_by", fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  follower user @relation(name: "following", fields: [follower_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([user_id, follower_id])
+}
+
 model user {
   user_id              Int       @id @default(autoincrement())
   username             String    @unique @db.VarChar(30)
@@ -271,4 +281,6 @@ model user {
   user_tag       user_tag[]
   level          level            @relation(fields: [level_id], references: [level_id], onDelete: Cascade, onUpdate: Cascade)
   plan           plan             @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
+  following      user_follower[]  @relation("following")
+  followed_by    user_follower[]  @relation("followed_by")
 }
