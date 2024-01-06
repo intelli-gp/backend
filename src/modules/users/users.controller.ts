@@ -9,14 +9,15 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { SerializedUser } from 'src/utils/serialized-types/serialized-user';
-import { sendSuccessResponse } from 'src/utils/response.handler';
+import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
+import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetCurrentUser } from '../auth/ParamDecorator';
 import { user } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
-@UseInterceptors(ClassSerializerInterceptor)
+@ApiTags('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

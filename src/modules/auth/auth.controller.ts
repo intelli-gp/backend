@@ -42,7 +42,6 @@ import { SwaggerFailureResponseExample } from 'src/common/swagger-examples/failu
 
 @Controller('auth')
 @ApiTags('Auth')
-@UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(
     private readonly authService: AuthService,

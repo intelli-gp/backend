@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
-import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AtGuard } from './modules/auth/guards/access.jwt.guard';
 import { TagsModule } from './modules/tags/tags.module';
 import { CustomFilter } from './exception-filters/custom.filter';
@@ -30,6 +30,10 @@ import { PrismaExceptionFilter } from './exception-filters/prisma.filter';
   ],
   controllers: [],
   providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
+    },
     {
       provide: APP_PIPE,
       useClass: TrimStringsPipe,
