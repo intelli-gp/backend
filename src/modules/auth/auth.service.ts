@@ -13,11 +13,11 @@ import { MailsService } from '../mails/mails.service';
 import { Profile } from 'passport-google-oauth20';
 import { GooglePayload } from './types/google.payload';
 import { Response } from 'express';
-import { sendRefreshToken } from 'src/utils/response.handler';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { v4 as uuid } from 'uuid';
 import { loginResult } from './types/login.response';
+import { sendRefreshToken } from 'src/utils/response-handler/success.response-handler';
 
 @Injectable()
 export class AuthService {
