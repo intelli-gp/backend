@@ -3,13 +3,10 @@ import {
   IsDateString,
   IsEmail,
   IsNotEmpty,
-  IsOptional,
   IsPhoneNumber,
-  IsUrl,
   Length,
-  Matches,
-  MinLength,
 } from 'class-validator';
+import { ToLowerCase } from 'src/utils/class-transformer-decorators/lowercase-transformer.decorator';
 import { IsStrongPassword } from 'src/utils/class-validator-decorators/password.decorator';
 import { IsValidUsername } from 'src/utils/class-validator-decorators/username.decorator';
 
@@ -32,6 +29,7 @@ export class SignUpDto {
   @ApiProperty({ required: true, example: 'johndoe@gmail.com' })
   @IsNotEmpty()
   @IsEmail()
+  @ToLowerCase()
   email: string;
 
   @ApiProperty({ required: true, example: 'Testpassword@1234' })

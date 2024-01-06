@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { ToLowerCase } from 'src/utils/class-transformer-decorators/lowercase-transformer.decorator';
 import { IsStrongPassword } from 'src/utils/class-validator-decorators/password.decorator';
 
 export class ResetPasswordDto {
@@ -7,6 +8,7 @@ export class ResetPasswordDto {
   @IsString()
   @IsNotEmpty()
   @IsEmail()
+  @ToLowerCase()
   email: string;
 }
 

@@ -7,10 +7,12 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
+import { IsValidUsername } from 'src/utils/class-validator-decorators/username.decorator';
 
 export class UpdateUserDto {
   @ApiProperty({ required: false, example: 'John32' })
   @MinLength(4)
+  @IsValidUsername()
   @IsOptional()
   username: string;
 

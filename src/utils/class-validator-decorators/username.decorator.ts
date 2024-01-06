@@ -12,7 +12,7 @@ export function IsValidUsername(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any) {
+        validate(value: string) {
           const regex = /^[a-z0-9_.]{3,}$/i;
           return regex.test(value);
         },
