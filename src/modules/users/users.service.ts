@@ -73,6 +73,8 @@ export class UsersService {
         },
         include: {
           user_tag: true,
+          level: true,
+          plan: true,
         },
       });
       // }

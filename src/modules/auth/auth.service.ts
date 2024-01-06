@@ -142,6 +142,8 @@ export class AuthService {
       },
       include: {
         user_tag: true,
+        level: true,
+        plan: true,
       },
     });
     console.log(user);
@@ -236,6 +238,8 @@ export class AuthService {
       data: { ...userData },
       include: {
         user_tag: true,
+        level: true,
+        plan: true,
       },
     });
     await this.sendVerificationMail(user.username, user.email);
