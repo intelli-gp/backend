@@ -71,6 +71,9 @@ export class UsersService {
           phone_number: phoneNumber,
           image: image,
         },
+        include: {
+          user_tag: true,
+        },
       });
       // }
 

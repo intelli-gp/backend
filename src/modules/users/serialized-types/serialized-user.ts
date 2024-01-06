@@ -1,5 +1,5 @@
-import { level, plan, user } from '@prisma/client';
-import { Exclude } from 'class-transformer';
+import { level, plan, user, user_tag } from '@prisma/client';
+import { Exclude, Transform } from 'class-transformer';
 
 export class SerializedUser {
   id: string;
@@ -11,7 +11,11 @@ export class SerializedUser {
   image: string;
   plan: plan;
   level: level;
-  interests: string[];
+
+  @Transform(({ value }: { value: user_tag[] }) =>
+    value.map((tag) => tag.tag_name),
+  )
+  user_tag: string[];
 
   @Exclude()
   plan_id: number;
@@ -31,8 +35,4 @@ export class SerializedUser {
   constructor(partial: Partial<user>) {
     Object.assign(this, partial);
   }
-}
-
-export class FailureResponse {
-  data: any;
 }

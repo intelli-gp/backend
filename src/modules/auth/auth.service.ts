@@ -140,6 +140,9 @@ export class AuthService {
       where: {
         email: loginDto.email,
       },
+      include: {
+        user_tag: true,
+      },
     });
     console.log(user);
     if (!user) throw new UnauthorizedException('Invalid Credentials');
@@ -231,6 +234,9 @@ export class AuthService {
     };
     const user = await this.prismaService.user.create({
       data: { ...userData },
+      include: {
+        user_tag: true,
+      },
     });
     await this.sendVerificationMail(user.username, user.email);
     const { accessToken, refreshToken } = await this.issueTokens({
