@@ -211,7 +211,6 @@ export class AuthService {
   }
 
   async signUp(signUpDto: SignUpDto): Promise<loginResult> {
-    const full_name = this.makeFullName(signUpDto.fname, signUpDto.lname);
     const password = await hashS10(signUpDto.password);
     const dob = new Date(signUpDto.dob);
     const renewal_date = new Date(
@@ -220,7 +219,7 @@ export class AuthService {
 
     const userData = {
       password,
-      full_name,
+      full_name: signUpDto.fullName,
       renewal_date,
       username: signUpDto.username,
       email: signUpDto.email,

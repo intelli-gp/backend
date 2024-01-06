@@ -18,13 +18,8 @@ export class SignUpDto {
 
   @ApiProperty({ required: true, example: 'John' })
   @IsNotEmpty()
-  @Length(3, 20)
-  fname: string;
-
-  @ApiProperty({ required: true, example: 'Doe' })
-  @IsNotEmpty()
-  @Length(3, 20)
-  lname: string;
+  @Length(3, 50)
+  fullName: string;
 
   @ApiProperty({ required: true, example: 'johndoe@gmail.com' })
   @IsNotEmpty()

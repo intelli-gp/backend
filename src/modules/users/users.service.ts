@@ -31,45 +31,51 @@ export class UsersService {
     userData: user,
     updateUserDto: UpdateUserDto,
   ): Promise<user | null> {
-    let { username, fname, lname, email, phoneNumber, image, interests } =
-      updateUserDto;
+    let {
+      username,
+      fullName,
+      email,
+      phoneNumber,
+      bio,
+      image,
+      coverImage,
+      interests,
+    } = updateUserDto;
 
     // updateUserDto['full_name'] = fname.trim() + ' ' + lname.trim();
 
-    const user = await this.prismaService
-      .$transaction(async (prisma) => {
-        if (interests) {
-          await this.tagsService.updateTagsForTables(
-            interests,
-            'user',
-            userData.user_id,
-          );
-        }
+    const user = await this.prismaService.$transaction(async () => {
+      if (interests) {
+        await this.tagsService.updateTagsForTables(
+          interests,
+          'user',
+          userData.user_id,
+        );
+      }
 
-        // const userDiff = getObjectDiff(updateUserDto, userData);
-        username = username ? username : user.username;
-        fname = fname ? fname : user.full_name.split(' ')[0];
-        lname = lname ? lname : user.full_name.split(' ')[1];
-        email = email ? email : user.email;
-        phoneNumber = phoneNumber ? phoneNumber : user.phone_number;
-        image = image ? image : user.image;
-        let updatedUser;
-        // if (userDiff) {
-          updatedUser = await this.prismaService.user.update({
-            where: { user_id: userData.user_id },
-            data: {
-              username: username,
-              full_name: fname + ' ' + lname,
-              email: email,
-              phone_number: phoneNumber,
-              image: image,
-            },
-          });
-        // }
+      // const userDiff = getObjectDiff(updateUserDto, userData);
+      username = username ? username : userData.username;
+      fullName = fullName ? fullName : userData.full_name;
+      email = email ? email : userData.email;
+      phoneNumber = phoneNumber ? phoneNumber : userData.phone_number;
+      image = image ? image : userData.image;
+      coverImage = coverImage ? coverImage : userData.cover_image;
+      bio = bio ? bio : userData.bio;
+      // if (userDiff) {
+      const updatedUser = await this.prismaService.user.update({
+        where: { user_id: userData.user_id },
+        data: {
+          username,
+          full_name: fullName,
+          email: email,
+          phone_number: phoneNumber,
+          image: image,
+        },
+      });
+      // }
 
-        return updatedUser;
-      })
-      .catch((error) => console.log(error));
+      return updatedUser;
+    });
 
     return user ? user : null;
   }
@@ -80,6 +86,14 @@ export class UsersService {
       where: { user_id: id },
       data: { password: hashedPassword },
     });
+    return;
+  }
+
+  async followUser() {
+    return;
+  }
+
+  async unfollowUser() {
     return;
   }
 }
