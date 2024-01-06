@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  BadRequestException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -22,7 +17,6 @@ import { sendRefreshToken } from 'src/utils/response.handler';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { v4 as uuid } from 'uuid';
-import { PrismaErrors } from 'src/exception-filters/types/prisma-errors';
 import { loginResult } from './types/login.response';
 
 @Injectable()
@@ -236,22 +230,15 @@ export class AuthService {
       level_id: 1,
       plan_id: 1,
     };
-    try {
-      const user = await this.prismaService.user.create({
-        data: { ...userData },
-      });
-      await this.sendVerificationMail(user.username, user.email);
-      const { accessToken, refreshToken } = await this.issueTokens({
-        userId: user.user_id,
-        userEmail: user.email,
-      });
-      return { accessToken, refreshToken, user };
-    } catch (error) {
-      throw new BadRequestException({
-        errorCode: PrismaErrors[error.code] || error.code,
-        errorTarget: error.meta.target,
-      });
-    }
+    const user = await this.prismaService.user.create({
+      data: { ...userData },
+    });
+    await this.sendVerificationMail(user.username, user.email);
+    const { accessToken, refreshToken } = await this.issueTokens({
+      userId: user.user_id,
+      userEmail: user.email,
+    });
+    return { accessToken, refreshToken, user };
   }
 
   async sendVerificationMail(username: string, email: string) {

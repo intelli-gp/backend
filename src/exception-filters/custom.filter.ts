@@ -5,6 +5,7 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { sendFailureResponse } from 'src/utils/response-handler/failure.response-handler';
 
 @Catch(HttpException)
 export class CustomFilter implements ExceptionFilter {
@@ -12,13 +13,14 @@ export class CustomFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const errorMessage = exception.getResponse().hasOwnProperty('message')
+    const errorMessage: string = exception
+      .getResponse()
+      .hasOwnProperty('message')
       ? exception.getResponse()['message']
       : exception.getResponse();
 
-    response.status(exception.getStatus()).json({
-      status: 'failure',
-      data: errorMessage,
+    sendFailureResponse(response, exception.getStatus(), {
+      errorMessage,
     });
   }
 }

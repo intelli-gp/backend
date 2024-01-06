@@ -5,10 +5,12 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { AtGuard } from './modules/auth/guards/access.jwt.guard';
 import { TagsModule } from './modules/tags/tags.module';
 import { CustomFilter } from './exception-filters/custom.filter';
+import { TrimStringsPipe } from './utils/pipes/trim-string.pipe';
+import { PrismaExceptionFilter } from './exception-filters/prisma.filter';
 
 @Module({
   imports: [
@@ -29,8 +31,16 @@ import { CustomFilter } from './exception-filters/custom.filter';
   controllers: [],
   providers: [
     {
+      provide: APP_PIPE,
+      useClass: TrimStringsPipe,
+    },
+    {
       provide: APP_FILTER,
       useClass: CustomFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: PrismaExceptionFilter,
     },
     {
       provide: APP_GUARD,
