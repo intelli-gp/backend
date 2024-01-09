@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { tag } from '@prisma/client';
 import { PaginationDto } from 'src/common/dto';
 @Injectable()
 export class TagsService {
   constructor(private readonly prismaService: PrismaService) {}
-  async updateTagsForTables(
+  async addTagsForEntities(
     interests: string[],
-    tableName: 'user' | 'group' | 'course' | 'article' | 'ai_output',
-    id: number,
+    entityName: 'user' | 'group' | 'course' | 'article' | 'ai_output',
+    entityId: number,
   ) {
     const tags = interests.map((tag) => ({
       tag_name: tag.trim().toLowerCase(),
@@ -21,13 +20,35 @@ export class TagsService {
 
     const userTags = tags.map((tag) => ({
       tag_name: tag.tag_name,
-      [tableName + '_id']: id,
+      [entityName + '_id']: entityId,
     }));
 
-    await this.prismaService[tableName + '_tag'].createMany({
+    await this.prismaService[entityName + '_tag'].createMany({
       data: userTags,
       skipDuplicates: true,
     });
+  }
+
+  async updateTagsForEntities(
+    addedTags: string[],
+    removedTags: string[],
+    entityName: 'user' | 'group' | 'course' | 'article' | 'ai_output',
+    entityId: number,
+  ) {
+    if (addedTags.length > 0)
+      await this.addTagsForEntities(addedTags, entityName, entityId);
+
+    if (removedTags.length > 0)
+      await this.prismaService[entityName + '_tag'].deleteMany({
+        where: {
+          tag_name: {
+            in: removedTags,
+          },
+          [entityName + '_id']: entityId,
+        },
+      });
+
+    return true;
   }
 
   async getAllTags(paginationData?: PaginationDto) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { user } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,6 +12,30 @@ export class UsersService {
     private readonly prismaService: PrismaService,
     private readonly tagsService: TagsService,
   ) {}
+
+  convertUserDtoToDatabaseKeys(userData: Partial<UpdateUserDto>) {
+    const userDataInput: Partial<user> = {};
+
+    // DO NOT TRY TO REFACTOR THIS
+    // THIS IS THE WAY NOT TO CREATE EMPTY VALUED KEYS IN ONE LINE
+
+    userData.username !== undefined &&
+      (userDataInput.username = userData.username);
+
+    userData.fullName !== undefined &&
+      (userDataInput.full_name = userData.fullName);
+    userData.email !== undefined && (userDataInput.email = userData.email);
+
+    userData.phoneNumber !== undefined &&
+      (userDataInput.phone_number = userData.phoneNumber);
+
+    userData.image !== undefined && (userDataInput.image = userData.image);
+
+    userData.coverImage !== undefined &&
+      (userDataInput.cover_image = userData.coverImage);
+
+    return userDataInput;
+  }
 
   async getUsers(): Promise<user[] | null> {
     return await this.prismaService.user.findMany();
@@ -31,56 +55,41 @@ export class UsersService {
     userData: user,
     updateUserDto: UpdateUserDto,
   ): Promise<user | null> {
-    const {
-      username,
-      fullName,
-      email,
-      phoneNumber,
-      bio,
-      image,
-      coverImage,
-      interests,
-    } = updateUserDto;
-
-    // updateUserDto['full_name'] = fname.trim() + ' ' + lname.trim();
+    if (!updateUserDto) return null;
+    const { addedInterests, removedInterests, ...userDiff } = updateUserDto;
 
     const user = await this.prismaService.$transaction(async () => {
-      if (interests) {
-        await this.tagsService.updateTagsForTables(
-          interests,
+      if (addedInterests || removedInterests) {
+        await this.tagsService.updateTagsForEntities(
+          addedInterests,
+          removedInterests,
           'user',
           userData.user_id,
         );
       }
 
-      // const userDiff = getObjectDiff(updateUserDto, userData);
-      const userDataInput = {};
-      userDataInput['username'] = username ? username : userData.username;
-      userDataInput['full_name'] = fullName ? fullName : userData.full_name;
-      userDataInput['email'] = email ? email : userData.email;
-      userDataInput['phone_number'] = phoneNumber
-        ? phoneNumber
-        : userData.phone_number;
-      userDataInput['image'] = image ? image : userData.image;
-      userDataInput['cover_image'] = coverImage
-        ? coverImage
-        : userData.cover_image;
-      userDataInput['bio'] = bio ? bio : userData.bio;
-      // if (userDiff) {
-      const updatedUser = await this.prismaService.user.update({
-        where: { user_id: userData.user_id },
-        data: {
-          ...userDataInput,
-        },
-        include: {
-          user_tag: true,
-          level: true,
-          plan: true,
-        },
-      });
-      // }
+      const userDataInput = this.convertUserDtoToDatabaseKeys(userDiff);
 
-      return updatedUser;
+      if (Object.values(userDataInput).length === 0) {
+        return await this.prismaService.user.findUnique({
+          where: { user_id: userData.user_id },
+          include: {
+            user_tag: true,
+            level: true,
+            plan: true,
+          },
+        });
+      } else {
+        return await this.prismaService.user.update({
+          where: { user_id: userData.user_id },
+          data: { ...userDataInput },
+          include: {
+            user_tag: true,
+            level: true,
+            plan: true,
+          },
+        });
+      }
     });
 
     return user ? user : null;

@@ -60,5 +60,14 @@ export class UpdateUserDto {
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  interests: string[];
+  addedInterests: string[];
+
+  @ApiProperty({
+    required: false,
+    example: ['programming'],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  removedInterests: string[];
 }

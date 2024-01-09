@@ -14,7 +14,9 @@ import { sendSuccessResponse } from 'src/utils/response-handler/success.response
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetCurrentUser } from '../auth/ParamDecorator';
 import { user } from '@prisma/client';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
+import { SwaggerLoginExample } from '../auth/swagger-examples';
 
 @Controller('users')
 @ApiTags('Users')
@@ -22,14 +24,22 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Patch()
-  @HttpCode(HttpStatus.CREATED)
-  @UseFilters()
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User updated successfully',
+    schema: swaggerSuccessExample(SwaggerLoginExample),
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Validation or a constraint error',
+  })
   async update(@GetCurrentUser() userData: user, @Body() data: UpdateUserDto) {
     const updatedUser = new SerializedUser(
       await this.usersService.updateUser(userData, data),
     );
     return sendSuccessResponse({
-      data: updatedUser,
+      updatedUser,
     });
   }
 }
