@@ -3,8 +3,8 @@ import { user } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { TagsService } from '../tags/tags.service';
-import { getObjectDiff } from 'src/utils/diff.handler';
-import { hashS10 } from 'src/utils/bcrypt';
+import { hashS10 } from '../../utils/bcrypt';
+import { PaginationDto } from 'src/common/dto';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +31,7 @@ export class UsersService {
     userData: user,
     updateUserDto: UpdateUserDto,
   ): Promise<user | null> {
-    let {
+    const {
       username,
       fullName,
       email,
@@ -54,22 +54,23 @@ export class UsersService {
       }
 
       // const userDiff = getObjectDiff(updateUserDto, userData);
-      username = username ? username : userData.username;
-      fullName = fullName ? fullName : userData.full_name;
-      email = email ? email : userData.email;
-      phoneNumber = phoneNumber ? phoneNumber : userData.phone_number;
-      image = image ? image : userData.image;
-      coverImage = coverImage ? coverImage : userData.cover_image;
-      bio = bio ? bio : userData.bio;
+      const userDataInput = {};
+      userDataInput['username'] = username ? username : userData.username;
+      userDataInput['full_name'] = fullName ? fullName : userData.full_name;
+      userDataInput['email'] = email ? email : userData.email;
+      userDataInput['phone_number'] = phoneNumber
+        ? phoneNumber
+        : userData.phone_number;
+      userDataInput['image'] = image ? image : userData.image;
+      userDataInput['cover_image'] = coverImage
+        ? coverImage
+        : userData.cover_image;
+      userDataInput['bio'] = bio ? bio : userData.bio;
       // if (userDiff) {
       const updatedUser = await this.prismaService.user.update({
         where: { user_id: userData.user_id },
         data: {
-          username,
-          full_name: fullName,
-          email: email,
-          phone_number: phoneNumber,
-          image: image,
+          ...userDataInput,
         },
         include: {
           user_tag: true,
@@ -92,6 +93,17 @@ export class UsersService {
       data: { password: hashedPassword },
     });
     return;
+  }
+
+  async getRecommendedUsers() {
+    return true;
+  }
+  async getUserFollowers() {
+    return true;
+  }
+
+  async getUserFollowing() {
+    return true;
   }
 
   async followUser() {
