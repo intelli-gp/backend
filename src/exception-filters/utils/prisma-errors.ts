@@ -6,7 +6,7 @@ export const PrismaErrorMessage = {
   P2005: 'invalid field value',
   P2025:
     'An operation failed because it depends on one or more records that were required but not found.',
-  p2000: 'input exceeded field size',
+  P2000: 'input exceeded field size',
 };
 
 export const PrismaErrorStatusCode = {
