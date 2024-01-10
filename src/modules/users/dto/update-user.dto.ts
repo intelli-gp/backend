@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
+  IsDateString,
   IsEmail,
+  IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
   IsString,
@@ -10,6 +12,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { ToLowerCase } from 'src/utils/class-transformer-decorators/lowercase-transformer.decorator';
+import { IsValidAge } from 'src/utils/class-validator-decorators';
 import { IsValidUsername } from 'src/utils/class-validator-decorators/username.decorator';
 
 export class UpdateUserDto {
@@ -52,6 +55,12 @@ export class UpdateUserDto {
   @IsOptional()
   @IsUrl()
   image: string;
+
+  @ApiProperty({ required: true, example: '2020-01-01' })
+  @IsOptional()
+  @IsDateString()
+  @IsValidAge(13)
+  dob: string;
 
   @ApiProperty({
     required: false,

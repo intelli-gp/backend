@@ -7,8 +7,12 @@ import {
   Length,
 } from 'class-validator';
 import { ToLowerCase } from 'src/utils/class-transformer-decorators/lowercase-transformer.decorator';
-import { IsStrongPassword } from 'src/utils/class-validator-decorators/password.decorator';
-import { IsValidUsername } from 'src/utils/class-validator-decorators/username.decorator';
+import {
+  IsValidAge,
+  IsGteZero,
+  IsStrongPassword,
+  IsValidUsername,
+} from 'src/utils/class-validator-decorators';
 
 export class SignUpDto {
   @ApiProperty({ required: true, example: 'John32' })
@@ -40,5 +44,6 @@ export class SignUpDto {
   @ApiProperty({ required: true, example: '2020-01-01' })
   @IsNotEmpty()
   @IsDateString()
+  @IsValidAge(13)
   dob: string;
 }
