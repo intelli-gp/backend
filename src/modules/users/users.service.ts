@@ -34,6 +34,10 @@ export class UsersService {
     userData.coverImage !== undefined &&
       (userDataInput.cover_image = userData.coverImage);
 
+    userData.bio !== undefined && (userDataInput.bio = userData.bio);
+
+    userData.email !== undefined && (userDataInput.email = userData.email);
+
     return userDataInput;
   }
 
@@ -57,9 +61,10 @@ export class UsersService {
   ): Promise<user | null> {
     if (!updateUserDto) return null;
     const { addedInterests, removedInterests, ...userDiff } = updateUserDto;
-
+    Logger.debug({ userDiff });
     const user = await this.prismaService.$transaction(async () => {
       if (addedInterests || removedInterests) {
+        Logger.debug({ addedInterests, removedInterests });
         await this.tagsService.updateTagsForEntities(
           addedInterests,
           removedInterests,
@@ -69,8 +74,9 @@ export class UsersService {
       }
 
       const userDataInput = this.convertUserDtoToDatabaseKeys(userDiff);
-
+      Logger.debug({ userDataInput });
       if (Object.values(userDataInput).length === 0) {
+        Logger.debug('No changes to user');
         return await this.prismaService.user.findUnique({
           where: { user_id: userData.user_id },
           include: {
@@ -80,6 +86,7 @@ export class UsersService {
           },
         });
       } else {
+        Logger.debug('Updating user');
         return await this.prismaService.user.update({
           where: { user_id: userData.user_id },
           data: { ...userDataInput },
