@@ -103,6 +103,11 @@ export class AuthService {
       where: {
         email: userProfile._json.email,
       },
+      include: {
+        user_tag: true,
+        level: true,
+        plan: true,
+      },
     });
     if (user) return { user, state: 'login' };
 
