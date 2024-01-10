@@ -38,6 +38,8 @@ export class UsersService {
 
     userData.email !== undefined && (userDataInput.email = userData.email);
 
+    userData.dob !== undefined && (userDataInput.dob = new Date(userData.dob));
+
     return userDataInput;
   }
 
@@ -61,7 +63,6 @@ export class UsersService {
   ): Promise<user | null> {
     if (!updateUserDto) return null;
     const { addedInterests, removedInterests, ...userDiff } = updateUserDto;
-    Logger.debug({ userDiff });
     const user = await this.prismaService.$transaction(async () => {
       if (addedInterests || removedInterests) {
         Logger.debug({ addedInterests, removedInterests });
@@ -74,7 +75,6 @@ export class UsersService {
       }
 
       const userDataInput = this.convertUserDtoToDatabaseKeys(userDiff);
-      Logger.debug({ userDataInput });
       if (Object.values(userDataInput).length === 0) {
         Logger.debug('No changes to user');
         return await this.prismaService.user.findUnique({
@@ -86,7 +86,6 @@ export class UsersService {
           },
         });
       } else {
-        Logger.debug('Updating user');
         return await this.prismaService.user.update({
           where: { user_id: userData.user_id },
           data: { ...userDataInput },
