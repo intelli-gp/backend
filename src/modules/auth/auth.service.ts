@@ -1,13 +1,12 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './types/token.payload';
 import { ConfigService } from '@nestjs/config';
 import { Tokens } from './types/tokens';
 import { user } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
-import { hashS10 } from 'src/utils/bcrypt';
+import { compare, hashS10 } from 'src/utils/bcrypt';
 import { SignUpDto } from './dto/signup.dto';
 import { MailsService } from '../mails/mails.service';
 import { Profile } from 'passport-google-oauth20';
@@ -89,10 +88,7 @@ export class AuthService {
     });
     if (!user) throw new UnauthorizedException('unauthorized user');
 
-    const isMatching = await bcrypt.compare(
-      refreshToken,
-      user.hashed_refresh_token,
-    );
+    const isMatching = await compare(refreshToken, user.hashed_refresh_token);
     if (!isMatching) throw new UnauthorizedException('Action Denied');
 
     return user;
@@ -154,7 +150,7 @@ export class AuthService {
     console.log(user);
     if (!user) throw new UnauthorizedException('Invalid Credentials');
 
-    const isMatching = await bcrypt.compare(loginDto.password, user.password);
+    const isMatching = await compare(loginDto.password, user.password);
     if (!isMatching && !(loginDto.password === user.password)) {
       throw new UnauthorizedException('Invalid Credentials');
     }
