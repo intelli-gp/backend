@@ -2,10 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ArticlesService } from './articles.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { DeepMocked, createMock } from '@golevelup/ts-jest';
+import { TagsService } from '../tags/tags.service';
 
 describe('ArticlesService', () => {
   let articlesService: ArticlesService;
   let prismaService: DeepMocked<PrismaService>;
+  let tagsService: DeepMocked<TagsService>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -15,31 +17,44 @@ describe('ArticlesService', () => {
           provide: PrismaService,
           useValue: createMock<PrismaService>({
             article: {
-              create: jest.fn().mockReturnValue([
-                {
-                  article_id: 1,
-                  title: 'My article title',
-                  cover_image_url: 'www.google.com/url/to/image.jpg',
-                  created_at: new Date(),
-                  updated_at: new Date(),
-                  user_id: 1,
-                },
-                {
-                  article_id: 2,
-                  title: 'My article title',
-                  cover_image_url: 'www.google.com/url/to/image.jpg',
-                  created_at: new Date(),
-                  updated_at: new Date(),
-                  user_id: 1,
-                },
-              ]),
+              create: jest.fn().mockReturnValue({
+                article_id: 1,
+                title: 'My article title',
+                cover_image_url: 'www.google.com/url/to/image.jpg',
+                created_at: new Date(),
+                updated_at: new Date(),
+                user_id: 1,
+              }),
             },
+          }),
+        },
+        {
+          provide: TagsService,
+          useValue: createMock<TagsService>({
+            addTagsForEntities: jest.fn().mockReturnValue([
+              {
+                tag_name: 'tag1',
+                created_at: new Date(),
+                updated_at: new Date(),
+              },
+              {
+                tag_name: 'tag2',
+                created_at: new Date(),
+                updated_at: new Date(),
+              },
+              {
+                tag_name: 'tag3',
+                created_at: new Date(),
+                updated_at: new Date(),
+              },
+            ]),
           }),
         },
       ],
     }).compile();
 
     articlesService = module.get<ArticlesService>(ArticlesService);
+    tagsService = module.get(TagsService);
     prismaService = module.get(PrismaService);
   });
 
@@ -55,35 +70,43 @@ describe('ArticlesService', () => {
         ],
       };
       const userId = 1;
+      const articleId = 1;
+
       const addedArticle = await articlesService.createArticle(
         articleData,
         userId,
       );
-      const sectionsPayload = [
-        {
-          value: 'valueOfSection1',
-          content_type: 'typeOfSection1',
-          created_at: new Date(),
-        },
-        {
-          value: 'valueOfSection2',
-          content_type: 'typeOfSection2',
-          created_at: new Date(),
-        },
-      ];
+
       expect(prismaService.article.create).toHaveBeenCalledWith({
         data: {
           title: 'My article title',
           cover_image_url: 'www.google.com/url/to/image.jpg',
           user_id: 1,
-          created_at: new Date(),
+          created_at: expect.any(Date),
           articles_content: {
             createMany: {
-              data: sectionsPayload,
+              data: [
+                {
+                  value: 'valueOfSection1',
+                  content_type: 'typeOfSection1',
+                  created_at: expect.any(Date),
+                },
+                {
+                  value: 'valueOfSection2',
+                  content_type: 'typeOfSection2',
+                  created_at: expect.any(Date),
+                },
+              ],
             },
           },
         },
       });
+
+      expect(tagsService.addTagsForEntities).toHaveBeenCalledWith(
+        articleData.tags,
+        'article',
+        articleId,
+      );
 
       expect(addedArticle).toBe(true);
     });

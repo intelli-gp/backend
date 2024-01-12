@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateArticleDto } from './dto/create-article.dto';
+import { TagsService } from '../tags/tags.service';
 import { articles_content } from '@prisma/client';
 
 @Injectable()
 export class ArticlesService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly tagsService: TagsService,
+  ) {}
 
   async createArticle(data: CreateArticleDto, userId: number) {
     const { title, coverImageUrl, tags, sections } = data;
@@ -14,7 +18,8 @@ export class ArticlesService {
       content_type,
       created_at: new Date(),
     }));
-    await this.prismaService.article.create({
+
+    const addedArticle = await this.prismaService.article.create({
       data: {
         title,
         cover_image_url: coverImageUrl,
@@ -26,7 +31,18 @@ export class ArticlesService {
           },
         },
       },
+      include: {
+        article_tag: true,
+        user: true,
+        articles_content: true,
+      },
     });
-    return true;
+
+    await this.tagsService.addTagsForEntities(
+      tags,
+      'article',
+      addedArticle.article_id,
+    );
+    return addedArticle;
   }
 }

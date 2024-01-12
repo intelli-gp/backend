@@ -5,11 +5,11 @@ import { PaginationDto } from 'src/common/dto';
 export class TagsService {
   constructor(private readonly prismaService: PrismaService) {}
   async addTagsForEntities(
-    interests: string[],
+    entityTags: string[],
     entityName: 'user' | 'group' | 'course' | 'article' | 'ai_output',
     entityId: number,
   ) {
-    const tags = interests.map((tag) => ({
+    const tags = entityTags.map((tag) => ({
       tag_name: tag.trim().toLowerCase(),
     }));
 
@@ -62,7 +62,6 @@ export class TagsService {
 
   async getSuggestedTags(paginationData?: PaginationDto) {
     const userTags = await this.prismaService.user_tag.findMany({});
-    // I want to map these user tags to get the most frequent tags
     const tagFrequency = userTags.reduce((acc, cur) => {
       if (cur.tag_name in acc) {
         acc[cur.tag_name]++;

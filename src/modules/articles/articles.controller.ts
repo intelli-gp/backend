@@ -3,6 +3,7 @@ import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { GetCurrentUser, Public } from '../auth/ParamDecorator';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
+import { SerializedArticle } from './serialized-types/article.serialized';
 
 @Controller('articles')
 export class ArticlesController {
@@ -17,6 +18,6 @@ export class ArticlesController {
       articleData,
       userId,
     );
-    return sendSuccessResponse(createdArticle);
+    return sendSuccessResponse(new SerializedArticle(createdArticle));
   }
 }
