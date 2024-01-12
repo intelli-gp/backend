@@ -54,6 +54,7 @@ model articles_content {
   created_at DateTime  @db.Date
   updated_at DateTime? @db.Date
   value      String
+  content_type String
   article    article   @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([article_id, content_id])
