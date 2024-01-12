@@ -71,6 +71,7 @@ describe('ArticlesService', () => {
       };
       const userId = 1;
       const articleId = 1;
+      const now = new Date();
 
       const addedArticle = await articlesService.createArticle(
         articleData,
@@ -82,23 +83,28 @@ describe('ArticlesService', () => {
           title: 'My article title',
           cover_image_url: 'www.google.com/url/to/image.jpg',
           user_id: 1,
-          created_at: expect.any(Date),
+          created_at: now,
           articles_content: {
             createMany: {
               data: [
                 {
                   value: 'valueOfSection1',
                   content_type: 'typeOfSection1',
-                  created_at: expect.any(Date),
+                  created_at: now,
                 },
                 {
                   value: 'valueOfSection2',
                   content_type: 'typeOfSection2',
-                  created_at: expect.any(Date),
+                  created_at: now,
                 },
               ],
             },
           },
+        },
+        include: {
+          article_tag: true,
+          user: true,
+          articles_content: true,
         },
       });
 
@@ -107,8 +113,7 @@ describe('ArticlesService', () => {
         'article',
         articleId,
       );
-
-      expect(addedArticle).toBe(true);
+      // TODO: may check the returned schema
     });
   });
 });

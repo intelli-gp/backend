@@ -37,12 +37,26 @@ export class ArticlesService {
         articles_content: true,
       },
     });
-
     await this.tagsService.addTagsForEntities(
       tags,
       'article',
       addedArticle.article_id,
     );
+    // TODO: Remove this line after adding tags to the response
+    addedArticle.article_tag = tags
+      .map((tag) => ({
+        tag_name: tag,
+        article_id: addedArticle.article_id,
+      }))
+      .filter((tag, index, self) => {
+        return (
+          index ===
+          self.findIndex(
+            (t) =>
+              t.tag_name === tag.tag_name && t.article_id === tag.article_id,
+          )
+        );
+      });
     return addedArticle;
   }
 }
