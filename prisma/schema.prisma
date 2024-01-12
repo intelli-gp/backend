@@ -39,8 +39,8 @@ model article_tag {
 model article {
   article_id       Int                @id @default(autoincrement())
   title            String             @db.VarChar(255)
-  created_at       DateTime           @db.Date
-  updated_at       DateTime?          @db.Date
+  created_at       DateTime?           @default(now())
+  updated_at       DateTime?          @updatedAt
   cover_image_url  String?            @db.VarChar(255)
   user_id          Int
   article_tag      article_tag[]
@@ -49,13 +49,13 @@ model article {
 }
 
 model articles_content {
-  article_id Int
-  content_id Int       @default(autoincrement())
-  created_at DateTime  @db.Date
-  updated_at DateTime? @db.Date
-  value      String
+  article_id   Int
+  content_id   Int       @default(autoincrement())
+  created_at   DateTime?  @default(now())
+  updated_at   DateTime? @updatedAt
+  value        String
   content_type String
-  article    article   @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
+  article      article   @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([article_id, content_id])
 }
@@ -123,7 +123,8 @@ model group {
   title           String       @db.VarChar(255)
   description     String
   cover_image_url String       @db.VarChar(255)
-  created_at      DateTime     @db.Date
+  created_at      DateTime?     @default(now())
+  updated_at      DateTime?    @updatedAt
   created_by      Int
   group_tag       group_tag[]
   group_user      group_user[]
@@ -140,11 +141,12 @@ model level {
 }
 
 model message_ai {
-  message_ai_id Int      @id @default(autoincrement())
-  content       String   @db.VarChar(255)
-  created_at    DateTime @db.Date
+  message_ai_id Int       @id @default(autoincrement())
+  content       String    @db.VarChar(255)
+  created_at    DateTime?  @default(now())
+  updated_at    DateTime? @updatedAt
   user_id       Int
-  user          user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  user          user      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model message {
@@ -152,31 +154,34 @@ model message {
   user_id    Int
   group_id   Int
   content    String
-  created_at DateTime     @db.Date
-  updated_at DateTime     @db.Date
+  created_at DateTime?     @default(now())
+  updated_at DateTime?    @updatedAt
   attachment attachment[]
   group      group        @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
   user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model notification {
-  notification_id Int      @id @default(autoincrement())
-  title           String   @db.VarChar(255)
+  notification_id Int       @id @default(autoincrement())
+  title           String    @db.VarChar(255)
   content         String
-  created_at      DateTime @db.Date
+  created_at      DateTime?  @default(now())
+  updated_at      DateTime? @updatedAt
   seen            Boolean
   user_id         Int
-  user            user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  user            user      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model payment_method {
-  method_id   Int      @id @default(autoincrement())
-  card_id     String   @db.VarChar(50)
-  card_number String   @db.VarChar(255)
-  holder_name String   @db.VarChar(100)
-  expiry_date DateTime @db.Date
+  method_id   Int       @id @default(autoincrement())
+  card_id     String    @db.VarChar(50)
+  card_number String    @db.VarChar(255)
+  holder_name String    @db.VarChar(100)
+  expiry_date DateTime  @db.Date
   user_id     Int
-  user        user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  created_at  DateTime?  @default(now())
+  updated_at  DateTime? @updatedAt
+  user        user      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model plan_benefit {
