@@ -59,4 +59,28 @@ export class ArticlesService {
       });
     return addedArticle;
   }
+
+  async getArticle(articleId: number) {
+    const article = await this.prismaService.article.findUnique({
+      where: {
+        article_id: articleId,
+      },
+      include: {
+        article_tag: true,
+        user: true,
+        articles_content: true,
+      },
+    });
+    return article;
+  }
+
+  async deleteArticle(articleId: number, userId: number) {
+    await this.prismaService.article.delete({
+      where: {
+        article_id: articleId,
+        user_id: userId,
+      },
+    });
+    return true;
+  }
 }

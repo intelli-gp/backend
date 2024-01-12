@@ -18,6 +18,7 @@ export class SerializedArticle {
 
   @Transform(({ value }: { value: user }) => ({
     user_id: value.user_id,
+    full_name: value.full_name,
     username: value.username,
     image: value.image,
   }))

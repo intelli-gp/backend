@@ -6,6 +6,7 @@ export const articleExample = {
   article_tag: [],
   user: {
     user_id: 3,
+    full_name: 'John Doe',
     username: 'john11',
     image: 'www.google.com/url/to/image.jpg',
   },

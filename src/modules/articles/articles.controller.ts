@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { GetCurrentUser, Public } from '../auth/ParamDecorator';
@@ -7,6 +15,7 @@ import { SerializedArticle } from './serialized-types/article.serialized';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { CreateArticleExample } from './swagger-examples';
+import { DeleteArticleDto } from './dto';
 
 @Controller('articles')
 @ApiTags('Articles')
@@ -28,5 +37,26 @@ export class ArticlesController {
       userId,
     );
     return sendSuccessResponse(new SerializedArticle(createdArticle));
+  }
+
+  @Public()
+  @Get('/:articleId')
+  async getArticle(@Param() articleData: DeleteArticleDto) {
+    const article = await this.articlesService.getArticle(
+      articleData.articleId,
+    );
+    return sendSuccessResponse(new SerializedArticle(article));
+  }
+
+  @Delete('/:articleId')
+  async deleteArticle(
+    @GetCurrentUser('user_id') userId: number,
+    @Param() articleData: DeleteArticleDto,
+  ) {
+    const deletedArticle = await this.articlesService.deleteArticle(
+      articleData.articleId,
+      userId,
+    );
+    return sendSuccessResponse(deletedArticle);
   }
 }

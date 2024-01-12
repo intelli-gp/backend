@@ -25,6 +25,15 @@ describe('ArticlesService', () => {
                 updated_at: new Date(),
                 user_id: 1,
               }),
+              findUnique: jest.fn().mockReturnValue({
+                article_id: 1,
+                title: 'My article title',
+                cover_image_url: 'www.google.com/url/to/image.jpg',
+                created_at: new Date(),
+                updated_at: new Date(),
+                user_id: 1,
+              }),
+              delete: jest.fn().mockReturnValue(true),
             },
           }),
         },
@@ -114,6 +123,46 @@ describe('ArticlesService', () => {
         articleId,
       );
       // TODO: may check the returned schema
+    });
+  });
+
+  describe('get article', () => {
+    it('should get article successfully', async () => {
+      const articleId = 1;
+
+      await articlesService.getArticle(articleId);
+
+      expect(prismaService.article.findUnique).toHaveBeenCalledWith({
+        where: {
+          article_id: articleId,
+        },
+        include: {
+          article_tag: true,
+          user: true,
+          articles_content: true,
+        },
+      });
+    });
+
+    describe('delete article', () => {
+      it('should delete article successfully', async () => {
+        const articleId = 1;
+        const userId = 1;
+
+        const isDeleted = await articlesService.deleteArticle(
+          articleId,
+          userId,
+        );
+
+        expect(prismaService.article.delete).toHaveBeenCalledWith({
+          where: {
+            article_id: articleId,
+            user_id: userId,
+          },
+        });
+
+        expect(isDeleted).toBe(true);
+      });
     });
   });
 });
