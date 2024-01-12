@@ -11,6 +11,7 @@ import { TagsModule } from './modules/tags/tags.module';
 import { CustomFilter } from './exception-filters/custom.filter';
 import { TrimStringsPipe } from './utils/pipes/trim-string.pipe';
 import { PrismaExceptionFilter } from './exception-filters/prisma.filter';
+import { ArticlesModule } from './modules/articles/articles.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { PrismaExceptionFilter } from './exception-filters/prisma.filter';
       port: process.env.REDIS_PORT,
     }),
     TagsModule,
+    ArticlesModule,
   ],
   controllers: [],
   providers: [

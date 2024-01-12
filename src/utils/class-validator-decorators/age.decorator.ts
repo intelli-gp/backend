@@ -20,7 +20,6 @@ export function IsValidAge(
           const today = new Date();
           const birthDate = new Date(dateString);
           const actualAge = today.getFullYear() - birthDate.getFullYear();
-          Logger.debug({ actualAge, validAge });
           return actualAge >= validAge;
         },
         defaultMessage() {
