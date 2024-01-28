@@ -151,7 +151,7 @@ export class StudyPlannerService {
       const taskStartDate = task.start_date.getTime();
       const taskDueDate = task.due_date.getTime();
       // if start date is in the interval of other task
-      if (start_date >= taskStartDate && start_date <= taskDueDate)
+      if (start_date >= taskStartDate && start_date < taskDueDate)
         throw new BadRequestException({
           message: 'start cannot be inside the interval of other tasks',
         });

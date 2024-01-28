@@ -14,15 +14,15 @@ import {
 import AddTaskDto from './dto/create-task.dto';
 import { StudyPlannerService } from './study-planner.service';
 import { GetCurrentUser } from '../auth/ParamDecorator';
-import { sendSuccessResponse } from 'src/utils/response.handler';
+import { sendSuccessResponse } from '../../utils/response.handler';
 import {
   ApiBadRequestResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { SerializedTask } from 'src/utils/serialized-types/serialized-task';
-import { PaginationDto } from 'src/common/dto';
+import { SerializedTask } from '../../utils/serialized-types/serialized-task';
+import { PaginationDto } from '../../common/dto';
 import UpdateTaskDto from './dto/update-task.dto';
 
 // TODO: add swagger example for the return object for each output from each controller
@@ -66,8 +66,20 @@ export class StudyPlannerController {
     description: 'successfully get a specific task',
     schema: {
       type: 'object',
-      properties: {
-        status: { type: 'string', example: 'success' },
+
+      examples: {
+        'application/json': {
+          status: 'success',
+          data: {
+            task_id: 1,
+            title: 'task 1',
+            description: 'task 1 description',
+            start_date: '2021-05-19T00:00:00.000Z',
+            due_date: '2021-05-20T00:00:00.000Z',
+            status: 'in-progress',
+            user_id: 1,
+          },
+        },
       },
     },
   })
@@ -96,13 +108,6 @@ export class StudyPlannerController {
   @ApiOperation({ summary: 'Create a new task' })
   @ApiOkResponse({
     description: 'a task has been successfully created.',
-    schema: {
-      type: 'object',
-      properties: {
-        status: { type: 'string', example: 'success' },
-        data: { type: 'object', example: { x: 'x', y: 'y' } },
-      },
-    },
   })
   @ApiBadRequestResponse({
     description: 'Bad request. request parameters have something wrong',
