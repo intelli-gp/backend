@@ -3,6 +3,11 @@ import { task } from '@prisma/client';
 
 export class SerializedTask {
   @ApiProperty({
+    example: 1,
+  })
+  ID: number;
+
+  @ApiProperty({
     example: 'test title for a task',
   })
   Title: string;
@@ -28,6 +33,7 @@ export class SerializedTask {
   Status: string;
 
   constructor(partial: Partial<task>) {
+    this.ID = partial.task_id;
     this.Title = partial.title;
     this.Description = partial.description;
     this.Status = partial.status;
