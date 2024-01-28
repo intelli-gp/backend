@@ -47,7 +47,9 @@ export class CreateArticleDto {
     ],
     description: 'The sections of the article',
   })
+  @IsNotEmpty()
   @IsArray()
+  @ArrayNotEmpty()
   @ArrayMinSize(1)
   @ArrayMaxSize(10)
   @ArrayNotEmpty({ each: true })

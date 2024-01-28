@@ -15,7 +15,12 @@ export function IsValidArticleSections(validationOptions?: ValidationOptions) {
           const sectionTypeRegex = new RegExp(
             `^(${Object.values(ArticleSectionType).join('|')})$`,
           );
+          if (!Array.isArray(sections)) {
+            errorMessage = `Sections must be an array`;
+            Logger.error(errorMessage);
 
+            return false;
+          }
           for (const section of sections) {
             const [sectionValue, sectionType] = section;
             if (typeof sectionValue !== 'string') {
