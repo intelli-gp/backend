@@ -3,6 +3,10 @@ import { ArticlesService } from './articles.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { DeepMocked, createMock } from '@golevelup/ts-jest';
 import { TagsService } from '../tags/tags.service';
+import { DeserializedArticle } from './serialized-types/article.deserializer';
+import { Prisma } from '@prisma/client';
+import { BadRequestException } from '@nestjs/common';
+import { error } from 'console';
 
 describe('ArticlesService', () => {
   let articlesService: ArticlesService;
@@ -16,6 +20,45 @@ describe('ArticlesService', () => {
         {
           provide: PrismaService,
           useValue: createMock<PrismaService>({
+            $transaction: jest.fn().mockReturnValue([
+              {
+                article_id: 1,
+                title: 'My article title',
+                cover_image_url: 'www.google.com/url/to/image.jpg',
+                created_at: new Date(),
+                updated_at: new Date(),
+                user_id: 1,
+              },
+              [
+                {
+                  tag_name: 'tag1',
+                  created_at: new Date(),
+                  updated_at: new Date(),
+                },
+                {
+                  tag_name: 'tag2',
+                  created_at: new Date(),
+                  updated_at: new Date(),
+                },
+                {
+                  tag_name: 'tag3',
+                  created_at: new Date(),
+                  updated_at: new Date(),
+                },
+              ],
+              [
+                {
+                  value: 'valueOfSection1',
+                  content_type: 'typeOfSection1',
+                  created_at: new Date(),
+                },
+                {
+                  value: 'valueOfSection2',
+                  content_type: 'typeOfSection2',
+                  created_at: new Date(),
+                },
+              ],
+            ]),
             article: {
               create: jest.fn().mockReturnValue({
                 article_id: 1,
@@ -33,7 +76,30 @@ describe('ArticlesService', () => {
                 updated_at: new Date(),
                 user_id: 1,
               }),
+              update: jest.fn().mockReturnValue({
+                article_id: 1,
+                title: 'My article title',
+                cover_image_url: 'www.google.com/url/to/image.jpg',
+                created_at: new Date(),
+                updated_at: new Date(),
+                user_id: 1,
+              }),
               delete: jest.fn().mockReturnValue(true),
+            },
+            articles_content: {
+              createMany: jest.fn().mockReturnValue([
+                {
+                  value: 'valueOfSection1',
+                  content_type: 'typeOfSection1',
+                  created_at: new Date(),
+                },
+                {
+                  value: 'valueOfSection2',
+                  content_type: 'typeOfSection2',
+                  created_at: new Date(),
+                },
+              ]),
+              deleteMany: jest.fn().mockReturnValue(true),
             },
           }),
         },
@@ -57,6 +123,7 @@ describe('ArticlesService', () => {
                 updated_at: new Date(),
               },
             ]),
+            updateTagsForEntities: jest.fn().mockReturnValue(true),
           }),
         },
       ],
@@ -80,31 +147,24 @@ describe('ArticlesService', () => {
       };
       const userId = 1;
       const articleId = 1;
-      const now = new Date();
 
-      const addedArticle = await articlesService.createArticle(
-        articleData,
-        userId,
-      );
+      await articlesService.createArticle(articleData, userId);
 
       expect(prismaService.article.create).toHaveBeenCalledWith({
         data: {
           title: 'My article title',
           cover_image_url: 'www.google.com/url/to/image.jpg',
           user_id: 1,
-          created_at: now,
           articles_content: {
             createMany: {
               data: [
                 {
                   value: 'valueOfSection1',
                   content_type: 'typeOfSection1',
-                  created_at: now,
                 },
                 {
                   value: 'valueOfSection2',
                   content_type: 'typeOfSection2',
-                  created_at: now,
                 },
               ],
             },
@@ -163,6 +223,61 @@ describe('ArticlesService', () => {
 
         expect(isDeleted).toBe(true);
       });
+    });
+  });
+
+  describe('update article', () => {
+    it('should deserialize article successfully', async () => {
+      const articleData = {
+        title: 'My article title',
+        coverImageUrl: 'www.google.com/url/to/image.jpg',
+        sections: [
+          ['valueOfSection1', 'typeOfSection1'],
+          ['valueOfSection2', 'typeOfSection2'],
+        ],
+        addedTags: ['tag1', 'tag2', 'tag3'],
+        removedTags: ['tag4', 'tag5'],
+      };
+
+      const deserializedArticle = new DeserializedArticle(articleData);
+
+      expect(deserializedArticle).toEqual({
+        title: 'My article title',
+        cover_image_url: 'www.google.com/url/to/image.jpg',
+        articles_content: [
+          ['valueOfSection1', 'typeOfSection1'],
+          ['valueOfSection2', 'typeOfSection2'],
+        ],
+      });
+    });
+    it('should return No update data', async () => {
+      try {
+        await articlesService.updateArticle(null, 1, 1);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.message).toBe('No update data provided');
+      }
+    });
+    it('should update article successfully', async () => {
+      // TODO: fix this test to check callback internally
+      const articleId = 1;
+      const userId = 1;
+      const articleData = {
+        title: 'My article title',
+        coverImageUrl: 'www.google.com/url/to/image.jpg',
+        sections: [
+          ['valueOfSection1', 'typeOfSection1'],
+          ['valueOfSection2', 'typeOfSection2'],
+        ],
+        addedTags: ['tag1', 'tag2', 'tag3'],
+        removedTags: ['tag4', 'tag5'],
+      };
+
+      await articlesService.updateArticle(articleData, articleId, userId);
+
+      expect(prismaService.$transaction).toHaveBeenCalledWith(
+        expect.any(Function),
+      );
     });
   });
 });
