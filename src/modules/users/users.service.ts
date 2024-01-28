@@ -4,7 +4,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { TagsService } from '../tags/tags.service';
 import { hashS10 } from '../../utils/bcrypt';
-import { PaginationDto } from 'src/common/dto';
 
 @Injectable()
 export class UsersService {

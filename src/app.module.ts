@@ -8,6 +8,7 @@ import * as redisStore from 'cache-manager-redis-store';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AtGuard } from './modules/auth/guards/access.jwt.guard';
 import { TagsModule } from './modules/tags/tags.module';
+import { StudyPlannerModule } from './modules/study-planner/study-planner.module';
 import { CustomFilter } from './exception-filters/custom.filter';
 import { TrimStringsPipe } from './utils/pipes/trim-string.pipe';
 import { PrismaExceptionFilter } from './exception-filters/prisma.filter';
@@ -29,6 +30,7 @@ import { ArticlesModule } from './modules/articles/articles.module';
     }),
     TagsModule,
     ArticlesModule,
+    StudyPlannerModule,
   ],
   controllers: [],
   providers: [
