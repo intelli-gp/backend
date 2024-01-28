@@ -15,7 +15,8 @@ import { SerializedArticle } from './serialized-types/article.serialized';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { CreateArticleExample } from './swagger-examples';
-import { DeleteArticleDto } from './dto';
+import { DeleteArticleDto, UpdateArticleDto } from './dto';
+import { GetArticleDto } from './dto/get-article.dto';
 
 @Controller('articles')
 @ApiTags('Articles')
@@ -39,6 +40,11 @@ export class ArticlesController {
     return sendSuccessResponse(new SerializedArticle(createdArticle));
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'Returns article',
+    schema: swaggerSuccessExample(null, CreateArticleExample),
+  })
   @Public()
   @Get('/:articleId')
   async getArticle(@Param() articleData: DeleteArticleDto) {
@@ -48,6 +54,29 @@ export class ArticlesController {
     return sendSuccessResponse(new SerializedArticle(article));
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'Returns updated article',
+    schema: swaggerSuccessExample(null, CreateArticleExample),
+  })
+  @Patch('/:articleId')
+  async updateArticle(
+    @Body() articleData: UpdateArticleDto,
+    @Param() articleIdentifier: GetArticleDto,
+    @GetCurrentUser('user_id') userId: number,
+  ) {
+    const updatedArticle = await this.articlesService.updateArticle(
+      articleData,
+      articleIdentifier.articleId,
+      userId,
+    );
+    return sendSuccessResponse(new SerializedArticle(updatedArticle));
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Return confirmation for deletion',
+  })
   @Delete('/:articleId')
   async deleteArticle(
     @GetCurrentUser('user_id') userId: number,

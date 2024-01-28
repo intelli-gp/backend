@@ -1,5 +1,5 @@
-import { article_tag, articles_content, tag, user } from '@prisma/client';
-import { Exclude, Transform } from 'class-transformer';
+import { article_tag, articles_content, user } from '@prisma/client';
+import { Exclude, Expose, Transform } from 'class-transformer';
 
 export class SerializedArticle {
   @Exclude()
@@ -10,31 +10,35 @@ export class SerializedArticle {
 
   title: string;
 
+  @Expose({ name: 'coverImageUrl' })
   cover_image_url: string;
 
+  @Expose({ name: 'createdAt' })
   created_at: Date;
 
+  @Expose({ name: 'updatedAt' })
   updated_at: Date;
 
+  @Expose({ name: 'author' })
   @Transform(({ value }: { value: user }) => ({
-    user_id: value.user_id,
-    full_name: value.full_name,
+    fullName: value.full_name,
     username: value.username,
     image: value.image,
   }))
   user: user;
 
+  @Expose({ name: 'sections' })
   @Transform(({ value }: { value: articles_content[] }) =>
     value.map((content: articles_content) => {
       return {
-        content_id: content.content_id,
         value: content.value,
-        content_type: content['content_type'],
+        contentType: content.content_type,
       };
     }),
   )
   articles_content: articles_content[];
 
+  @Expose({ name: 'tags' })
   @Transform(({ value }: { value: article_tag[] }) =>
     value.map((tag: article_tag) => tag.tag_name),
   )

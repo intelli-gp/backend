@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { TagsService } from '../tags/tags.service';
 import { articles_content } from '@prisma/client';
+import { UpdateArticleDto } from './dto';
+import { SerializedArticle } from './serialized-types/article.serialized';
+import { DeserializedArticle } from './serialized-types/article.deserializer';
 
 @Injectable()
 export class ArticlesService {
@@ -24,7 +27,6 @@ export class ArticlesService {
         title,
         cover_image_url: coverImageUrl,
         user_id: userId,
-        created_at: new Date(),
         articles_content: {
           createMany: {
             data: sectionsPayload,
@@ -74,6 +76,78 @@ export class ArticlesService {
     return article;
   }
 
+  async updateArticle(
+    articleData: UpdateArticleDto,
+    articleId: number,
+    userId: number,
+  ) {
+    if (!articleData) throw new BadRequestException('No update data provided');
+
+    const { addedTags, removedTags, ...restOfData } = articleData;
+    const deserializedArticle = new DeserializedArticle(restOfData);
+
+    const { articles_content, ...articleMainData } = deserializedArticle;
+
+    const updatedArticle = await this.prismaService.$transaction(
+      async (prisma) => {
+        Logger.debug('Updating article');
+        // Repopulate the sections of the articles with new data
+        // TODO: Clean up
+        if (articles_content) {
+          prisma.articles_content.deleteMany({
+            where: {
+              article_id: articleId,
+            },
+          });
+
+          prisma.articles_content.createMany({
+            data: articles_content.map(([value, content_type]) => ({
+              article_id: articleId,
+              value,
+              content_type,
+            })),
+          });
+        }
+        if (addedTags?.length || removedTags?.length) {
+          // TODO: Not included in the transaction
+          this.tagsService.updateTagsForEntities(
+            addedTags,
+            removedTags,
+            'article',
+            articleId,
+          );
+        }
+        if (articleMainData) {
+          return await prisma.article.update({
+            where: {
+              article_id: articleId,
+              user_id: userId,
+            },
+            data: {
+              ...articleMainData,
+            },
+            include: {
+              article_tag: true,
+              user: true,
+              articles_content: true,
+            },
+          });
+        } else {
+          return await prisma.article.findUnique({
+            where: {
+              article_id: articleId,
+            },
+            include: {
+              article_tag: true,
+              user: true,
+              articles_content: true,
+            },
+          });
+        }
+      },
+    );
+    return updatedArticle;
+  }
   async deleteArticle(articleId: number, userId: number) {
     await this.prismaService.article.delete({
       where: {
