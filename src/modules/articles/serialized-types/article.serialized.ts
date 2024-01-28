@@ -2,7 +2,7 @@ import { article_tag, articles_content, user } from '@prisma/client';
 import { Exclude, Expose, Transform } from 'class-transformer';
 
 export class SerializedArticle {
-  @Exclude()
+  @Expose({ name: 'ID' })
   article_id: number;
 
   @Exclude()

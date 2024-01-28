@@ -1,4 +1,5 @@
 export const articleExample = {
+  ID: 1,
   title: 'My article title',
   createdAt: '2024-01-12T14:21:45.574Z',
   updatedAt: '2024-01-12T14:21:45.583Z',
