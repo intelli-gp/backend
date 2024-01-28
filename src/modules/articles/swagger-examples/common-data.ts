@@ -1,25 +1,22 @@
 export const articleExample = {
   title: 'My article title',
-  created_at: '2024-01-12T14:21:45.574Z',
-  updated_at: '2024-01-12T14:21:45.583Z',
-  cover_image_url: 'www.google.com/url/to/image.jpg',
-  article_tag: [],
-  user: {
-    user_id: 3,
+  createdAt: '2024-01-12T14:21:45.574Z',
+  updatedAt: '2024-01-12T14:21:45.583Z',
+  coverImageUrl: 'www.google.com/url/to/image.jpg',
+  tags: ['tag1', 'tag2'],
+  author: {
     full_name: 'John Doe',
     username: 'john11',
     image: 'www.google.com/url/to/image.jpg',
   },
-  articles_content: [
+  sections: [
     {
-      content_id: 17,
       value: 'valueOfSection1',
-      content_type: 'text',
+      contentType: 'text',
     },
     {
-      content_id: 18,
       value: 'typeOfSection1',
-      content_type: 'text',
+      contentType: 'text',
     },
   ],
 };
