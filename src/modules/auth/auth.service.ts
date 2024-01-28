@@ -30,7 +30,7 @@ export class AuthService {
 
   async issueAccessToken(payload: TokenPayload): Promise<string> {
     const accessToken = await this.jwt.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: this.config.get('ACCESS_TOKEN_EXPIRATION_TIME'),
       secret: this.config.get('ACCESS_TOKEN_SECRET'),
     });
     return accessToken;
@@ -38,7 +38,7 @@ export class AuthService {
 
   async issueRefreshToken(payload: TokenPayload): Promise<string> {
     const refreshToken = await this.jwt.signAsync(payload, {
-      expiresIn: '7d',
+      expiresIn: this.config.get('REFRESH_TOKEN_EXPIRATION_TIME'),
       secret: this.config.get('REFRESH_TOKEN_SECRET'),
     });
     return refreshToken;
