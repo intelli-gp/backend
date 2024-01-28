@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import * as fs from 'fs';
 
 async function bootstrap() {
   const config = new ConfigService();
@@ -31,7 +32,15 @@ async function bootstrap() {
 
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('/6YrzxCg81s/swagger-docs', app, document);
+
+    const jsonOutput = JSON.stringify(document, null, 2);
+
+    fs.writeFileSync('swagger.json', jsonOutput);
   }
+
+  // Generate Swagger json schema
+  const jsonOutput = JSON.stringify(document, null, 2);
+  fs.writeFileSync('swagger.json', jsonOutput);
 
   await app.listen(config.get('PORT'));
 }

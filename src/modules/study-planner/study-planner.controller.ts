@@ -14,7 +14,7 @@ import {
 import AddTaskDto from './dto/create-task.dto';
 import { StudyPlannerService } from './study-planner.service';
 import { GetCurrentUser } from '../auth/ParamDecorator';
-import { sendSuccessResponse } from '../../utils/response.handler';
+import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
 import {
   ApiBadRequestResponse,
   ApiOkResponse,
