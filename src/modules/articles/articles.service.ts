@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { TagsService } from '../tags/tags.service';
@@ -6,6 +11,7 @@ import { articles_content } from '@prisma/client';
 import { UpdateArticleDto } from './dto';
 import { SerializedArticle } from './serialized-types/article.serialized';
 import { DeserializedArticle } from './serialized-types/article.deserializer';
+import { PaginationDto } from 'src/common/dto';
 
 @Injectable()
 export class ArticlesService {
@@ -14,6 +20,23 @@ export class ArticlesService {
     private readonly tagsService: TagsService,
   ) {}
 
+  // TODO: Temporary
+  async getAllArticles(paginationData: PaginationDto) {
+    const articles = await this.prismaService.article.findMany({
+      take: paginationData.limit,
+      skip: paginationData.offset,
+      include: {
+        article_tag: true,
+        user: {
+          include: {
+            followed_by: true,
+          },
+        },
+        articles_content: true,
+      },
+    });
+    return articles;
+  }
   async createArticle(data: CreateArticleDto, userId: number) {
     const { title, coverImageUrl, tags, sections } = data;
     const sectionsPayload = sections.map(([value, content_type]) => ({
@@ -73,6 +96,9 @@ export class ArticlesService {
         articles_content: true,
       },
     });
+
+    if (!article) throw new NotFoundException('Article not found');
+
     return article;
   }
 

@@ -203,26 +203,22 @@ describe('ArticlesService', () => {
         },
       });
     });
+  });
+  describe('delete article', () => {
+    it('should delete article successfully', async () => {
+      const articleId = 1;
+      const userId = 1;
 
-    describe('delete article', () => {
-      it('should delete article successfully', async () => {
-        const articleId = 1;
-        const userId = 1;
+      const isDeleted = await articlesService.deleteArticle(articleId, userId);
 
-        const isDeleted = await articlesService.deleteArticle(
-          articleId,
-          userId,
-        );
-
-        expect(prismaService.article.delete).toHaveBeenCalledWith({
-          where: {
-            article_id: articleId,
-            user_id: userId,
-          },
-        });
-
-        expect(isDeleted).toBe(true);
+      expect(prismaService.article.delete).toHaveBeenCalledWith({
+        where: {
+          article_id: articleId,
+          user_id: userId,
+        },
       });
+
+      expect(isDeleted).toBe(true);
     });
   });
 

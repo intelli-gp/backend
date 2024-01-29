@@ -9,6 +9,7 @@ export const articleExample = {
     full_name: 'John Doe',
     username: 'john11',
     image: 'www.google.com/url/to/image.jpg',
+    followersCount: 0,
   },
   sections: [
     {

@@ -1,1297 +1,1431 @@
 {
-    "openapi": "3.0.0",
-    "paths": {
-        "/api/auth/signup": {
-            "post": {
-                "operationId": "AuthController_signUp",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/SignUpDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "User Created",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "user": {
-                                                    "type": "object",
-                                                    "example": {
-                                                        "id": "1",
-                                                        "full_name": "John Doe",
-                                                        "username": "johndoe",
-                                                        "email": "johndoe@email.com",
-                                                        "dob": "1999-01-01",
-                                                        "bio": "I am a cool guy",
-                                                        "phone_number": "+23481050790880",
-                                                        "cover_image": "https://example.com/cover.jpg",
-                                                        "image": "https://example.com/image.jpg",
-                                                        "user_tag": [
-                                                            "music",
-                                                            "sports"
-                                                        ],
-                                                        "level": {
-                                                            "level_id": 1,
-                                                            "title": "noob",
-                                                            "description": "a newbie",
-                                                            "image_url": "www.google.com"
-                                                        },
-                                                        "plan": {
-                                                            "plan_id": 1,
-                                                            "title": "free",
-                                                            "description": "free plan",
-                                                            "trial_period": "30",
-                                                            "billing_frequency": 10,
-                                                            "image_url": "www.google.com",
-                                                            "price": 0,
-                                                            "currency": "EGP"
-                                                        }
-                                                    }
-                                                },
-                                                "access_token": {
-                                                    "type": "string",
-                                                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "example": {
-                                                "errorMessage": "unique constraint failed",
-                                                "errorTarget": "username"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "Auth"
-                ]
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/auth/signup": {
+      "post": {
+        "operationId": "AuthController_signUp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpDto"
+              }
             }
+          }
         },
-        "/api/auth/send-verification/{username}": {
-            "get": {
-                "operationId": "AuthController_resendVerification",
-                "parameters": [
-                    {
-                        "name": "username",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
+        "responses": {
+          "201": {
+            "description": "User Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "example": {
+                            "id": "1",
+                            "full_name": "John Doe",
+                            "username": "johndoe",
+                            "email": "johndoe@email.com",
+                            "dob": "1999-01-01",
+                            "bio": "I am a cool guy",
+                            "phone_number": "+23481050790880",
+                            "cover_image": "https://example.com/cover.jpg",
+                            "image": "https://example.com/image.jpg",
+                            "user_tag": [
+                              "music",
+                              "sports"
+                            ],
+                            "level": {
+                              "level_id": 1,
+                              "title": "noob",
+                              "description": "a newbie",
+                              "image_url": "www.google.com"
+                            },
+                            "plan": {
+                              "plan_id": 1,
+                              "title": "free",
+                              "description": "free plan",
+                              "trial_period": "30",
+                              "billing_frequency": 10,
+                              "image_url": "www.google.com",
+                              "price": 0,
+                              "currency": "EGP"
+                            }
+                          }
+                        },
+                        "access_token": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
                         }
+                      }
                     }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Verification Mail Sent"
-                    }
-                },
-                "tags": [
-                    "Auth"
-                ]
+                  }
+                }
+              }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "errorMessage": "unique constraint failed",
+                        "errorTarget": "username"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         },
-        "/api/auth/verify/{username}/{token}": {
-            "get": {
-                "operationId": "AuthController_verify",
-                "parameters": [
-                    {
-                        "name": "username",
-                        "required": true,
-                        "in": "path",
-                        "example": "John32",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "token",
-                        "required": true,
-                        "in": "path",
-                        "example": "a valid token",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User Verified"
-                    },
-                    "400": {
-                        "description": "Broken Link",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "example": {
-                                                "errorMessage": "broken link"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "Auth"
-                ]
-            }
-        },
-        "/api/auth/reset-password/{email}": {
-            "get": {
-                "operationId": "AuthController_resetPassword",
-                "parameters": [
-                    {
-                        "name": "email",
-                        "required": true,
-                        "in": "path",
-                        "example": "John32@gmail.com",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Reset Password Mail Sent"
-                    },
-                    "404": {
-                        "description": "Email Not Found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "example": {
-                                                "errorMessage": "email not found"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "Auth"
-                ]
-            }
-        },
-        "/api/auth/reset-password/{email}/{token}": {
-            "post": {
-                "operationId": "AuthController_resetPasswordConfirm",
-                "parameters": [
-                    {
-                        "name": "email",
-                        "required": true,
-                        "in": "path",
-                        "example": "John32@gmail.com",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "token",
-                        "required": true,
-                        "in": "path",
-                        "example": "Standard JWT token",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ResetPasswordConfirmationBodyDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Password Reset Successful"
-                    },
-                    "400": {
-                        "description": "Broken Link",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "example": {
-                                                "errorMessage": "broken link"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "Auth"
-                ]
-            }
-        },
-        "/api/auth/refresh": {
-            "post": {
-                "operationId": "AuthController_refresh",
-                "parameters": [],
-                "responses": {
-                    "201": {
-                        "description": "Refresh Token Generated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "access_token": {
-                                                    "type": "string",
-                                                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid Refresh Token",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "example": {
-                                                "errorMessage": "invalid refresh token"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "Auth"
-                ]
-            }
-        },
-        "/api/auth/login": {
-            "post": {
-                "operationId": "AuthController_login",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/LoginDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Login Successful",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "user": {
-                                                    "type": "object",
-                                                    "example": {
-                                                        "id": "1",
-                                                        "full_name": "John Doe",
-                                                        "username": "johndoe",
-                                                        "email": "johndoe@email.com",
-                                                        "dob": "1999-01-01",
-                                                        "bio": "I am a cool guy",
-                                                        "phone_number": "+23481050790880",
-                                                        "cover_image": "https://example.com/cover.jpg",
-                                                        "image": "https://example.com/image.jpg",
-                                                        "user_tag": [
-                                                            "music",
-                                                            "sports"
-                                                        ],
-                                                        "level": {
-                                                            "level_id": 1,
-                                                            "title": "noob",
-                                                            "description": "a newbie",
-                                                            "image_url": "www.google.com"
-                                                        },
-                                                        "plan": {
-                                                            "plan_id": 1,
-                                                            "title": "free",
-                                                            "description": "free plan",
-                                                            "trial_period": "30",
-                                                            "billing_frequency": 10,
-                                                            "image_url": "www.google.com",
-                                                            "price": 0,
-                                                            "currency": "EGP"
-                                                        }
-                                                    }
-                                                },
-                                                "access_token": {
-                                                    "type": "string",
-                                                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Invalid Credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "example": {
-                                                "errorMessage": "invalid credentials"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "Auth"
-                ]
-            }
-        },
-        "/api/auth/logout": {
-            "post": {
-                "operationId": "AuthController_logout",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "Logout Successful"
-                    }
-                },
-                "tags": [
-                    "Auth"
-                ]
-            }
-        },
-        "/api/auth/google/callback": {
-            "get": {
-                "operationId": "AuthController_googleCallback",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": [
-                    "Auth"
-                ]
-            }
-        },
-        "/api/users": {
-            "patch": {
-                "operationId": "UsersController_update",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateUserDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "User updated successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "user": {
-                                                    "type": "object",
-                                                    "example": {
-                                                        "id": "1",
-                                                        "full_name": "John Doe",
-                                                        "username": "johndoe",
-                                                        "email": "johndoe@email.com",
-                                                        "dob": "1999-01-01",
-                                                        "bio": "I am a cool guy",
-                                                        "phone_number": "+23481050790880",
-                                                        "cover_image": "https://example.com/cover.jpg",
-                                                        "image": "https://example.com/image.jpg",
-                                                        "user_tag": [
-                                                            "music",
-                                                            "sports"
-                                                        ],
-                                                        "level": {
-                                                            "level_id": 1,
-                                                            "title": "noob",
-                                                            "description": "a newbie",
-                                                            "image_url": "www.google.com"
-                                                        },
-                                                        "plan": {
-                                                            "plan_id": 1,
-                                                            "title": "free",
-                                                            "description": "free plan",
-                                                            "trial_period": "30",
-                                                            "billing_frequency": 10,
-                                                            "image_url": "www.google.com",
-                                                            "price": 0,
-                                                            "currency": "EGP"
-                                                        }
-                                                    }
-                                                },
-                                                "access_token": {
-                                                    "type": "string",
-                                                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Validation or a constraint error"
-                    }
-                },
-                "tags": [
-                    "Users"
-                ]
-            }
-        },
-        "/api/tags": {
-            "get": {
-                "operationId": "TagsController_getAllTags",
-                "parameters": [
-                    {
-                        "name": "limit",
-                        "required": true,
-                        "in": "query",
-                        "example": 10,
-                        "description": "Number of items per page",
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "name": "offset",
-                        "required": true,
-                        "in": "query",
-                        "example": 1,
-                        "description": "Page number",
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": [
-                    "Tags"
-                ]
-            }
-        },
-        "/api/tags/suggested": {
-            "get": {
-                "operationId": "TagsController_getSuggestedTags",
-                "parameters": [
-                    {
-                        "name": "limit",
-                        "required": true,
-                        "in": "query",
-                        "example": 10,
-                        "description": "Number of items per page",
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "name": "offset",
-                        "required": true,
-                        "in": "query",
-                        "example": 1,
-                        "description": "Page number",
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "tags": [
-                    "Tags"
-                ]
-            }
-        },
-        "/api/articles": {
-            "post": {
-                "operationId": "ArticlesController_createArticle",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateArticleDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Returns created article",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "properties": null,
-                                            "example": {
-                                                "title": "My article title",
-                                                "createdAt": "2024-01-12T14:21:45.574Z",
-                                                "updatedAt": "2024-01-12T14:21:45.583Z",
-                                                "coverImageUrl": "www.google.com/url/to/image.jpg",
-                                                "tags": [
-                                                    "tag1",
-                                                    "tag2"
-                                                ],
-                                                "author": {
-                                                    "full_name": "John Doe",
-                                                    "username": "john11",
-                                                    "image": "www.google.com/url/to/image.jpg"
-                                                },
-                                                "sections": [
-                                                    {
-                                                        "value": "valueOfSection1",
-                                                        "contentType": "text"
-                                                    },
-                                                    {
-                                                        "value": "typeOfSection1",
-                                                        "contentType": "text"
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "Articles"
-                ]
-            }
-        },
-        "/api/articles/{articleId}": {
-            "get": {
-                "operationId": "ArticlesController_getArticle",
-                "parameters": [
-                    {
-                        "name": "articleId",
-                        "required": true,
-                        "in": "path",
-                        "example": 1,
-                        "description": "Article id",
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Returns article",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "properties": null,
-                                            "example": {
-                                                "title": "My article title",
-                                                "createdAt": "2024-01-12T14:21:45.574Z",
-                                                "updatedAt": "2024-01-12T14:21:45.583Z",
-                                                "coverImageUrl": "www.google.com/url/to/image.jpg",
-                                                "tags": [
-                                                    "tag1",
-                                                    "tag2"
-                                                ],
-                                                "author": {
-                                                    "full_name": "John Doe",
-                                                    "username": "john11",
-                                                    "image": "www.google.com/url/to/image.jpg"
-                                                },
-                                                "sections": [
-                                                    {
-                                                        "value": "valueOfSection1",
-                                                        "contentType": "text"
-                                                    },
-                                                    {
-                                                        "value": "typeOfSection1",
-                                                        "contentType": "text"
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "Articles"
-                ]
-            },
-            "patch": {
-                "operationId": "ArticlesController_updateArticle",
-                "parameters": [
-                    {
-                        "name": "articleId",
-                        "required": true,
-                        "in": "path",
-                        "example": 1,
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateArticleDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Returns updated article",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "properties": null,
-                                            "example": {
-                                                "title": "My article title",
-                                                "createdAt": "2024-01-12T14:21:45.574Z",
-                                                "updatedAt": "2024-01-12T14:21:45.583Z",
-                                                "coverImageUrl": "www.google.com/url/to/image.jpg",
-                                                "tags": [
-                                                    "tag1",
-                                                    "tag2"
-                                                ],
-                                                "author": {
-                                                    "full_name": "John Doe",
-                                                    "username": "john11",
-                                                    "image": "www.google.com/url/to/image.jpg"
-                                                },
-                                                "sections": [
-                                                    {
-                                                        "value": "valueOfSection1",
-                                                        "contentType": "text"
-                                                    },
-                                                    {
-                                                        "value": "typeOfSection1",
-                                                        "contentType": "text"
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "Articles"
-                ]
-            },
-            "delete": {
-                "operationId": "ArticlesController_deleteArticle",
-                "parameters": [
-                    {
-                        "name": "articleId",
-                        "required": true,
-                        "in": "path",
-                        "example": 1,
-                        "description": "Article id",
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Return confirmation for deletion"
-                    }
-                },
-                "tags": [
-                    "Articles"
-                ]
-            }
-        },
-        "/api/study-planner": {
-            "get": {
-                "operationId": "StudyPlannerController_getTasks",
-                "summary": "Get all tasks paginated",
-                "parameters": [
-                    {
-                        "name": "limit",
-                        "required": true,
-                        "in": "query",
-                        "example": 10,
-                        "description": "Number of items per page",
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "name": "offset",
-                        "required": true,
-                        "in": "query",
-                        "example": 1,
-                        "description": "Page number",
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Get all tasks paginated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request. request parameters have something wrong"
-                    }
-                },
-                "tags": [
-                    "study-planner"
-                ]
-            },
-            "post": {
-                "operationId": "StudyPlannerController_createTask",
-                "summary": "Create a new task",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/AddTaskDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "a task has been successfully created."
-                    },
-                    "400": {
-                        "description": "Bad request. request parameters have something wrong"
-                    }
-                },
-                "tags": [
-                    "study-planner"
-                ]
-            }
-        },
-        "/api/study-planner/{task_id}": {
-            "get": {
-                "operationId": "StudyPlannerController_getTaskById",
-                "summary": "Get a specific task",
-                "parameters": [
-                    {
-                        "name": "task_id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successfully get a specific task",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "examples": {
-                                        "application/json": {
-                                            "status": "success",
-                                            "data": {
-                                                "task_id": 1,
-                                                "title": "task 1",
-                                                "description": "task 1 description",
-                                                "start_date": "2021-05-19T00:00:00.000Z",
-                                                "due_date": "2021-05-20T00:00:00.000Z",
-                                                "status": "in-progress",
-                                                "user_id": 1
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request. request parameters have something wrong"
-                    }
-                },
-                "tags": [
-                    "study-planner"
-                ]
-            },
-            "patch": {
-                "operationId": "StudyPlannerController_updateTask",
-                "summary": "Update a task",
-                "parameters": [
-                    {
-                        "name": "task_id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateTaskDto"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Task has been successfully updated"
-                    },
-                    "400": {
-                        "description": "Bad request. request parameters have something wrong"
-                    }
-                },
-                "tags": [
-                    "study-planner"
-                ]
-            },
-            "delete": {
-                "operationId": "StudyPlannerController_deleteTask",
-                "summary": "Delete a task",
-                "parameters": [
-                    {
-                        "name": "task_id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Task has been successfully deleted"
-                    },
-                    "400": {
-                        "description": "Bad request. request parameters have something wrong"
-                    }
-                },
-                "tags": [
-                    "study-planner"
-                ]
-            }
-        }
+        "tags": [
+          "Auth"
+        ]
+      }
     },
-    "info": {
-        "title": "INTELLI GP",
-        "description": "The INTELLI-GP API documentation",
-        "version": "1.0",
-        "contact": {}
+    "/api/auth/send-verification/{username}": {
+      "get": {
+        "operationId": "AuthController_resendVerification",
+        "parameters": [
+          {
+            "name": "username",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification Mail Sent"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
     },
-    "tags": [
-        {
-            "name": "INTELLI GP",
+    "/api/auth/verify/{username}/{token}": {
+      "get": {
+        "operationId": "AuthController_verify",
+        "parameters": [
+          {
+            "name": "username",
+            "required": true,
+            "in": "path",
+            "example": "John32",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "example": "a valid token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User Verified"
+          },
+          "400": {
+            "description": "Broken Link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "errorMessage": "broken link"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/reset-password/{email}": {
+      "get": {
+        "operationId": "AuthController_resetPassword",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "path",
+            "example": "John32@gmail.com",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reset Password Mail Sent"
+          },
+          "404": {
+            "description": "Email Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "errorMessage": "email not found"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/reset-password/{email}/{token}": {
+      "post": {
+        "operationId": "AuthController_resetPasswordConfirm",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "path",
+            "example": "John32@gmail.com",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "example": "Standard JWT token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordConfirmationBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password Reset Successful"
+          },
+          "400": {
+            "description": "Broken Link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "errorMessage": "broken link"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Refresh Token Generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Refresh Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "errorMessage": "invalid refresh token"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "example": {
+                            "id": "1",
+                            "full_name": "John Doe",
+                            "username": "johndoe",
+                            "email": "johndoe@email.com",
+                            "dob": "1999-01-01",
+                            "bio": "I am a cool guy",
+                            "phone_number": "+23481050790880",
+                            "cover_image": "https://example.com/cover.jpg",
+                            "image": "https://example.com/image.jpg",
+                            "user_tag": [
+                              "music",
+                              "sports"
+                            ],
+                            "level": {
+                              "level_id": 1,
+                              "title": "noob",
+                              "description": "a newbie",
+                              "image_url": "www.google.com"
+                            },
+                            "plan": {
+                              "plan_id": 1,
+                              "title": "free",
+                              "description": "free plan",
+                              "trial_period": "30",
+                              "billing_frequency": 10,
+                              "image_url": "www.google.com",
+                              "price": 0,
+                              "currency": "EGP"
+                            }
+                          }
+                        },
+                        "access_token": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid Credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "example": {
+                        "errorMessage": "invalid credentials"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Logout Successful"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/google/callback": {
+      "get": {
+        "operationId": "AuthController_googleCallback",
+        "parameters": [],
+        "responses": {
+          "200": {
             "description": ""
-        }
-    ],
-    "servers": [],
-    "components": {
-        "securitySchemes": {
-            "bearer": {
-                "scheme": "bearer",
-                "bearerFormat": "JWT",
-                "type": "http"
-            }
+          }
         },
-        "schemas": {
-            "SignUpDto": {
-                "type": "object",
-                "properties": {
-                    "username": {
-                        "type": "string",
-                        "example": "John32"
-                    },
-                    "fullName": {
-                        "type": "string",
-                        "example": "John"
-                    },
-                    "email": {
-                        "type": "string",
-                        "example": "johndoe@gmail.com"
-                    },
-                    "password": {
-                        "type": "string",
-                        "example": "Testpassword@1234"
-                    },
-                    "phoneNumber": {
-                        "type": "string",
-                        "example": "+xx1050790880"
-                    },
-                    "dob": {
-                        "type": "string",
-                        "example": "2020-01-01"
-                    }
-                },
-                "required": [
-                    "username",
-                    "fullName",
-                    "email",
-                    "password",
-                    "phoneNumber",
-                    "dob"
-                ]
-            },
-            "ResetPasswordConfirmationBodyDto": {
-                "type": "object",
-                "properties": {
-                    "password": {
-                        "type": "string",
-                        "example": "Testpassword@1234"
-                    }
-                },
-                "required": [
-                    "password"
-                ]
-            },
-            "LoginDto": {
-                "type": "object",
-                "properties": {
-                    "email": {
-                        "type": "string",
-                        "example": "John@admin.com"
-                    },
-                    "password": {
-                        "type": "string",
-                        "example": "Testpassword@1234"
-                    }
-                },
-                "required": [
-                    "email",
-                    "password"
-                ]
-            },
-            "UpdateUserDto": {
-                "type": "object",
-                "properties": {
-                    "username": {
-                        "type": "string",
-                        "example": "John32"
-                    },
-                    "fullName": {
-                        "type": "string",
-                        "example": "John Doe"
-                    },
-                    "email": {
-                        "type": "string",
-                        "example": "johndoe@gmail.com"
-                    },
-                    "bio": {
-                        "type": "string",
-                        "example": "My name is John doe and iam a software developer"
-                    },
-                    "coverImage": {
-                        "type": "string",
-                        "example": "https://image.com"
-                    },
-                    "phoneNumber": {
-                        "type": "string",
-                        "example": "+xx1050790880"
-                    },
-                    "image": {
-                        "type": "string",
-                        "example": "https://image.com"
-                    },
-                    "dob": {
-                        "type": "string",
-                        "example": "2020-01-01"
-                    },
-                    "addedInterests": {
-                        "example": [
-                            "gaming",
-                            "programming",
-                            "backend"
-                        ],
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "removedInterests": {
-                        "example": [
-                            "programming"
-                        ],
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "required": [
-                    "dob"
-                ]
-            },
-            "CreateArticleDto": {
-                "type": "object",
-                "properties": {
-                    "title": {
-                        "type": "string",
-                        "example": "My article title",
-                        "description": "The title of the article"
-                    },
-                    "coverImageUrl": {
-                        "type": "string",
-                        "example": "www.google.com/url/to/image.jpg",
-                        "description": "The cover image of the article"
-                    },
-                    "tags": {
-                        "example": [
-                            "tag1",
-                            "tag2",
-                            "tag3"
-                        ],
-                        "description": "The tags of the article",
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "sections": {
-                        "example": [
-                            [
-                                "section1",
-                                "typeOfSection1"
-                            ],
-                            [
-                                "section2",
-                                "typeOfSection2"
-                            ]
-                        ],
-                        "description": "The sections of the article",
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "required": [
-                    "title",
-                    "coverImageUrl",
-                    "tags",
-                    "sections"
-                ]
-            },
-            "UpdateArticleDto": {
-                "type": "object",
-                "properties": {
-                    "title": {
-                        "type": "string",
-                        "example": "My article title",
-                        "description": "The title of the article"
-                    },
-                    "coverImageUrl": {
-                        "type": "string",
-                        "example": "www.google.com/url/to/image.jpg",
-                        "description": "The cover image of the article"
-                    },
-                    "sections": {
-                        "example": [
-                            [
-                                "section1",
-                                "typeOfSection1"
-                            ],
-                            [
-                                "section2",
-                                "typeOfSection2"
-                            ]
-                        ],
-                        "description": "The sections of the article",
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "AddTaskDto": {
-                "type": "object",
-                "properties": {
-                    "Title": {
-                        "type": "string",
-                        "description": "The title of the task",
-                        "maxLength": 255,
-                        "example": "task 1"
-                    },
-                    "Description": {
-                        "type": "string",
-                        "description": "The description of the task",
-                        "maxLength": 255,
-                        "example": "task 1 for CS256 assignment"
-                    },
-                    "StartDate": {
-                        "type": "string",
-                        "description": "The start date of the task in the format yyyy-mm-ddThh:mm",
-                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$",
-                        "example": "2021-01-01T00:00"
-                    },
-                    "DueDate": {
-                        "type": "string",
-                        "description": "The due date of the task in the format yyyy-mm-ddThh:mm",
-                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$",
-                        "example": "2021-01-01T00:00"
-                    },
-                    "Status": {
-                        "type": "string",
-                        "description": "The status of the task",
-                        "maxLength": 255,
-                        "example": "in progress"
-                    }
-                },
-                "required": [
-                    "Title",
-                    "StartDate",
-                    "DueDate",
-                    "Status"
-                ]
-            },
-            "UpdateTaskDto": {
-                "type": "object",
-                "properties": {
-                    "Title": {
-                        "type": "string",
-                        "description": "The title of the task",
-                        "maxLength": 255,
-                        "example": "task 1"
-                    },
-                    "Description": {
-                        "type": "string",
-                        "description": "The description of the task",
-                        "maxLength": 255,
-                        "example": "task 1 for CS256 assignment"
-                    },
-                    "StartDate": {
-                        "type": "string",
-                        "description": "The start date of the task in the format yyyy-mm-ddThh:mm",
-                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$",
-                        "example": "2021-01-01T00:00"
-                    },
-                    "DueDate": {
-                        "type": "string",
-                        "description": "The due date of the task in the format yyyy-mm-ddThh:mm",
-                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$",
-                        "example": "2021-01-01T00:00"
-                    },
-                    "Status": {
-                        "type": "string",
-                        "description": "The status of the task",
-                        "maxLength": 255,
-                        "example": "in progress"
-                    }
-                }
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/users": {
+      "patch": {
+        "operationId": "UsersController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
             }
-        }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "example": {
+                            "id": "1",
+                            "full_name": "John Doe",
+                            "username": "johndoe",
+                            "email": "johndoe@email.com",
+                            "dob": "1999-01-01",
+                            "bio": "I am a cool guy",
+                            "phone_number": "+23481050790880",
+                            "cover_image": "https://example.com/cover.jpg",
+                            "image": "https://example.com/image.jpg",
+                            "user_tag": [
+                              "music",
+                              "sports"
+                            ],
+                            "level": {
+                              "level_id": 1,
+                              "title": "noob",
+                              "description": "a newbie",
+                              "image_url": "www.google.com"
+                            },
+                            "plan": {
+                              "plan_id": 1,
+                              "title": "free",
+                              "description": "free plan",
+                              "trial_period": "30",
+                              "billing_frequency": 10,
+                              "image_url": "www.google.com",
+                              "price": 0,
+                              "currency": "EGP"
+                            }
+                          }
+                        },
+                        "access_token": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or a constraint error"
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/tags": {
+      "get": {
+        "operationId": "TagsController_getAllTags",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tags"
+        ]
+      }
+    },
+    "/api/tags/suggested": {
+      "get": {
+        "operationId": "TagsController_getSuggestedTags",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tags"
+        ]
+      }
+    },
+    "/api/articles": {
+      "get": {
+        "operationId": "ArticlesController_getArticles",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns articles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 1,
+                          "title": "My article title",
+                          "createdAt": "2024-01-12T14:21:45.574Z",
+                          "updatedAt": "2024-01-12T14:21:45.583Z",
+                          "coverImageUrl": "www.google.com/url/to/image.jpg",
+                          "tags": [
+                            "tag1",
+                            "tag2"
+                          ],
+                          "author": {
+                            "full_name": "John Doe",
+                            "username": "john11",
+                            "image": "www.google.com/url/to/image.jpg",
+                            "followersCount": 0
+                          },
+                          "sections": [
+                            {
+                              "value": "valueOfSection1",
+                              "contentType": "text"
+                            },
+                            {
+                              "value": "typeOfSection1",
+                              "contentType": "text"
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 1,
+                          "title": "My article title",
+                          "createdAt": "2024-01-12T14:21:45.574Z",
+                          "updatedAt": "2024-01-12T14:21:45.583Z",
+                          "coverImageUrl": "www.google.com/url/to/image.jpg",
+                          "tags": [
+                            "tag1",
+                            "tag2"
+                          ],
+                          "author": {
+                            "full_name": "John Doe",
+                            "username": "john11",
+                            "image": "www.google.com/url/to/image.jpg",
+                            "followersCount": 0
+                          },
+                          "sections": [
+                            {
+                              "value": "valueOfSection1",
+                              "contentType": "text"
+                            },
+                            {
+                              "value": "typeOfSection1",
+                              "contentType": "text"
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 1,
+                          "title": "My article title",
+                          "createdAt": "2024-01-12T14:21:45.574Z",
+                          "updatedAt": "2024-01-12T14:21:45.583Z",
+                          "coverImageUrl": "www.google.com/url/to/image.jpg",
+                          "tags": [
+                            "tag1",
+                            "tag2"
+                          ],
+                          "author": {
+                            "full_name": "John Doe",
+                            "username": "john11",
+                            "image": "www.google.com/url/to/image.jpg",
+                            "followersCount": 0
+                          },
+                          "sections": [
+                            {
+                              "value": "valueOfSection1",
+                              "contentType": "text"
+                            },
+                            {
+                              "value": "typeOfSection1",
+                              "contentType": "text"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      },
+      "post": {
+        "operationId": "ArticlesController_createArticle",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateArticleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Returns created article",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "ID": 1,
+                        "title": "My article title",
+                        "createdAt": "2024-01-12T14:21:45.574Z",
+                        "updatedAt": "2024-01-12T14:21:45.583Z",
+                        "coverImageUrl": "www.google.com/url/to/image.jpg",
+                        "tags": [
+                          "tag1",
+                          "tag2"
+                        ],
+                        "author": {
+                          "full_name": "John Doe",
+                          "username": "john11",
+                          "image": "www.google.com/url/to/image.jpg",
+                          "followersCount": 0
+                        },
+                        "sections": [
+                          {
+                            "value": "valueOfSection1",
+                            "contentType": "text"
+                          },
+                          {
+                            "value": "typeOfSection1",
+                            "contentType": "text"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
+    "/api/articles/{articleId}": {
+      "get": {
+        "operationId": "ArticlesController_getArticle",
+        "parameters": [
+          {
+            "name": "articleId",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "description": "Article id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns article",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "ID": 1,
+                        "title": "My article title",
+                        "createdAt": "2024-01-12T14:21:45.574Z",
+                        "updatedAt": "2024-01-12T14:21:45.583Z",
+                        "coverImageUrl": "www.google.com/url/to/image.jpg",
+                        "tags": [
+                          "tag1",
+                          "tag2"
+                        ],
+                        "author": {
+                          "full_name": "John Doe",
+                          "username": "john11",
+                          "image": "www.google.com/url/to/image.jpg",
+                          "followersCount": 0
+                        },
+                        "sections": [
+                          {
+                            "value": "valueOfSection1",
+                            "contentType": "text"
+                          },
+                          {
+                            "value": "typeOfSection1",
+                            "contentType": "text"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      },
+      "patch": {
+        "operationId": "ArticlesController_updateArticle",
+        "parameters": [
+          {
+            "name": "articleId",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateArticleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns updated article",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "ID": 1,
+                        "title": "My article title",
+                        "createdAt": "2024-01-12T14:21:45.574Z",
+                        "updatedAt": "2024-01-12T14:21:45.583Z",
+                        "coverImageUrl": "www.google.com/url/to/image.jpg",
+                        "tags": [
+                          "tag1",
+                          "tag2"
+                        ],
+                        "author": {
+                          "full_name": "John Doe",
+                          "username": "john11",
+                          "image": "www.google.com/url/to/image.jpg",
+                          "followersCount": 0
+                        },
+                        "sections": [
+                          {
+                            "value": "valueOfSection1",
+                            "contentType": "text"
+                          },
+                          {
+                            "value": "typeOfSection1",
+                            "contentType": "text"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      },
+      "delete": {
+        "operationId": "ArticlesController_deleteArticle",
+        "parameters": [
+          {
+            "name": "articleId",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "description": "Article id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return confirmation for deletion"
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
+    "/api/study-planner": {
+      "get": {
+        "operationId": "StudyPlannerController_getTasks",
+        "summary": "Get all tasks paginated",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get all tasks paginated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. request parameters have something wrong"
+          }
+        },
+        "tags": [
+          "study-planner"
+        ]
+      },
+      "post": {
+        "operationId": "StudyPlannerController_createTask",
+        "summary": "Create a new task",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "a task has been successfully created."
+          },
+          "400": {
+            "description": "Bad request. request parameters have something wrong"
+          }
+        },
+        "tags": [
+          "study-planner"
+        ]
+      }
+    },
+    "/api/study-planner/{task_id}": {
+      "get": {
+        "operationId": "StudyPlannerController_getTaskById",
+        "summary": "Get a specific task",
+        "parameters": [
+          {
+            "name": "task_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get a specific task",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "examples": {
+                    "application/json": {
+                      "status": "success",
+                      "data": {
+                        "task_id": 1,
+                        "title": "task 1",
+                        "description": "task 1 description",
+                        "start_date": "2021-05-19T00:00:00.000Z",
+                        "due_date": "2021-05-20T00:00:00.000Z",
+                        "status": "in-progress",
+                        "user_id": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. request parameters have something wrong"
+          }
+        },
+        "tags": [
+          "study-planner"
+        ]
+      },
+      "patch": {
+        "operationId": "StudyPlannerController_updateTask",
+        "summary": "Update a task",
+        "parameters": [
+          {
+            "name": "task_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task has been successfully updated"
+          },
+          "400": {
+            "description": "Bad request. request parameters have something wrong"
+          }
+        },
+        "tags": [
+          "study-planner"
+        ]
+      },
+      "delete": {
+        "operationId": "StudyPlannerController_deleteTask",
+        "summary": "Delete a task",
+        "parameters": [
+          {
+            "name": "task_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task has been successfully deleted"
+          },
+          "400": {
+            "description": "Bad request. request parameters have something wrong"
+          }
+        },
+        "tags": [
+          "study-planner"
+        ]
+      }
     }
+  },
+  "info": {
+    "title": "INTELLI GP",
+    "description": "The INTELLI-GP API documentation",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "INTELLI GP",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "SignUpDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "John32"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "John"
+          },
+          "email": {
+            "type": "string",
+            "example": "johndoe@gmail.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Testpassword@1234"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+xx1050790880"
+          },
+          "dob": {
+            "type": "string",
+            "example": "2020-01-01"
+          }
+        },
+        "required": [
+          "username",
+          "fullName",
+          "email",
+          "password",
+          "phoneNumber",
+          "dob"
+        ]
+      },
+      "ResetPasswordConfirmationBodyDto": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "example": "Testpassword@1234"
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "John@admin.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Testpassword@1234"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "John32"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "johndoe@gmail.com"
+          },
+          "bio": {
+            "type": "string",
+            "example": "My name is John doe and iam a software developer"
+          },
+          "coverImage": {
+            "type": "string",
+            "example": "https://image.com"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+xx1050790880"
+          },
+          "image": {
+            "type": "string",
+            "example": "https://image.com"
+          },
+          "dob": {
+            "type": "string",
+            "example": "2020-01-01"
+          },
+          "addedInterests": {
+            "example": [
+              "gaming",
+              "programming",
+              "backend"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "removedInterests": {
+            "example": [
+              "programming"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "dob"
+        ]
+      },
+      "CreateArticleDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "My article title",
+            "description": "The title of the article"
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "example": "www.google.com/url/to/image.jpg",
+            "description": "The cover image of the article"
+          },
+          "tags": {
+            "example": [
+              "tag1",
+              "tag2",
+              "tag3"
+            ],
+            "description": "The tags of the article",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sections": {
+            "example": [
+              [
+                "section1",
+                "typeOfSection1"
+              ],
+              [
+                "section2",
+                "typeOfSection2"
+              ]
+            ],
+            "description": "The sections of the article",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "coverImageUrl",
+          "tags",
+          "sections"
+        ]
+      },
+      "UpdateArticleDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "My article title",
+            "description": "The title of the article"
+          },
+          "coverImageUrl": {
+            "type": "string",
+            "example": "www.google.com/url/to/image.jpg",
+            "description": "The cover image of the article"
+          },
+          "sections": {
+            "example": [
+              [
+                "section1",
+                "typeOfSection1"
+              ],
+              [
+                "section2",
+                "typeOfSection2"
+              ]
+            ],
+            "description": "The sections of the article",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AddTaskDto": {
+        "type": "object",
+        "properties": {
+          "Title": {
+            "type": "string",
+            "description": "The title of the task",
+            "maxLength": 255,
+            "example": "task 1"
+          },
+          "Description": {
+            "type": "string",
+            "description": "The description of the task",
+            "maxLength": 255,
+            "example": "task 1 for CS256 assignment"
+          },
+          "StartDate": {
+            "type": "string",
+            "description": "The start date of the task in the format yyyy-mm-ddThh:mm",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$",
+            "example": "2021-01-01T00:00"
+          },
+          "DueDate": {
+            "type": "string",
+            "description": "The due date of the task in the format yyyy-mm-ddThh:mm",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$",
+            "example": "2021-01-01T00:00"
+          },
+          "Status": {
+            "type": "string",
+            "description": "The status of the task",
+            "maxLength": 255,
+            "example": "in progress"
+          }
+        },
+        "required": [
+          "Title",
+          "StartDate",
+          "DueDate",
+          "Status"
+        ]
+      },
+      "UpdateTaskDto": {
+        "type": "object",
+        "properties": {
+          "Title": {
+            "type": "string",
+            "description": "The title of the task",
+            "maxLength": 255,
+            "example": "task 1"
+          },
+          "Description": {
+            "type": "string",
+            "description": "The description of the task",
+            "maxLength": 255,
+            "example": "task 1 for CS256 assignment"
+          },
+          "StartDate": {
+            "type": "string",
+            "description": "The start date of the task in the format yyyy-mm-ddThh:mm",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$",
+            "example": "2021-01-01T00:00"
+          },
+          "DueDate": {
+            "type": "string",
+            "description": "The due date of the task in the format yyyy-mm-ddThh:mm",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$",
+            "example": "2021-01-01T00:00"
+          },
+          "Status": {
+            "type": "string",
+            "description": "The status of the task",
+            "maxLength": 255,
+            "example": "in progress"
+          }
+        }
+      }
+    }
+  }
 }

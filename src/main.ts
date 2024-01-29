@@ -33,14 +33,10 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('/6YrzxCg81s/swagger-docs', app, document);
 
+    // Generate Swagger json schema
     const jsonOutput = JSON.stringify(document, null, 2);
-
     fs.writeFileSync('swagger.json', jsonOutput);
   }
-
-  // Generate Swagger json schema
-  const jsonOutput = JSON.stringify(document, null, 2);
-  fs.writeFileSync('swagger.json', jsonOutput);
 
   await app.listen(config.get('PORT'));
 }

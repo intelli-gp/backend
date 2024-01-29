@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
@@ -17,11 +18,27 @@ import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { CreateArticleExample } from './swagger-examples';
 import { DeleteArticleDto, UpdateArticleDto } from './dto';
 import { GetArticleDto } from './dto/get-article.dto';
+import { PaginationDto } from 'src/common/dto';
+import { MultipleArticlesExample } from './swagger-examples/multiple-articles.example';
 
 @Controller('articles')
 @ApiTags('Articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
+
+  @Public()
+  @ApiResponse({
+    status: 200,
+    description: 'Returns articles',
+    schema: swaggerSuccessExample(null, MultipleArticlesExample),
+  })
+  @Get()
+  async getArticles(@Query() paginationData: PaginationDto) {
+    const articles = await this.articlesService.getAllArticles(paginationData);
+    return sendSuccessResponse(
+      articles.map((article) => new SerializedArticle(article)),
+    );
+  }
 
   @ApiResponse({
     status: 201,
