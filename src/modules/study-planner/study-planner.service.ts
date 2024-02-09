@@ -108,7 +108,7 @@ export class StudyPlannerService {
       });
 
     if (!task) throw new BadRequestException({ message: "Task doesn't exist" });
-    return 'Task has been deleted successfully';
+    return true;
   }
 
   private async checkValidDate(id: number, startDate: Date, dueDate: Date) {
@@ -132,45 +132,45 @@ export class StudyPlannerService {
     if (start_date < currentDate || due_date < currentDate)
       throw new BadRequestException({ message: 'Date cannot be in the past' });
 
-    // not more than 1 months in the future
-    const dateAfterMonth = new Date(
-      new Date().setMonth(new Date().getMonth() + 1),
-    ).getTime();
+    // // not more than 1 months in the future
+    // const dateAfterMonth = new Date(
+    //   new Date().setMonth(new Date().getMonth() + 1),
+    // ).getTime();
 
-    if (start_date > dateAfterMonth || due_date > dateAfterMonth)
-      throw new BadRequestException({
-        message: 'Date cannot be more than 1 months in the future',
-      });
+    // if (start_date > dateAfterMonth || due_date > dateAfterMonth)
+    //   throw new BadRequestException({
+    //     message: 'Date cannot be more than 1 months in the future',
+    //   });
 
-    // check if date is not in the interval of other tasks
-    const tasks = await this.prismaService.task.findMany({
-      where: { user_id: id },
-    });
+    // // check if date is not in the interval of other tasks
+    // const tasks = await this.prismaService.task.findMany({
+    //   where: { user_id: id },
+    // });
 
-    for (const task of tasks) {
-      const taskStartDate = task.start_date.getTime();
-      const taskDueDate = task.due_date.getTime();
-      // if start date is in the interval of other task
-      if (start_date >= taskStartDate && start_date < taskDueDate)
-        throw new BadRequestException({
-          message: 'start cannot be inside the interval of other tasks',
-        });
+    // for (const task of tasks) {
+    //   const taskStartDate = task.start_date.getTime();
+    //   const taskDueDate = task.due_date.getTime();
+    //   // if start date is in the interval of other task
+    //   if (start_date >= taskStartDate && start_date < taskDueDate)
+    //     throw new BadRequestException({
+    //       message: 'start cannot be inside the interval of other tasks',
+    //     });
 
-      // if end date is in the interval of other task
-      if (due_date >= taskStartDate && due_date <= taskDueDate)
-        throw new BadRequestException({
-          message: 'end date cannot be inside the interval of other tasks',
-        });
+    //   // if end date is in the interval of other task
+    //   if (due_date >= taskStartDate && due_date <= taskDueDate)
+    //     throw new BadRequestException({
+    //       message: 'end date cannot be inside the interval of other tasks',
+    //     });
 
-      // if some other task interval is inside this interval
-      if (
-        start_date <= taskStartDate &&
-        due_date >= taskStartDate &&
-        due_date >= taskDueDate
-      )
-        throw new BadRequestException({
-          message: 'intervals cannot be inside each other',
-        });
-    }
+    //   // if some other task interval is inside this interval
+    //   if (
+    //     start_date <= taskStartDate &&
+    //     due_date >= taskStartDate &&
+    //     due_date >= taskDueDate
+    //   )
+    //     throw new BadRequestException({
+    //       message: 'intervals cannot be inside each other',
+    //     });
+    // }
   }
 }
