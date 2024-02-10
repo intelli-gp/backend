@@ -24,6 +24,11 @@ import {
 import { SerializedTask } from './serialized-types/serialized-task';
 import { PaginationDto } from '../../common/dto';
 import UpdateTaskDto from './dto/update-task.dto';
+import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
+import { MultipleTasksExample } from './swagger-examples/multiple-tasks.example';
+import { ErrorScheme } from './swagger-examples/error.example';
+import { CommonTask } from './swagger-examples/common-data';
+import { DeleteTaskExample } from './swagger-examples/delete-task.example';
 
 // TODO: add swagger example for the return object for each output from each controller
 @Controller('study-planner')
@@ -37,15 +42,11 @@ export class StudyPlannerController {
   @ApiOperation({ summary: 'Get all tasks paginated' })
   @ApiOkResponse({
     description: 'Get all tasks paginated',
-    schema: {
-      type: 'object',
-      properties: {
-        status: { type: 'string', example: 'success' },
-      },
-    },
+    schema: swaggerSuccessExample(null, MultipleTasksExample),
   })
   @ApiBadRequestResponse({
     description: 'Bad request. request parameters have something wrong',
+    schema: swaggerSuccessExample(null, ErrorScheme),
   })
   async getTasks(
     @GetCurrentUser('user_id') id,
@@ -64,27 +65,11 @@ export class StudyPlannerController {
   @ApiOperation({ summary: 'Get a specific task' })
   @ApiOkResponse({
     description: 'successfully get a specific task',
-    schema: {
-      type: 'object',
-
-      examples: {
-        'application/json': {
-          status: 'success',
-          data: {
-            task_id: 1,
-            title: 'task 1',
-            description: 'task 1 description',
-            start_date: '2021-05-19T00:00:00.000Z',
-            due_date: '2021-05-20T00:00:00.000Z',
-            status: 'in-progress',
-            user_id: 1,
-          },
-        },
-      },
-    },
+    schema: swaggerSuccessExample(null, CommonTask),
   })
   @ApiBadRequestResponse({
     description: 'Bad request. request parameters have something wrong',
+    schema: swaggerSuccessExample(null, ErrorScheme),
   })
   // TODO: Pipe need to return custom error message
   async getTaskById(
@@ -108,9 +93,11 @@ export class StudyPlannerController {
   @ApiOperation({ summary: 'Create a new task' })
   @ApiOkResponse({
     description: 'a task has been successfully created.',
+    schema: swaggerSuccessExample(null, CommonTask),
   })
   @ApiBadRequestResponse({
     description: 'Bad request. request parameters have something wrong',
+    schema: swaggerSuccessExample(null, ErrorScheme),
   })
   async createTask(
     @GetCurrentUser('user_id') id,
@@ -128,9 +115,13 @@ export class StudyPlannerController {
   @HttpCode(HttpStatus.OK)
   @HttpCode(HttpStatus.BAD_REQUEST)
   @ApiOperation({ summary: 'Update a task' })
-  @ApiOkResponse({ description: 'Task has been successfully updated' })
+  @ApiOkResponse({
+    description: 'Task has been successfully updated',
+    schema: swaggerSuccessExample(null, CommonTask),
+  })
   @ApiBadRequestResponse({
     description: 'Bad request. request parameters have something wrong',
+    schema: swaggerSuccessExample(null, ErrorScheme),
   })
   async updateTask(
     @GetCurrentUser('user_id') userId,
@@ -157,9 +148,13 @@ export class StudyPlannerController {
   @HttpCode(HttpStatus.OK)
   @HttpCode(HttpStatus.BAD_REQUEST)
   @ApiOperation({ summary: 'Delete a task' })
-  @ApiOkResponse({ description: 'Task has been successfully deleted' })
+  @ApiOkResponse({
+    description: 'Task has been successfully deleted',
+    schema: swaggerSuccessExample(null, DeleteTaskExample),
+  })
   @ApiBadRequestResponse({
     description: 'Bad request. request parameters have something wrong',
+    schema: swaggerSuccessExample(null, ErrorScheme),
   })
   async deleteTask(
     @GetCurrentUser('user_id') userId,
