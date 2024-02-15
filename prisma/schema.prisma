@@ -226,7 +226,7 @@ model task {
   start_date  DateTime @db.Timestamp
   user_id     Int
   status      String   @db.VarChar(255)
-  color       String   @db.VarChar(255)
+  color       String   @db.Char(7)
   user        user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([user_id])

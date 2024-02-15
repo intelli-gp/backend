@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, Matches, MaxLength } from 'class-validator';
+import {
+  IsHexColor,
+  IsNotEmpty,
+  IsOptional,
+  Length,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export default class AddTaskDto {
   @ApiProperty({
@@ -54,4 +61,16 @@ export default class AddTaskDto {
   @IsNotEmpty()
   @MaxLength(255)
   Status: string;
+
+  @ApiProperty({
+    description: 'The color of the task',
+    required: false,
+    example: '#ffffff',
+  })
+  @IsNotEmpty()
+  @Length(7, 7, {
+    message: 'Invalid color format. Must be in the format #ffffff',
+  })
+  @IsHexColor()
+  Color: string;
 }

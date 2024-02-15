@@ -50,6 +50,7 @@ export class StudyPlannerService {
           start_date,
           due_date,
           status: addTaskDto.Status,
+          color: addTaskDto.Color,
           user_id: id,
         },
       })
@@ -65,7 +66,8 @@ export class StudyPlannerService {
     taskId: number,
     updateTaskDto: UpdateTaskDto,
   ) {
-    const { StartDate, DueDate, Title, Description, Status } = updateTaskDto;
+    const { StartDate, DueDate, Title, Description, Status, Color } =
+      updateTaskDto;
     const updatedTaskData = {};
     if ((StartDate && !DueDate) || (!StartDate && DueDate))
       throw new BadRequestException({
@@ -81,6 +83,8 @@ export class StudyPlannerService {
     if (Title) updatedTaskData['title'] = Title;
     if (Description) updatedTaskData['description'] = Description;
     if (Status) updatedTaskData['status'] = Status;
+    if (Color) updatedTaskData['color'] = Color;
+
     const task = await this.prismaService.task
       .update({
         where: { task_id: taskId, user_id: userId },

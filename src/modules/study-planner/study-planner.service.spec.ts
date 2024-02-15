@@ -15,6 +15,7 @@ describe('StudyPlannerService', () => {
         start_date: new Date('2024-02-19T12:00'),
         due_date: new Date('2024-02-19T14:00'),
         status: 'IN_PROGRESS',
+        color: '#ffffff',
       },
       {
         id: 2,
@@ -23,6 +24,7 @@ describe('StudyPlannerService', () => {
         start_date: new Date('2024-02-19T15:00'),
         due_date: new Date('2024-02-19T18:00'),
         status: 'IN_PROGRESS',
+        color: '#ffffff',
       },
       {
         id: 3,
@@ -31,6 +33,7 @@ describe('StudyPlannerService', () => {
         start_date: new Date('2024-02-20T12:00'),
         due_date: new Date('2024-02-20T13:00'),
         status: 'IN_PROGRESS',
+        color: '#ffffff',
       },
     ];
     const module: TestingModule = await Test.createTestingModule({
@@ -70,6 +73,7 @@ describe('StudyPlannerService', () => {
         StartDate: '2024-02-21T12:00',
         DueDate: '2024-02-21T14:00',
         Status: 'IN_PROGRESS',
+        Color: '#ffffff',
       });
 
       expect(prismaService.task.create).toHaveBeenCalledWith({
@@ -80,6 +84,7 @@ describe('StudyPlannerService', () => {
           start_date: new Date('2024-02-21T12:00'),
           due_date: new Date('2024-02-21T14:00'),
           status: 'IN_PROGRESS',
+          color: '#ffffff',
         },
       });
     });
@@ -115,6 +120,7 @@ describe('StudyPlannerService', () => {
         start_date: new Date('2024-02-19T15:00'),
         due_date: new Date('2024-02-19T18:00'),
         status: 'IN_PROGRESS',
+        color: '#ffffff',
       });
     });
   });
@@ -127,6 +133,7 @@ describe('StudyPlannerService', () => {
         StartDate: '2024-02-20T15:00',
         DueDate: '2024-02-20T18:00',
         Status: 'IN_PROGRESS',
+        Color: '#aaaaaa',
       });
 
       expect(prismaService.task.update).toHaveBeenCalledWith({
@@ -137,6 +144,7 @@ describe('StudyPlannerService', () => {
           start_date: new Date('2024-02-20T15:00'),
           due_date: new Date('2024-02-20T18:00'),
           status: 'IN_PROGRESS',
+          color: '#aaaaaa',
         },
       });
 
@@ -147,6 +155,7 @@ describe('StudyPlannerService', () => {
         start_date: new Date('2024-02-20T15:00'),
         due_date: new Date('2024-02-20T18:00'),
         status: 'IN_PROGRESS',
+        color: '#aaaaaa',
       });
     });
 
@@ -157,6 +166,7 @@ describe('StudyPlannerService', () => {
         StartDate: null,
         DueDate: null,
         Status: null,
+        Color: null,
       });
 
       expect(prismaService.task.update).toHaveBeenCalledWith({
@@ -174,6 +184,7 @@ describe('StudyPlannerService', () => {
         start_date: new Date('2024-02-19T15:00'),
         due_date: new Date('2024-02-19T18:00'),
         status: 'IN_PROGRESS',
+        color: '#ffffff',
       });
     });
 
@@ -184,6 +195,7 @@ describe('StudyPlannerService', () => {
         StartDate: '2024-02-24T15:00',
         DueDate: '2024-02-24T18:00',
         Status: null,
+        Color: null,
       });
 
       expect(prismaService.task.update).toHaveBeenCalledWith({
@@ -201,6 +213,7 @@ describe('StudyPlannerService', () => {
         start_date: new Date('2024-02-24T15:00'),
         due_date: new Date('2024-02-24T18:00'),
         status: 'IN_PROGRESS',
+        color: '#ffffff',
       });
     });
   });

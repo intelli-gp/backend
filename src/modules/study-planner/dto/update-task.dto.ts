@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, Matches, MaxLength } from 'class-validator';
+import { IsOptional, Length, Matches, MaxLength } from 'class-validator';
 
 export default class UpdateTaskDto {
   @ApiProperty({
@@ -54,4 +54,13 @@ export default class UpdateTaskDto {
   @IsOptional()
   @MaxLength(255)
   Status: string;
+
+  @ApiProperty({
+    description: 'The color of the task',
+    required: false,
+    example: '#xxxxxx',
+  })
+  @IsOptional()
+  @Length(7, 7)
+  Color: string;
 }

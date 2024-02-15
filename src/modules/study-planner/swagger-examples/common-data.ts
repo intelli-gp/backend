@@ -4,4 +4,5 @@ export const CommonTask = {
   StartSate: '2021-05-19T00:00:00.000Z',
   DueDate: '2021-05-20T00:00:00.000Z',
   Status: 'in-progress',
+  Color: '#123456',
 };
