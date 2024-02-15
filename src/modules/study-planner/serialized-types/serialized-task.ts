@@ -32,6 +32,11 @@ export class SerializedTask {
   })
   Status: string;
 
+  @ApiProperty({
+    example: '#123456',
+  })
+  Color: string;
+
   constructor(partial: Partial<task>) {
     this.ID = partial.task_id;
     this.Title = partial.title;
@@ -39,5 +44,6 @@ export class SerializedTask {
     this.Status = partial.status;
     this.StartDate = partial.start_date;
     this.DueDate = partial.due_date;
+    this.Color = partial.color;
   }
 }
