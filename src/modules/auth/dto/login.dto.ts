@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { ToLowerCase } from 'src/utils/class-transformer-decorators/lowercase-transformer.decorator';
+import { ToLowerCase } from '../../../utils/class-transformer-decorators/lowercase-transformer.decorator';
 
 export class LoginDto {
   @ApiProperty({ required: true, example: 'John@admin.com' })

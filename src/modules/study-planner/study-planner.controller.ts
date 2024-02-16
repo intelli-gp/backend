@@ -24,7 +24,7 @@ import {
 import { SerializedTask } from './serialized-types/serialized-task';
 import { PaginationDto } from '../../common/dto';
 import UpdateTaskDto from './dto/update-task.dto';
-import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
+import { swaggerSuccessExample } from '../../utils/swagger/example-generator';
 import { MultipleTasksExample } from './swagger-examples/multiple-tasks.example';
 import { ErrorScheme } from './swagger-examples/error.example';
 import { CommonTask } from './swagger-examples/common-data';

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { PaginationDto } from 'src/common/dto';
+import { PaginationDto } from '../../common/dto';
 @Injectable()
 export class TagsService {
   constructor(private readonly prismaService: PrismaService) {}

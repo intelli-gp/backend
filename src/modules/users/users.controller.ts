@@ -9,13 +9,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
-import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
+import { SerializedUser } from '../../modules/users/serialized-types/serialized-user';
+import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetCurrentUser } from '../auth/ParamDecorator';
 import { user } from '@prisma/client';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
+import { swaggerSuccessExample } from '../../utils/swagger/example-generator';
 import { SwaggerLoginExample } from '../auth/swagger-examples';
 
 @Controller('users')

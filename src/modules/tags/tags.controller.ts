@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { TagsService } from './tags.service';
-import { PaginationDto } from 'src/common/dto';
-import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
+import { PaginationDto } from '../../common/dto';
+import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('tags')

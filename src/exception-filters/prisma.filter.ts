@@ -5,7 +5,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { sendFailureResponse } from 'src/utils/response-handler/failure.response-handler';
+import { sendFailureResponse } from '../utils/response-handler/failure.response-handler';
 import {
   PrismaErrorStatusCode,
   PrismaErrorMessage,

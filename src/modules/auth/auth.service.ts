@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { Tokens } from './types/tokens';
 import { user } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
-import { compare, hashS10 } from 'src/utils/bcrypt';
+import { compare, hashS10 } from '../../utils/bcrypt';
 import { SignUpDto } from './dto/signup.dto';
 import { MailsService } from '../mails/mails.service';
 import { Profile } from 'passport-google-oauth20';
@@ -16,7 +16,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { v4 as uuid } from 'uuid';
 import { loginResult } from './types/login.response';
-import { sendRefreshToken } from 'src/utils/response-handler/success.response-handler';
+import { sendRefreshToken } from '../../utils/response-handler/success.response-handler';
 
 @Injectable()
 export class AuthService {

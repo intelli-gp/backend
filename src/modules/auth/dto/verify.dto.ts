@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
-import { IsValidUsername } from 'src/utils/class-validator-decorators/username.decorator';
+import { IsValidUsername } from '../../../utils/class-validator-decorators/username.decorator';
 
 export class SendVerificationEmailDto {
   @ApiProperty({ required: true, example: 'John32' })

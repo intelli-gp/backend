@@ -6,13 +6,13 @@ import {
   IsPhoneNumber,
   Length,
 } from 'class-validator';
-import { ToLowerCase } from 'src/utils/class-transformer-decorators/lowercase-transformer.decorator';
+import { ToLowerCase } from '../../../utils/class-transformer-decorators/lowercase-transformer.decorator';
 import {
   IsValidAge,
   IsGteZero,
   IsStrongPassword,
   IsValidUsername,
-} from 'src/utils/class-validator-decorators';
+} from '../../../utils/class-validator-decorators';
 
 export class SignUpDto {
   @ApiProperty({ required: true, example: 'John32' })

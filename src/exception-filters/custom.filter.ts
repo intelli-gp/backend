@@ -5,7 +5,7 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { sendFailureResponse } from 'src/utils/response-handler/failure.response-handler';
+import { sendFailureResponse } from '../utils/response-handler/failure.response-handler';
 
 @Catch(HttpException)
 export class CustomFilter implements ExceptionFilter {

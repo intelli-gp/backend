@@ -19,10 +19,10 @@ import { LoginDto } from './dto/login.dto';
 import {
   sendRefreshToken,
   sendSuccessResponse,
-} from 'src/utils/response-handler/success.response-handler';
+} from '../../utils/response-handler/success.response-handler';
 import { GetCurrentUser, Public } from './ParamDecorator';
 import { GoogleGuard } from './guards/google.guard';
-import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
+import { SerializedUser } from '../../modules/users/serialized-types/serialized-user';
 import { SignUpDto } from './dto/signup.dto';
 import { GooglePayload } from './types/google.payload';
 import { LinkedinGuard } from './guards/linkedin.guard';
@@ -36,9 +36,9 @@ import {
   ResetPasswordConfirmationParamDto,
   ResetPasswordConfirmationBodyDto,
 } from './dto';
-import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
+import { swaggerSuccessExample } from '../../utils/swagger/example-generator';
 import { SwaggerLoginExample, SwaggerRefreshExample } from './swagger-examples';
-import { SwaggerFailureResponseExample } from 'src/common/swagger-examples/failure.example';
+import { SwaggerFailureResponseExample } from '../../common/swagger-examples/failure.example';
 
 @Controller('auth')
 @ApiTags('Auth')

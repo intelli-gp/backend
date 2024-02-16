@@ -11,9 +11,9 @@ import {
   Length,
   MinLength,
 } from 'class-validator';
-import { ToLowerCase } from 'src/utils/class-transformer-decorators/lowercase-transformer.decorator';
-import { IsValidAge } from 'src/utils/class-validator-decorators';
-import { IsValidUsername } from 'src/utils/class-validator-decorators/username.decorator';
+import { ToLowerCase } from '../../../utils/class-transformer-decorators/lowercase-transformer.decorator';
+import { IsValidAge } from '../../../utils/class-validator-decorators';
+import { IsValidUsername } from '../../../utils/class-validator-decorators/username.decorator';
 
 export class UpdateUserDto {
   @ApiProperty({ required: false, example: 'John32' })

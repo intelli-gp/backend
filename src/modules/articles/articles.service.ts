@@ -11,7 +11,7 @@ import { articles_content } from '@prisma/client';
 import { UpdateArticleDto } from './dto';
 import { SerializedArticle } from './serialized-types/article.serialized';
 import { DeserializedArticle } from './serialized-types/article.deserializer';
-import { PaginationDto } from 'src/common/dto';
+import { PaginationDto } from '../../common/dto';
 
 @Injectable()
 export class ArticlesService {

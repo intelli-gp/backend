@@ -9,7 +9,7 @@ import {
   IsUrl,
   Length,
 } from 'class-validator';
-import { IsValidArticleSections } from 'src/utils/class-validator-decorators';
+import { IsValidArticleSections } from '../../../utils/class-validator-decorators';
 
 export class CreateArticleDto {
   @ApiProperty({

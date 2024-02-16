@@ -1,4 +1,4 @@
-import { FailurePayload } from 'src/utils/response-handler/types/failure-payload';
+import { FailurePayload } from '../../utils/response-handler/types/failure-payload';
 
 export const SwaggerFailureResponseExample = (payload: FailurePayload) => {
   return {

@@ -11,14 +11,14 @@ import {
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { GetCurrentUser, Public } from '../auth/ParamDecorator';
-import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
+import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
 import { SerializedArticle } from './serialized-types/article.serialized';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
+import { swaggerSuccessExample } from '../../utils/swagger/example-generator';
 import { CreateArticleExample } from './swagger-examples';
 import { DeleteArticleDto, UpdateArticleDto } from './dto';
 import { GetArticleDto } from './dto/get-article.dto';
-import { PaginationDto } from 'src/common/dto';
+import { PaginationDto } from '../../common/dto';
 import { MultipleArticlesExample } from './swagger-examples/multiple-articles.example';
 
 @Controller('articles')
