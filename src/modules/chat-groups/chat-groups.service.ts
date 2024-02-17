@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   Logger,
@@ -106,7 +107,19 @@ export class ChatGroupsService {
     updateData: UpdateChatGroupDto,
     userId: number,
   ): Promise<group> {
-    const deserializedChatGroup = new DeserializedChatGroup(updateData);
+    if (!chatGroupId)
+      throw new BadRequestException('Chat group Id is required');
+
+    const { AddedGroupTags, RemovedGroupTags, ...deserializableData } =
+      updateData;
+    const deserializedChatGroup = new DeserializedChatGroup(deserializableData);
+
+    await this.tagsService.updateTagsForEntities(
+      AddedGroupTags,
+      RemovedGroupTags,
+      'group',
+      chatGroupId,
+    );
     const updatedChatGroup = await this.prismaService.group.update({
       where: {
         group_id: chatGroupId,
@@ -114,6 +127,15 @@ export class ChatGroupsService {
       },
       data: {
         ...deserializedChatGroup,
+      },
+      include: {
+        group_tag: true,
+        group_user: {
+          include: {
+            user: true,
+          },
+        },
+        user: true,
       },
     });
     if (!updatedChatGroup) {

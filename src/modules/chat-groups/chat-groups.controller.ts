@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ChatGroupsService } from './chat-groups.service';
 import { PaginationDto } from 'src/common/dto';
 import {
@@ -20,7 +29,7 @@ export class ChatGroupsController {
   @Post()
   @ApiResponse({
     status: 201,
-    description: 'Returns created article',
+    description: 'Returns created group',
     schema: swaggerSuccessExample(null, singleGroupExample),
   })
   async createChatGroup(
@@ -33,8 +42,8 @@ export class ChatGroupsController {
   }
   @Get()
   @ApiResponse({
-    status: 201,
-    description: 'Returns created article',
+    status: 200,
+    description: 'Returns groups array',
     schema: swaggerSuccessExample(null, multipleGroupsExample),
   })
   async getChatGroups(@Query() dto: GetChatGroupsDto) {
@@ -50,5 +59,25 @@ export class ChatGroupsController {
     return sendSuccessResponse(
       chatGroups.map((chatGroup) => new SerializedChatGroup(chatGroup)),
     );
+  }
+
+  @Patch('/:ID')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns updated group',
+    schema: swaggerSuccessExample(null, multipleGroupsExample),
+  })
+  async updateChatGroup(
+    @Body() dto: UpdateChatGroupDto,
+    @Param() groupIdentifier: GetChatGroupsDto,
+    @GetCurrentUser('user_id') userId,
+  ) {
+    this.logger.debug({ dto, groupIdentifier, userId });
+    const chatGroup = await this.chatGroupsService.updateChatGroup(
+      groupIdentifier.ID,
+      dto,
+      userId,
+    );
+    return sendSuccessResponse(new SerializedChatGroup(chatGroup));
   }
 }

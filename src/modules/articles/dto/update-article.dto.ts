@@ -1,7 +1,7 @@
 import { PartialType as MappedPartialType } from '@nestjs/mapped-types';
 import { CreateArticleDto } from './create-article.dto';
 import { IsArray, IsOptional, IsString } from 'class-validator';
-import { OmitType, PartialType, PickType } from '@nestjs/swagger';
+import { OmitType, PartialType } from '@nestjs/swagger';
 
 export class UpdateArticleDto extends PartialType(
   OmitType(CreateArticleDto, ['tags'] as const),
