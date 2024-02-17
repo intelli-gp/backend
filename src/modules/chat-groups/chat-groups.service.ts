@@ -228,6 +228,8 @@ export class ChatGroupsService {
   }
 
   async deleteChatGroup(chatGroupId: number, userId: number): Promise<string> {
+    if (!chatGroupId)
+      throw new BadRequestException('Chat group Id is required');
     const deletedChatGroup = await this.prismaService.group.delete({
       where: {
         group_id: chatGroupId,

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Logger,
   Param,
@@ -14,6 +15,7 @@ import {
   GetChatGroupsDto,
   UpdateChatGroupDto,
   CreateChatGroupDto,
+  joinChatGroupDto,
 } from './dto';
 import { SerializedChatGroup } from './serialized-types/chat-group.serializer';
 import { GetCurrentUser } from '../auth/ParamDecorator';
@@ -61,7 +63,7 @@ export class ChatGroupsController {
     );
   }
 
-  @Patch('/:ID')
+  @Patch('/:ID([0-9]+)')
   @ApiResponse({
     status: 200,
     description: 'Returns updated group',
@@ -79,5 +81,32 @@ export class ChatGroupsController {
       userId,
     );
     return sendSuccessResponse(new SerializedChatGroup(chatGroup));
+  }
+
+  @Post('/join')
+  async joinChatGroup(
+    @Body() dto: joinChatGroupDto,
+    @GetCurrentUser('user_id') userId,
+  ) {
+    await this.chatGroupsService.joinChatGroup(userId, dto.ChatGroupId);
+    return sendSuccessResponse('User joined the group successfully');
+  }
+
+  @Patch('/leave')
+  async leaveChatGroup(
+    @Body() dto: joinChatGroupDto,
+    @GetCurrentUser('user_id') userId,
+  ) {
+    await this.chatGroupsService.leaveChatGroup(userId, dto.ChatGroupId);
+    return sendSuccessResponse('User left the group successfully');
+  }
+
+  @Delete('/:ID')
+  async deleteChatGroup(
+    @Param() dto: GetChatGroupsDto,
+    @GetCurrentUser('user_id') userId,
+  ) {
+    await this.chatGroupsService.deleteChatGroup(dto.ID, userId);
+    return sendSuccessResponse('Group deleted successfully');
   }
 }
