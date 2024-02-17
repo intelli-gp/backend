@@ -1118,6 +1118,197 @@
           "study-planner"
         ]
       }
+    },
+    "/api/chat-groups": {
+      "post": {
+        "operationId": "ChatGroupsController_createChatGroup",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChatGroupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Returns created article",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "group_id": 10,
+                        "title": "Dummy Title2",
+                        "description": "Dummy Description",
+                        "cover_image_url": "www.google.com",
+                        "CreatedAt": "2024-02-17T21:10:57.714Z",
+                        "UpdatedAt": "2024-02-17T21:10:57.714Z",
+                        "created_by": 1,
+                        "GroupTags": [
+                          "tag1",
+                          "tag2"
+                        ],
+                        "GroupMembers": [
+                          {
+                            "user_id": 1,
+                            "username": "John3142",
+                            "joining_status": true,
+                            "type": "ADMIN"
+                          }
+                        ],
+                        "GroupOwner": {
+                          "user_id": 1,
+                          "username": "John3142",
+                          "email": "johndoe.22@gmail.com"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "ChatGroupsController_getChatGroups",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "ID",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "The Id of the chatgroup",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Returns created article",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "group_id": 10,
+                          "title": "Dummy Title2",
+                          "description": "Dummy Description",
+                          "cover_image_url": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:10:57.714Z",
+                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
+                          "created_by": 1,
+                          "GroupTags": [
+                            "tag1",
+                            "tag2"
+                          ],
+                          "GroupMembers": [
+                            {
+                              "user_id": 1,
+                              "username": "John3142",
+                              "joining_status": true,
+                              "type": "ADMIN"
+                            }
+                          ],
+                          "GroupOwner": {
+                            "user_id": 1,
+                            "username": "John3142",
+                            "email": "johndoe.22@gmail.com"
+                          }
+                        },
+                        {
+                          "group_id": 10,
+                          "title": "Dummy Title2",
+                          "description": "Dummy Description",
+                          "cover_image_url": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:10:57.714Z",
+                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
+                          "created_by": 1,
+                          "GroupTags": [
+                            "tag1",
+                            "tag2"
+                          ],
+                          "GroupMembers": [
+                            {
+                              "user_id": 1,
+                              "username": "John3142",
+                              "joining_status": true,
+                              "type": "ADMIN"
+                            }
+                          ],
+                          "GroupOwner": {
+                            "user_id": 1,
+                            "username": "John3142",
+                            "email": "johndoe.22@gmail.com"
+                          }
+                        },
+                        {
+                          "group_id": 10,
+                          "title": "Dummy Title2",
+                          "description": "Dummy Description",
+                          "cover_image_url": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:10:57.714Z",
+                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
+                          "created_by": 1,
+                          "GroupTags": [
+                            "tag1",
+                            "tag2"
+                          ],
+                          "GroupMembers": [
+                            {
+                              "user_id": 1,
+                              "username": "John3142",
+                              "joining_status": true,
+                              "type": "ADMIN"
+                            }
+                          ],
+                          "GroupOwner": {
+                            "user_id": 1,
+                            "username": "John3142",
+                            "email": "johndoe.22@gmail.com"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "info": {
@@ -1425,6 +1616,41 @@
             "example": "in progress"
           }
         }
+      },
+      "CreateChatGroupDto": {
+        "type": "object",
+        "properties": {
+          "GroupTitle": {
+            "type": "string",
+            "example": "Chat Group Title"
+          },
+          "GroupDescription": {
+            "type": "string",
+            "example": "Chat Group Description"
+          },
+          "GroupCoverImageUrl": {
+            "type": "string",
+            "example": "https://chat-group-cover-image-url.com"
+          },
+          "GroupTags": {
+            "example": [
+              "tag1",
+              "tag2",
+              "tag3"
+            ],
+            "description": "The tags of the group",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "GroupTitle",
+          "GroupDescription",
+          "GroupCoverImageUrl",
+          "GroupTags"
+        ]
       }
     }
   }

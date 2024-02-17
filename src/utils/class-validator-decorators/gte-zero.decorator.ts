@@ -16,7 +16,7 @@ export function IsGteZero(validationOptions?: ValidationOptions) {
           return value >= 0;
         },
         defaultMessage(args: ValidationArguments) {
-          return `${args.property} must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and be between 8 and 30 characters in length.`;
+          return `${args.property} must be a number greater than or equal 0.`;
         },
       },
     });

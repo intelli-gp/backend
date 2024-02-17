@@ -9,7 +9,6 @@ export function sendRefreshToken(res: Response, refreshToken: string) {
 
 export function sendSuccessResponse(data: any) {
   return {
-    status: 'success',
     data,
   };
 }

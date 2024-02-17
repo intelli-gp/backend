@@ -39,7 +39,7 @@ model article_tag {
 model article {
   article_id       Int                @id @default(autoincrement())
   title            String             @db.VarChar(255)
-  created_at       DateTime?           @default(now())
+  created_at       DateTime?          @default(now())
   updated_at       DateTime?          @updatedAt
   cover_image_url  String?            @db.VarChar(255)
   user_id          Int
@@ -51,7 +51,7 @@ model article {
 model articles_content {
   article_id   Int
   content_id   Int       @default(autoincrement())
-  created_at   DateTime?  @default(now())
+  created_at   DateTime? @default(now())
   updated_at   DateTime? @updatedAt
   value        String
   content_type String
@@ -107,23 +107,24 @@ model group_tag {
 }
 
 model group_user {
-  group_id  Int
-  user_id   Int
-  type      String    @db.VarChar(255)
-  joined_at DateTime  @db.Date
-  left_at   DateTime? @db.Date
-  group     group     @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
-  user      user      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  group_id       Int
+  user_id        Int
+  type           GroupUserTypeEnum @default(MEMBER)
+  joined_at      DateTime          @default(now())
+  left_at        DateTime?         @db.Date
+  joining_status Boolean           @default(true)
+  group          group             @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
+  user           user              @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([group_id, user_id])
 }
 
 model group {
   group_id        Int          @id @default(autoincrement())
-  title           String       @db.VarChar(255)
+  title           String       @unique @db.VarChar(255)
   description     String
   cover_image_url String       @db.VarChar(255)
-  created_at      DateTime?     @default(now())
+  created_at      DateTime?    @default(now())
   updated_at      DateTime?    @updatedAt
   created_by      Int
   group_tag       group_tag[]
@@ -143,7 +144,7 @@ model level {
 model message_ai {
   message_ai_id Int       @id @default(autoincrement())
   content       String    @db.VarChar(255)
-  created_at    DateTime?  @default(now())
+  created_at    DateTime? @default(now())
   updated_at    DateTime? @updatedAt
   user_id       Int
   user          user      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
@@ -154,7 +155,7 @@ model message {
   user_id    Int
   group_id   Int
   content    String
-  created_at DateTime?     @default(now())
+  created_at DateTime?    @default(now())
   updated_at DateTime?    @updatedAt
   attachment attachment[]
   group      group        @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
@@ -165,7 +166,7 @@ model notification {
   notification_id Int       @id @default(autoincrement())
   title           String    @db.VarChar(255)
   content         String
-  created_at      DateTime?  @default(now())
+  created_at      DateTime? @default(now())
   updated_at      DateTime? @updatedAt
   seen            Boolean
   user_id         Int
@@ -179,7 +180,7 @@ model payment_method {
   holder_name String    @db.VarChar(100)
   expiry_date DateTime  @db.Date
   user_id     Int
-  created_at  DateTime?  @default(now())
+  created_at  DateTime? @default(now())
   updated_at  DateTime? @updatedAt
   user        user      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
@@ -294,4 +295,9 @@ model user {
   plan           plan             @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
   following      user_follower[]  @relation("following")
   followed_by    user_follower[]  @relation("followed_by")
+}
+
+enum GroupUserTypeEnum {
+  ADMIN
+  MEMBER
 }
