@@ -30,7 +30,6 @@ import { ErrorScheme } from './swagger-examples/error.example';
 import { CommonTask } from './swagger-examples/common-data';
 import { DeleteTaskExample } from './swagger-examples/delete-task.example';
 
-// TODO: add swagger example for the return object for each output from each controller
 @Controller('study-planner')
 @ApiTags('study-planner')
 export class StudyPlannerController {
@@ -71,7 +70,6 @@ export class StudyPlannerController {
     description: 'Bad request. request parameters have something wrong',
     schema: swaggerSuccessExample(null, ErrorScheme),
   })
-  // TODO: Pipe need to return custom error message
   async getTaskById(
     @GetCurrentUser('user_id') userId,
     @Param(
@@ -110,7 +108,6 @@ export class StudyPlannerController {
     );
   }
 
-  // TODO: Pipe need to return custom error message
   @Patch(':task_id')
   @HttpCode(HttpStatus.OK)
   @HttpCode(HttpStatus.BAD_REQUEST)
@@ -143,7 +140,6 @@ export class StudyPlannerController {
     );
   }
 
-  // TODO: Pipe need to return custom error message
   @Delete(':task_id')
   @HttpCode(HttpStatus.OK)
   @HttpCode(HttpStatus.BAD_REQUEST)
