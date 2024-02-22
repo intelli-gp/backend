@@ -1,0 +1,27 @@
+export type ConfigType = {
+  PORT: string;
+  FRONT_URL: string;
+  SERVER_URL: string;
+  DATABASE_URL: string;
+  DATABASE_HOST: string;
+  DATABASE_PORT: string;
+  DATABASE_NAME: string;
+  DATABASE_USER_NAME: string;
+  DATABASE_USER_PASSWORD: string;
+  ACCESS_TOKEN_SECRET: string;
+  REFRESH_TOKEN_SECRET: string;
+  ACCESS_TOKEN_EXPIRATION_TIME: string;
+  REFRESH_TOKEN_EXPIRATION_TIME: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  GOOGLE_CALLBACK_URL: string;
+  LINKEDIN_CLIENT_ID: string;
+  LINKEDIN_CLIENT_SECRET: string;
+  LINKEDIN_CALLBACK_URL: string;
+  ENABLE_SWAGGER: string;
+  MAIL_USERNAME: string;
+  MAIL_PASSWORD: string;
+  REDIS_HOST: string;
+  REDIS_PORT: string;
+  REDIS_PASSWORD: string;
+};
