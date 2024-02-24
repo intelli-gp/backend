@@ -162,7 +162,6 @@ packages/**/*.js
 /example
 
 # tests
-/test
 /benchmarks/memory
 /coverage
 /.nyc_output
