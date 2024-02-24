@@ -17,6 +17,7 @@ import { GetCurrentUser } from '../auth/ParamDecorator';
 import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
 import {
   ApiBadRequestResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -29,6 +30,7 @@ import { MultipleTasksExample } from './swagger-examples/multiple-tasks.example'
 import { ErrorScheme } from './swagger-examples/error.example';
 import { CommonTask } from './swagger-examples/common-data';
 import { DeleteTaskExample } from './swagger-examples/delete-task.example';
+import { NotFoundScheme } from './swagger-examples/notfound.example';
 
 @Controller('study-planner')
 @ApiTags('study-planner')
@@ -65,6 +67,10 @@ export class StudyPlannerController {
   @ApiOkResponse({
     description: 'successfully get a specific task',
     schema: swaggerSuccessExample(null, CommonTask),
+  })
+  @ApiNotFoundResponse({
+    description: 'Task not found',
+    schema: swaggerSuccessExample(null, NotFoundScheme),
   })
   @ApiBadRequestResponse({
     description: 'Bad request. request parameters have something wrong',
@@ -151,6 +157,10 @@ export class StudyPlannerController {
   @ApiBadRequestResponse({
     description: 'Bad request. request parameters have something wrong',
     schema: swaggerSuccessExample(null, ErrorScheme),
+  })
+  @ApiNotFoundResponse({
+    description: 'Task not found',
+    schema: swaggerSuccessExample(null, NotFoundScheme),
   })
   async deleteTask(
     @GetCurrentUser('user_id') userId,

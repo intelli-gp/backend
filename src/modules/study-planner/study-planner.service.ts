@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import AddTaskDto from './dto/create-task.dto';
 import { PaginationDto } from 'src/common/dto';
@@ -31,7 +35,7 @@ export class StudyPlannerService {
         throw new BadRequestException({ error: err });
       });
 
-    if (!task) throw new BadRequestException({ message: 'Task not found' });
+    if (!task) throw new NotFoundException({ message: 'Task not found' });
     return task;
   }
 
@@ -107,11 +111,11 @@ export class StudyPlannerService {
       })
       .catch((err) => {
         if (err.code === 'P2025')
-          throw new BadRequestException({ message: "Task doesn't exist" });
+          throw new NotFoundException({ message: "Task doesn't exist" });
         throw new BadRequestException({ error: err });
       });
 
-    if (!task) throw new BadRequestException({ message: "Task doesn't exist" });
+    if (!task) throw new NotFoundException({ message: "Task doesn't exist" });
     return true;
   }
 
