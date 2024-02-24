@@ -35,10 +35,10 @@ export class TagsService {
     entityName: 'user' | 'group' | 'course' | 'article' | 'ai_output',
     entityId: number,
   ) {
-    if (addedTags.length > 0)
+    if (addedTags?.length > 0)
       await this.addTagsForEntities(addedTags, entityName, entityId);
 
-    if (removedTags.length > 0)
+    if (removedTags?.length > 0)
       await this.prismaService[entityName + '_tag'].deleteMany({
         where: {
           tag_name: {
