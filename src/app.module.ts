@@ -13,6 +13,7 @@ import { CustomFilter } from './exception-filters/custom.filter';
 import { TrimStringsPipe } from './utils/pipes/trim-string.pipe';
 import { PrismaExceptionFilter } from './exception-filters/prisma.filter';
 import { ArticlesModule } from './modules/articles/articles.module';
+import { GamificationModule } from './modules/gamification/gamification.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ArticlesModule } from './modules/articles/articles.module';
     TagsModule,
     ArticlesModule,
     StudyPlannerModule,
+    GamificationModule,
   ],
   controllers: [],
   providers: [
