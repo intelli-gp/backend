@@ -30,7 +30,9 @@
     "@nestjs/mapped-types": "^2.0.4",
     "@nestjs/passport": "^10.0.2",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/platform-socket.io": "^10.3.3",
     "@nestjs/swagger": "^7.1.16",
+    "@nestjs/websockets": "^10.3.3",
     "@prisma/client": "^5.7.1",
     "@types/uuid": "^9.0.7",
     "bcrypt": "^5.1.1",
@@ -49,7 +51,8 @@
     "passport-jwt": "^4.0.1",
     "passport-linkedin-oauth2": "^2.0.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "socket.io": "^4.7.4"
   },
   "devDependencies": {
     "@golevelup/ts-jest": "^0.4.0",

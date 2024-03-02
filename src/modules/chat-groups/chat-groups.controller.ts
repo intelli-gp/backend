@@ -15,7 +15,7 @@ import {
   GetChatGroupsDto,
   UpdateChatGroupDto,
   CreateChatGroupDto,
-  joinChatGroupDto,
+  JoinChatGroupDto,
 } from './dto';
 import { SerializedChatGroup } from './serialized-types/chat-group.serializer';
 import { GetCurrentUser } from '../auth/ParamDecorator';
@@ -85,7 +85,7 @@ export class ChatGroupsController {
 
   @Post('/join')
   async joinChatGroup(
-    @Body() dto: joinChatGroupDto,
+    @Body() dto: JoinChatGroupDto,
     @GetCurrentUser('user_id') userId,
   ) {
     await this.chatGroupsService.joinChatGroup(userId, dto.ChatGroupId);
@@ -94,7 +94,7 @@ export class ChatGroupsController {
 
   @Patch('/leave')
   async leaveChatGroup(
-    @Body() dto: joinChatGroupDto,
+    @Body() dto: JoinChatGroupDto,
     @GetCurrentUser('user_id') userId,
   ) {
     await this.chatGroupsService.leaveChatGroup(userId, dto.ChatGroupId);

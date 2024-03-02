@@ -1135,7 +1135,7 @@
         },
         "responses": {
           "201": {
-            "description": "Returns created article",
+            "description": "Returns created group",
             "content": {
               "application/json": {
                 "schema": {
@@ -1212,8 +1212,8 @@
           }
         ],
         "responses": {
-          "201": {
-            "description": "Returns created article",
+          "200": {
+            "description": "Returns groups array",
             "content": {
               "application/json": {
                 "schema": {
@@ -1306,6 +1306,232 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/chat-groups/{ID}": {
+      "patch": {
+        "operationId": "ChatGroupsController_updateChatGroup",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "path",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "ID",
+            "required": false,
+            "in": "path",
+            "example": 1,
+            "description": "The Id of the chatgroup",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateChatGroupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns updated group",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "group_id": 10,
+                          "title": "Dummy Title2",
+                          "description": "Dummy Description",
+                          "cover_image_url": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:10:57.714Z",
+                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
+                          "created_by": 1,
+                          "GroupTags": [
+                            "tag1",
+                            "tag2"
+                          ],
+                          "GroupMembers": [
+                            {
+                              "user_id": 1,
+                              "username": "John3142",
+                              "joining_status": true,
+                              "type": "ADMIN"
+                            }
+                          ],
+                          "GroupOwner": {
+                            "user_id": 1,
+                            "username": "John3142",
+                            "email": "johndoe.22@gmail.com"
+                          }
+                        },
+                        {
+                          "group_id": 10,
+                          "title": "Dummy Title2",
+                          "description": "Dummy Description",
+                          "cover_image_url": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:10:57.714Z",
+                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
+                          "created_by": 1,
+                          "GroupTags": [
+                            "tag1",
+                            "tag2"
+                          ],
+                          "GroupMembers": [
+                            {
+                              "user_id": 1,
+                              "username": "John3142",
+                              "joining_status": true,
+                              "type": "ADMIN"
+                            }
+                          ],
+                          "GroupOwner": {
+                            "user_id": 1,
+                            "username": "John3142",
+                            "email": "johndoe.22@gmail.com"
+                          }
+                        },
+                        {
+                          "group_id": 10,
+                          "title": "Dummy Title2",
+                          "description": "Dummy Description",
+                          "cover_image_url": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:10:57.714Z",
+                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
+                          "created_by": 1,
+                          "GroupTags": [
+                            "tag1",
+                            "tag2"
+                          ],
+                          "GroupMembers": [
+                            {
+                              "user_id": 1,
+                              "username": "John3142",
+                              "joining_status": true,
+                              "type": "ADMIN"
+                            }
+                          ],
+                          "GroupOwner": {
+                            "user_id": 1,
+                            "username": "John3142",
+                            "email": "johndoe.22@gmail.com"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "ChatGroupsController_deleteChatGroup",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "path",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "ID",
+            "required": false,
+            "in": "path",
+            "example": 1,
+            "description": "The Id of the chatgroup",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/chat-groups/join": {
+      "post": {
+        "operationId": "ChatGroupsController_joinChatGroup",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinChatGroupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/chat-groups/leave": {
+      "patch": {
+        "operationId": "ChatGroupsController_leaveChatGroup",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinChatGroupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
           }
         }
       }
@@ -1650,6 +1876,23 @@
           "GroupDescription",
           "GroupCoverImageUrl",
           "GroupTags"
+        ]
+      },
+      "UpdateChatGroupDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "JoinChatGroupDto": {
+        "type": "object",
+        "properties": {
+          "ChatGroupId": {
+            "type": "number",
+            "example": 1,
+            "description": "The Id of the chatgroup"
+          }
+        },
+        "required": [
+          "ChatGroupId"
         ]
       }
     }
