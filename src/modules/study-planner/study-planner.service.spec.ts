@@ -12,8 +12,8 @@ describe('StudyPlannerService', () => {
         id: 1,
         title: 'My study planner title 1',
         description: 'My study planner description 1',
-        start_date: new Date('2024-02-19T12:00'),
-        due_date: new Date('2024-02-19T14:00'),
+        start_date: new Date('2025-02-19T12:00'),
+        due_date: new Date('2025-02-19T14:00'),
         status: 'IN_PROGRESS',
         color: '#ffffff',
       },
@@ -21,8 +21,8 @@ describe('StudyPlannerService', () => {
         id: 2,
         title: 'My study planner title 2',
         description: 'My study planner description 2',
-        start_date: new Date('2024-02-19T15:00'),
-        due_date: new Date('2024-02-19T18:00'),
+        start_date: new Date('2025-02-19T15:00'),
+        due_date: new Date('2025-02-19T18:00'),
         status: 'IN_PROGRESS',
         color: '#ffffff',
       },
@@ -30,8 +30,8 @@ describe('StudyPlannerService', () => {
         id: 3,
         title: 'My study planner title 3',
         description: 'My study planner description',
-        start_date: new Date('2024-02-20T12:00'),
-        due_date: new Date('2024-02-20T13:00'),
+        start_date: new Date('2025-02-20T12:00'),
+        due_date: new Date('2025-02-20T13:00'),
         status: 'IN_PROGRESS',
         color: '#ffffff',
       },
@@ -45,8 +45,8 @@ describe('StudyPlannerService', () => {
             task: {
               create: jest.fn().mockResolvedValue({
                 ...commonTasks[0],
-                start_date: new Date('2024-02-21T12:00'),
-                due_date: new Date('2024-02-21T14:00'),
+                start_date: new Date('2025-02-21T12:00'),
+                due_date: new Date('2025-02-21T14:00'),
               }),
               findMany: jest.fn().mockResolvedValue(commonTasks),
               findUnique: jest.fn().mockResolvedValue(commonTasks[1]),
@@ -70,8 +70,8 @@ describe('StudyPlannerService', () => {
       const task = await studyPlannerService.createTask(1, {
         Title: 'My study planner title 1',
         Description: 'My study planner description 1',
-        StartDate: '2024-02-21T12:00',
-        DueDate: '2024-02-21T14:00',
+        StartDate: '2025-02-21T12:00',
+        DueDate: '2025-02-21T14:00',
         Status: 'IN_PROGRESS',
         Color: '#ffffff',
       });
@@ -81,8 +81,8 @@ describe('StudyPlannerService', () => {
           user_id: 1,
           title: 'My study planner title 1',
           description: 'My study planner description 1',
-          start_date: new Date('2024-02-21T12:00'),
-          due_date: new Date('2024-02-21T14:00'),
+          start_date: new Date('2025-02-21T12:00'),
+          due_date: new Date('2025-02-21T14:00'),
           status: 'IN_PROGRESS',
           color: '#ffffff',
         },
@@ -117,8 +117,8 @@ describe('StudyPlannerService', () => {
         id: 2,
         title: 'My study planner title 2',
         description: 'My study planner description 2',
-        start_date: new Date('2024-02-19T15:00'),
-        due_date: new Date('2024-02-19T18:00'),
+        start_date: new Date('2025-02-19T15:00'),
+        due_date: new Date('2025-02-19T18:00'),
         status: 'IN_PROGRESS',
         color: '#ffffff',
       });
@@ -130,8 +130,8 @@ describe('StudyPlannerService', () => {
       const task = await studyPlannerService.updateTask(1, 2, {
         Title: 'My study planner title 2 updated',
         Description: 'My study planner description 2 updated',
-        StartDate: '2024-02-20T15:00',
-        DueDate: '2024-02-20T18:00',
+        StartDate: '2025-02-20T15:00',
+        DueDate: '2025-02-20T18:00',
         Status: 'IN_PROGRESS',
         Color: '#aaaaaa',
       });
@@ -141,8 +141,8 @@ describe('StudyPlannerService', () => {
         data: {
           title: 'My study planner title 2 updated',
           description: 'My study planner description 2 updated',
-          start_date: new Date('2024-02-20T15:00'),
-          due_date: new Date('2024-02-20T18:00'),
+          start_date: new Date('2025-02-20T15:00'),
+          due_date: new Date('2025-02-20T18:00'),
           status: 'IN_PROGRESS',
           color: '#aaaaaa',
         },
@@ -152,8 +152,8 @@ describe('StudyPlannerService', () => {
         id: 2,
         title: 'My study planner title 2 updated',
         description: 'My study planner description 2 updated',
-        start_date: new Date('2024-02-20T15:00'),
-        due_date: new Date('2024-02-20T18:00'),
+        start_date: new Date('2025-02-20T15:00'),
+        due_date: new Date('2025-02-20T18:00'),
         status: 'IN_PROGRESS',
         color: '#aaaaaa',
       });
@@ -181,8 +181,8 @@ describe('StudyPlannerService', () => {
         id: 2,
         title: 'My study planner title 2 updated',
         description: 'My study planner description 2 updated',
-        start_date: new Date('2024-02-19T15:00'),
-        due_date: new Date('2024-02-19T18:00'),
+        start_date: new Date('2025-02-19T15:00'),
+        due_date: new Date('2025-02-19T18:00'),
         status: 'IN_PROGRESS',
         color: '#ffffff',
       });
@@ -192,8 +192,8 @@ describe('StudyPlannerService', () => {
       const task = await studyPlannerService.updateTask(1, 2, {
         Title: null,
         Description: null,
-        StartDate: '2024-02-24T15:00',
-        DueDate: '2024-02-24T18:00',
+        StartDate: '2025-02-24T15:00',
+        DueDate: '2025-02-24T18:00',
         Status: null,
         Color: null,
       });
@@ -201,8 +201,8 @@ describe('StudyPlannerService', () => {
       expect(prismaService.task.update).toHaveBeenCalledWith({
         where: { task_id: 2, user_id: 1 },
         data: {
-          start_date: new Date('2024-02-24T15:00'),
-          due_date: new Date('2024-02-24T18:00'),
+          start_date: new Date('2025-02-24T15:00'),
+          due_date: new Date('2025-02-24T18:00'),
         },
       });
 
@@ -210,8 +210,8 @@ describe('StudyPlannerService', () => {
         id: 2,
         title: 'My study planner title 2',
         description: 'My study planner description 2',
-        start_date: new Date('2024-02-24T15:00'),
-        due_date: new Date('2024-02-24T18:00'),
+        start_date: new Date('2025-02-24T15:00'),
+        due_date: new Date('2025-02-24T18:00'),
         status: 'IN_PROGRESS',
         color: '#ffffff',
       });
