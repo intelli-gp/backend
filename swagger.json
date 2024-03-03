@@ -1139,6 +1139,26 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "errorMessage": [
+                          "task not found"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -1266,10 +1286,90 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "errorMessage": [
+                          "task not found"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "tags": [
           "study-planner"
+        ]
+      }
+    },
+    "/api/gamification/change-points": {
+      "patch": {
+        "operationId": "GamificationController_addPoints",
+        "summary": "add points to a certain user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PointsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Points added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "points": 20
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "errorMessage": [
+                          "depending on the error, this will be a string or an array of strings"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "gamification"
         ]
       }
     }
@@ -1589,6 +1689,19 @@
             "example": "#xxxxxx"
           }
         }
+      },
+      "PointsDto": {
+        "type": "object",
+        "properties": {
+          "points": {
+            "type": "number",
+            "description": "The points to be added to the user",
+            "example": 20
+          }
+        },
+        "required": [
+          "points"
+        ]
       }
     }
   }
