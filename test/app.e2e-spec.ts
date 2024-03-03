@@ -111,8 +111,8 @@ describe('App e2e', () => {
     const task = {
       Title: 'task 1',
       Description: 'task 1',
-      StartDate: '2024-12-05T03:00',
-      DueDate: '2024-12-05T05:00',
+      StartDate: '2025-12-05T03:00',
+      DueDate: '2025-12-05T05:00',
       Status: 'HOLDING',
       Color: '#000000',
     };
@@ -122,7 +122,7 @@ describe('App e2e', () => {
       const wrongTask = {
         Title: 'task 1',
         Description: 'task 1',
-        StartDate: '2024-12-05T03:00',
+        StartDate: '2025-12-05T03:00',
         Status: 'HOLDING',
         Color: '#000000',
       };
@@ -302,8 +302,8 @@ describe('App e2e', () => {
         const updatedTask = {
           Title: 'task 1 updated',
           Description: 'task 1 updated',
-          StartDate: '2024-12-05T06:00',
-          DueDate: '2024-12-05T07:00',
+          StartDate: '2025-12-05T06:00',
+          DueDate: '2025-12-05T07:00',
           Status: 'HOLDING',
           Color: '#000000',
         };
@@ -360,8 +360,8 @@ describe('App e2e', () => {
 
       it('(PATCH) - update a task by ID - Dates only', async () => {
         const updatedTask = {
-          StartDate: '2024-12-05T08:00',
-          DueDate: '2024-12-05T10:00',
+          StartDate: '2025-12-05T08:00',
+          DueDate: '2025-12-05T10:00',
         };
 
         await request(app.getHttpServer())
@@ -399,9 +399,9 @@ describe('App e2e', () => {
               data: {
                 Color: '#000000',
                 Description: 'task 1 updated',
-                DueDate: '2024-12-05T08:00:00.000Z',
+                DueDate: '2025-12-05T08:00:00.000Z',
                 ID: returnedTask.ID,
-                StartDate: '2024-12-05T06:00:00.000Z',
+                StartDate: '2025-12-05T06:00:00.000Z',
                 Status: 'HOLDING',
                 Title: 'task 1 updated',
               },
@@ -411,7 +411,7 @@ describe('App e2e', () => {
 
       it('(PATCH) - update a task by ID - Dates only - fail (only start date provided)', async () => {
         const updatedTask = {
-          StartDate: '2024-12-05T08:00',
+          StartDate: '2025-12-05T08:00',
         };
 
         await request(app.getHttpServer())
@@ -431,7 +431,7 @@ describe('App e2e', () => {
 
       it('(PATCH) - update a task by ID - Dates only - fail (only due date provided)', async () => {
         const updatedTask = {
-          DueDate: '2024-12-05T08:00',
+          DueDate: '2025-12-05T08:00',
         };
 
         await request(app.getHttpServer())
@@ -451,8 +451,8 @@ describe('App e2e', () => {
 
       it('(PATCH) - update a task by ID - fail (no token) access denied', async () => {
         const updatedTask = {
-          StartDate: '2024-12-05T08:00',
-          DueDate: '2024-12-05T10:00',
+          StartDate: '2025-12-05T08:00',
+          DueDate: '2025-12-05T10:00',
         };
 
         await request(app.getHttpServer())
