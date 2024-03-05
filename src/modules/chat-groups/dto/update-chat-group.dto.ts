@@ -8,11 +8,13 @@ import {
   ArrayMinSize,
   ArrayMaxSize,
   Length,
+  IsOptional,
 } from 'class-validator';
 
 export class UpdateChatGroupDto extends PartialType(
   OmitType(CreateChatGroupDto, ['GroupTags'] as const),
 ) {
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   @ArrayNotEmpty()
@@ -21,6 +23,7 @@ export class UpdateChatGroupDto extends PartialType(
   @Length(1, 512, { each: true })
   AddedGroupTags?: string[];
 
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   @ArrayNotEmpty()

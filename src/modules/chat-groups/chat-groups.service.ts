@@ -107,6 +107,8 @@ export class ChatGroupsService {
     updateData: UpdateChatGroupDto,
     userId: number,
   ): Promise<group> {
+    if (!updateData) throw new BadRequestException('Update data is required');
+
     if (!chatGroupId)
       throw new BadRequestException('Chat group Id is required');
 

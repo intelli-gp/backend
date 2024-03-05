@@ -20,11 +20,12 @@ import {
 import { SerializedChatGroup } from './serialized-types/chat-group.serializer';
 import { GetCurrentUser } from '../auth/ParamDecorator';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { multipleGroupsExample, singleGroupExample } from './swagger-examples';
 
 @Controller('chat-groups')
+@ApiTags('Chat Groups')
 export class ChatGroupsController {
   private logger = new Logger('ChatGroupsController');
   constructor(private readonly chatGroupsService: ChatGroupsService) {}
