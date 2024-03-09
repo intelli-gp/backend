@@ -116,16 +116,35 @@ export class ChatGroupsService {
       updateData;
     const deserializedChatGroup = new DeserializedChatGroup(deserializableData);
 
-    await this.tagsService.updateTagsForEntities(
-      AddedGroupTags,
-      RemovedGroupTags,
-      'group',
-      chatGroupId,
-    );
+    if (AddedGroupTags || RemovedGroupTags) {
+      await this.tagsService.updateTagsForEntities(
+        AddedGroupTags,
+        RemovedGroupTags,
+        'group',
+        chatGroupId,
+      );
+    }
+
+    const currentGroupUser = await this.prismaService.group_user.findUnique({
+      where: {
+        group_id_user_id: {
+          user_id: userId,
+          group_id: chatGroupId,
+        },
+      },
+    });
+    if (
+      !currentGroupUser ||
+      currentGroupUser.type !== GroupUserTypeEnum.ADMIN
+    ) {
+      throw new ForbiddenException(
+        'User not authorized to update the chat group',
+      );
+    }
+
     const updatedChatGroup = await this.prismaService.group.update({
       where: {
         group_id: chatGroupId,
-        created_by: userId,
       },
       data: {
         ...deserializedChatGroup,
@@ -140,11 +159,6 @@ export class ChatGroupsService {
         user: true,
       },
     });
-    if (!updatedChatGroup) {
-      throw new ForbiddenException(
-        'Chat group not found or user not authorized to update the chat group',
-      );
-    }
     return updatedChatGroup;
   }
 
