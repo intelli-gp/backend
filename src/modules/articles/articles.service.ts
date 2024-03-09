@@ -120,13 +120,13 @@ export class ArticlesService {
         // Repopulate the sections of the articles with new data
         // TODO: Clean up
         if (articles_content) {
-          prisma.articles_content.deleteMany({
+          await prisma.articles_content.deleteMany({
             where: {
               article_id: articleId,
             },
           });
 
-          prisma.articles_content.createMany({
+          await prisma.articles_content.createMany({
             data: articles_content.map(([value, content_type]) => ({
               article_id: articleId,
               value,
@@ -136,7 +136,7 @@ export class ArticlesService {
         }
         if (addedTags?.length || removedTags?.length) {
           // TODO: Not included in the transaction
-          this.tagsService.updateTagsForEntities(
+          await this.tagsService.updateTagsForEntities(
             addedTags,
             removedTags,
             'article',
