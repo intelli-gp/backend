@@ -31,9 +31,10 @@ export class SerializedChatGroup {
         ?.filter((groupUser: group_user) => groupUser.joining_status !== false)
         .map((groupUser: group_user) => {
           return {
-            user_id: groupUser.user_id,
-            username: (groupUser as any).user?.username,
-            joining_status: groupUser.joining_status,
+            ID: groupUser.user_id,
+            username: ((groupUser as any)?.user as user)?.username,
+            profileImg: ((groupUser as any)?.user as user)?.cover_image,
+            joiningStatus: groupUser.joining_status,
             type: groupUser.type,
           };
         }),
@@ -43,10 +44,10 @@ export class SerializedChatGroup {
   @Expose({ name: 'GroupOwner' })
   @Transform(({ value }) => {
     return {
-      user_id: value?.user_id,
+      ID: value?.user_id,
       username: value?.username,
       email: value?.email,
-      profile_image_url: value?.profile_image_url,
+      profileImage: value?.profile_image_url,
     };
   })
   user?: user;

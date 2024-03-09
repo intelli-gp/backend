@@ -15,3 +15,14 @@ export class GetChatGroupsDto extends PaginationDto {
   @IsGteZero()
   ID?: number;
 }
+
+export class GetSingleChatGroupDto {
+  @ApiProperty({
+    example: 1,
+    description: 'The Id of the chatgroup',
+    required: true,
+  })
+  @ToInteger()
+  @IsGteZero()
+  ID: number;
+}

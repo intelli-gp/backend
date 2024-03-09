@@ -177,6 +177,18 @@ export class ChatGroupsService {
 
   async leaveChatGroup(userId: number, chatGroupId: number): Promise<string> {
     // TODO: Handle what happens when the user is the last admin in the group
+    // check that user is owner of the group
+    const owner = await this.prismaService.group.findUnique({
+      where: {
+        group_id: chatGroupId,
+        created_by: userId,
+      },
+    });
+    if (owner) {
+      throw new ForbiddenException(
+        'Owner of the chat group cannot leave the chat group',
+      );
+    }
     const user = await this.prismaService.group_user.update({
       where: {
         group_id_user_id: {
@@ -198,6 +210,7 @@ export class ChatGroupsService {
     chatGroupId: number,
     currentUserId: number,
     targetUserId: number,
+    permissionLevel: GroupUserTypeEnum,
   ): Promise<group_user> {
     const currentUser = await this.prismaService.group_user.findUnique({
       where: {
@@ -212,6 +225,17 @@ export class ChatGroupsService {
         'User not authorized to update the user permission',
       );
     }
+    // check that the target user is not the owner of the group
+    const owner = await this.prismaService.group.findUnique({
+      where: {
+        group_id: chatGroupId,
+        created_by: targetUserId,
+      },
+    });
+
+    if (owner) {
+      throw new ForbiddenException('Owner of the chat group cannot be updated');
+    }
     const updatedTargetUser = await this.prismaService.group_user.update({
       where: {
         group_id_user_id: {
@@ -220,7 +244,7 @@ export class ChatGroupsService {
         },
       },
       data: {
-        type: GroupUserTypeEnum.ADMIN,
+        type: permissionLevel,
       },
     });
     if (!updatedTargetUser) {
