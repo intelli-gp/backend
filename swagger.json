@@ -520,7 +520,7 @@
         "parameters": [
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "query",
             "example": 10,
             "description": "Number of items per page",
@@ -530,7 +530,7 @@
           },
           {
             "name": "offset",
-            "required": true,
+            "required": false,
             "in": "query",
             "example": 1,
             "description": "Page number",
@@ -555,7 +555,7 @@
         "parameters": [
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "query",
             "example": 10,
             "description": "Number of items per page",
@@ -565,7 +565,7 @@
           },
           {
             "name": "offset",
-            "required": true,
+            "required": false,
             "in": "query",
             "example": 1,
             "description": "Page number",
@@ -590,7 +590,7 @@
         "parameters": [
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "query",
             "example": 10,
             "description": "Number of items per page",
@@ -600,7 +600,7 @@
           },
           {
             "name": "offset",
-            "required": true,
+            "required": false,
             "in": "query",
             "example": 1,
             "description": "Page number",
@@ -940,7 +940,7 @@
         "parameters": [
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "query",
             "example": 10,
             "description": "Number of items per page",
@@ -950,7 +950,7 @@
           },
           {
             "name": "offset",
-            "required": true,
+            "required": false,
             "in": "query",
             "example": 1,
             "description": "Page number",
@@ -1144,29 +1144,38 @@
                       "type": "object",
                       "properties": null,
                       "example": {
-                        "group_id": 10,
-                        "title": "Dummy Title2",
-                        "description": "Dummy Description",
-                        "cover_image_url": "www.google.com",
-                        "CreatedAt": "2024-02-17T21:10:57.714Z",
-                        "UpdatedAt": "2024-02-17T21:10:57.714Z",
-                        "created_by": 1,
+                        "ID": 1,
+                        "GroupTitle": "Example Group",
+                        "GroupDescription": "This is an example group description.",
+                        "GroupCoverImageUrl": "https://example.com/group-cover.jpg",
+                        "CreatedAt": "2024-03-09T08:00:00.000Z",
+                        "UpdatedAt": "2024-03-09T08:30:00.000Z",
                         "GroupTags": [
-                          "tag1",
-                          "tag2"
+                          "Tag1",
+                          "Tag2",
+                          "Tag3"
                         ],
                         "GroupMembers": [
                           {
-                            "user_id": 1,
-                            "username": "John3142",
-                            "joining_status": true,
-                            "type": "ADMIN"
+                            "ID": 1,
+                            "username": "user1",
+                            "profileImg": "https://example.com/user1-profile.jpg",
+                            "joiningStatus": true,
+                            "type": "admin"
+                          },
+                          {
+                            "ID": 2,
+                            "username": "user2",
+                            "profileImg": "https://example.com/user2-profile.jpg",
+                            "joiningStatus": true,
+                            "type": "member"
                           }
                         ],
                         "GroupOwner": {
-                          "user_id": 1,
-                          "username": "John3142",
-                          "email": "johndoe.22@gmail.com"
+                          "ID": 3,
+                          "username": "owner",
+                          "email": "owner@example.com",
+                          "profileImage": "https://example.com/owner-profile.jpg"
                         }
                       }
                     }
@@ -1175,14 +1184,17 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Chat Groups"
+        ]
       },
       "get": {
         "operationId": "ChatGroupsController_getChatGroups",
         "parameters": [
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "query",
             "example": 10,
             "description": "Number of items per page",
@@ -1192,7 +1204,7 @@
           },
           {
             "name": "offset",
-            "required": true,
+            "required": false,
             "in": "query",
             "example": 1,
             "description": "Page number",
@@ -1223,81 +1235,108 @@
                       "properties": null,
                       "example": [
                         {
-                          "group_id": 10,
-                          "title": "Dummy Title2",
-                          "description": "Dummy Description",
-                          "cover_image_url": "www.google.com",
-                          "CreatedAt": "2024-02-17T21:10:57.714Z",
-                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
-                          "created_by": 1,
+                          "ID": 1,
+                          "GroupTitle": "Example Group",
+                          "GroupDescription": "This is an example group description.",
+                          "GroupCoverImageUrl": "https://example.com/group-cover.jpg",
+                          "CreatedAt": "2024-03-09T08:00:00.000Z",
+                          "UpdatedAt": "2024-03-09T08:30:00.000Z",
                           "GroupTags": [
-                            "tag1",
-                            "tag2"
+                            "Tag1",
+                            "Tag2",
+                            "Tag3"
                           ],
                           "GroupMembers": [
                             {
-                              "user_id": 1,
-                              "username": "John3142",
-                              "joining_status": true,
-                              "type": "ADMIN"
+                              "ID": 1,
+                              "username": "user1",
+                              "profileImg": "https://example.com/user1-profile.jpg",
+                              "joiningStatus": true,
+                              "type": "admin"
+                            },
+                            {
+                              "ID": 2,
+                              "username": "user2",
+                              "profileImg": "https://example.com/user2-profile.jpg",
+                              "joiningStatus": true,
+                              "type": "member"
                             }
                           ],
                           "GroupOwner": {
-                            "user_id": 1,
-                            "username": "John3142",
-                            "email": "johndoe.22@gmail.com"
+                            "ID": 3,
+                            "username": "owner",
+                            "email": "owner@example.com",
+                            "profileImage": "https://example.com/owner-profile.jpg"
                           }
                         },
                         {
-                          "group_id": 10,
-                          "title": "Dummy Title2",
-                          "description": "Dummy Description",
-                          "cover_image_url": "www.google.com",
-                          "CreatedAt": "2024-02-17T21:10:57.714Z",
-                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
-                          "created_by": 1,
+                          "ID": 1,
+                          "GroupTitle": "Example Group",
+                          "GroupDescription": "This is an example group description.",
+                          "GroupCoverImageUrl": "https://example.com/group-cover.jpg",
+                          "CreatedAt": "2024-03-09T08:00:00.000Z",
+                          "UpdatedAt": "2024-03-09T08:30:00.000Z",
                           "GroupTags": [
-                            "tag1",
-                            "tag2"
+                            "Tag1",
+                            "Tag2",
+                            "Tag3"
                           ],
                           "GroupMembers": [
                             {
-                              "user_id": 1,
-                              "username": "John3142",
-                              "joining_status": true,
-                              "type": "ADMIN"
+                              "ID": 1,
+                              "username": "user1",
+                              "profileImg": "https://example.com/user1-profile.jpg",
+                              "joiningStatus": true,
+                              "type": "admin"
+                            },
+                            {
+                              "ID": 2,
+                              "username": "user2",
+                              "profileImg": "https://example.com/user2-profile.jpg",
+                              "joiningStatus": true,
+                              "type": "member"
                             }
                           ],
                           "GroupOwner": {
-                            "user_id": 1,
-                            "username": "John3142",
-                            "email": "johndoe.22@gmail.com"
+                            "ID": 3,
+                            "username": "owner",
+                            "email": "owner@example.com",
+                            "profileImage": "https://example.com/owner-profile.jpg"
                           }
                         },
                         {
-                          "group_id": 10,
-                          "title": "Dummy Title2",
-                          "description": "Dummy Description",
-                          "cover_image_url": "www.google.com",
-                          "CreatedAt": "2024-02-17T21:10:57.714Z",
-                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
-                          "created_by": 1,
+                          "ID": 1,
+                          "GroupTitle": "Example Group",
+                          "GroupDescription": "This is an example group description.",
+                          "GroupCoverImageUrl": "https://example.com/group-cover.jpg",
+                          "CreatedAt": "2024-03-09T08:00:00.000Z",
+                          "UpdatedAt": "2024-03-09T08:30:00.000Z",
                           "GroupTags": [
-                            "tag1",
-                            "tag2"
+                            "Tag1",
+                            "Tag2",
+                            "Tag3"
                           ],
                           "GroupMembers": [
                             {
-                              "user_id": 1,
-                              "username": "John3142",
-                              "joining_status": true,
-                              "type": "ADMIN"
+                              "ID": 1,
+                              "username": "user1",
+                              "profileImg": "https://example.com/user1-profile.jpg",
+                              "joiningStatus": true,
+                              "type": "admin"
+                            },
+                            {
+                              "ID": 2,
+                              "username": "user2",
+                              "profileImg": "https://example.com/user2-profile.jpg",
+                              "joiningStatus": true,
+                              "type": "member"
                             }
                           ],
                           "GroupOwner": {
-                            "user_id": 1,
-                            "username": "John3142",
-                            "email": "johndoe.22@gmail.com"
+                            "ID": 3,
+                            "username": "owner",
+                            "email": "owner@example.com",
+                            "profileImage": "https://example.com/owner-profile.jpg"
                           }
                         }
                       ]
@@ -1307,7 +1346,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Chat Groups"
+        ]
       }
     },
     "/api/chat-groups/{ID}": {
@@ -1316,7 +1358,7 @@
         "parameters": [
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "path",
             "example": 10,
             "description": "Number of items per page",
@@ -1326,7 +1368,7 @@
           },
           {
             "name": "offset",
-            "required": true,
+            "required": false,
             "in": "path",
             "example": 1,
             "description": "Page number",
@@ -1365,100 +1407,58 @@
                     "data": {
                       "type": "object",
                       "properties": null,
-                      "example": [
-                        {
-                          "group_id": 10,
-                          "title": "Dummy Title2",
-                          "description": "Dummy Description",
-                          "cover_image_url": "www.google.com",
-                          "CreatedAt": "2024-02-17T21:10:57.714Z",
-                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
-                          "created_by": 1,
-                          "GroupTags": [
-                            "tag1",
-                            "tag2"
-                          ],
-                          "GroupMembers": [
-                            {
-                              "user_id": 1,
-                              "username": "John3142",
-                              "joining_status": true,
-                              "type": "ADMIN"
-                            }
-                          ],
-                          "GroupOwner": {
-                            "user_id": 1,
-                            "username": "John3142",
-                            "email": "johndoe.22@gmail.com"
+                      "example": {
+                        "ID": 1,
+                        "GroupTitle": "Example Group",
+                        "GroupDescription": "This is an example group description.",
+                        "GroupCoverImageUrl": "https://example.com/group-cover.jpg",
+                        "CreatedAt": "2024-03-09T08:00:00.000Z",
+                        "UpdatedAt": "2024-03-09T08:30:00.000Z",
+                        "GroupTags": [
+                          "Tag1",
+                          "Tag2",
+                          "Tag3"
+                        ],
+                        "GroupMembers": [
+                          {
+                            "ID": 1,
+                            "username": "user1",
+                            "profileImg": "https://example.com/user1-profile.jpg",
+                            "joiningStatus": true,
+                            "type": "admin"
+                          },
+                          {
+                            "ID": 2,
+                            "username": "user2",
+                            "profileImg": "https://example.com/user2-profile.jpg",
+                            "joiningStatus": true,
+                            "type": "member"
                           }
-                        },
-                        {
-                          "group_id": 10,
-                          "title": "Dummy Title2",
-                          "description": "Dummy Description",
-                          "cover_image_url": "www.google.com",
-                          "CreatedAt": "2024-02-17T21:10:57.714Z",
-                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
-                          "created_by": 1,
-                          "GroupTags": [
-                            "tag1",
-                            "tag2"
-                          ],
-                          "GroupMembers": [
-                            {
-                              "user_id": 1,
-                              "username": "John3142",
-                              "joining_status": true,
-                              "type": "ADMIN"
-                            }
-                          ],
-                          "GroupOwner": {
-                            "user_id": 1,
-                            "username": "John3142",
-                            "email": "johndoe.22@gmail.com"
-                          }
-                        },
-                        {
-                          "group_id": 10,
-                          "title": "Dummy Title2",
-                          "description": "Dummy Description",
-                          "cover_image_url": "www.google.com",
-                          "CreatedAt": "2024-02-17T21:10:57.714Z",
-                          "UpdatedAt": "2024-02-17T21:10:57.714Z",
-                          "created_by": 1,
-                          "GroupTags": [
-                            "tag1",
-                            "tag2"
-                          ],
-                          "GroupMembers": [
-                            {
-                              "user_id": 1,
-                              "username": "John3142",
-                              "joining_status": true,
-                              "type": "ADMIN"
-                            }
-                          ],
-                          "GroupOwner": {
-                            "user_id": 1,
-                            "username": "John3142",
-                            "email": "johndoe.22@gmail.com"
-                          }
+                        ],
+                        "GroupOwner": {
+                          "ID": 3,
+                          "username": "owner",
+                          "email": "owner@example.com",
+                          "profileImage": "https://example.com/owner-profile.jpg"
                         }
-                      ]
+                      }
                     }
                   }
                 }
               }
             }
           }
-        }
+        },
+        "tags": [
+          "Chat Groups"
+        ]
       },
       "delete": {
         "operationId": "ChatGroupsController_deleteChatGroup",
         "parameters": [
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "path",
             "example": 10,
             "description": "Number of items per page",
@@ -1468,7 +1468,7 @@
           },
           {
             "name": "offset",
-            "required": true,
+            "required": false,
             "in": "path",
             "example": 1,
             "description": "Page number",
@@ -1491,7 +1491,10 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Chat Groups"
+        ]
       }
     },
     "/api/chat-groups/join": {
@@ -1512,7 +1515,10 @@
           "201": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Chat Groups"
+        ]
       }
     },
     "/api/chat-groups/leave": {
@@ -1533,7 +1539,45 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Chat Groups"
+        ]
+      }
+    },
+    "/api/chat-groups/permission/{ID}": {
+      "patch": {
+        "operationId": "ChatGroupsController_updateChatGroupPermission",
+        "parameters": [
+          {
+            "name": "ID",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "description": "The Id of the chatgroup",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePermissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Chat Groups"
+        ]
       }
     }
   },
@@ -1893,6 +1937,25 @@
         },
         "required": [
           "ChatGroupId"
+        ]
+      },
+      "UpdatePermissionDto": {
+        "type": "object",
+        "properties": {
+          "TargetID": {
+            "type": "number",
+            "example": 1,
+            "description": "The Id of the user"
+          },
+          "permissionLevel": {
+            "type": "string",
+            "example": "ADMIN",
+            "description": "The new permission level for the user in the group"
+          }
+        },
+        "required": [
+          "TargetID",
+          "permissionLevel"
         ]
       }
     }

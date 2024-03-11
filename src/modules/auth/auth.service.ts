@@ -145,6 +145,34 @@ export class AuthService {
         user_tag: true,
         level: true,
         plan: true,
+        group: {
+          select: {
+            group_id: true,
+            title: true,
+            cover_image_url: true,
+            _count: {
+              select: {
+                group_user: true,
+              },
+            },
+          },
+        },
+        group_user: {
+          select: {
+            group: {
+              select: {
+                group_id: true,
+                title: true,
+                cover_image_url: true,
+                _count: {
+                  select: {
+                    group_user: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
     console.log(user);

@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import {
   registerDecorator,
   ValidationOptions,
@@ -13,6 +14,7 @@ export function IsGteZero(validationOptions?: ValidationOptions) {
       options: validationOptions,
       validator: {
         validate(value: number) {
+          Logger.debug('Value is', value);
           return value >= 0;
         },
         defaultMessage(args: ValidationArguments) {
