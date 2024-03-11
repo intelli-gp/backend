@@ -1,21 +1,27 @@
-import { Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { verify } from 'jsonwebtoken';
 import { Observable } from 'rxjs';
 import { Socket } from 'socket.io';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { ConfigType } from 'types/config.types';
+
+@Injectable()
 export class WsJwtGuard implements CanActivate {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  constructor(private readonly prismaService: PrismaService) {}
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     if (context.getType() !== 'ws') {
       return true;
     }
 
-    const client = context.switchToWs().getClient();
-    WsJwtGuard.validateToken(client);
+    const wsJwtGuardLogger = new Logger('WsJwtGuard');
 
+    const client = context.switchToWs().getClient();
+    const payload = WsJwtGuard.validateToken(client);
+    client.user = await this.prismaService.user.findUnique({
+      where: { user_id: payload['userId'] },
+    });
     // error will be thrown in the validateToken function if the token is invalid
     // TODO: unit test the validate token function
     return true;
@@ -32,6 +38,7 @@ export class WsJwtGuard implements CanActivate {
     const token: string = authorization?.split(' ')[1];
     try {
       const payload = verify(token, config.get('ACCESS_TOKEN_SECRET'));
+      wsValidationLogger.debug({ payload });
       return payload;
     } catch (error) {
       wsValidationLogger.error('WS JWT validation error', error);

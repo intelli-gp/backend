@@ -8,3 +8,11 @@ export const GetCurrentUser = createParamDecorator(
     return request.user[data];
   },
 );
+
+export const WsGetCurrentUser = createParamDecorator(
+  (data: keyof user | undefined, context: ExecutionContext) => {
+    const client = context.switchToWs().getClient();
+    if (!data) return client.user;
+    return client.user[data];
+  },
+);

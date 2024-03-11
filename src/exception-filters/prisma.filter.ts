@@ -3,6 +3,7 @@ import {
   Catch,
   ExceptionFilter,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { sendFailureResponse } from 'src/utils/response-handler/failure.response-handler';
@@ -11,6 +12,7 @@ import {
   PrismaErrorMessage,
 } from './utils/prisma-errors';
 import { Response } from 'express';
+import { Socket } from 'socket.io';
 
 // Got this from docs and logging output
 export type PrismaMeta = {
@@ -30,9 +32,24 @@ export class PrismaExceptionFilter implements ExceptionFilter {
       {
         errorMessage: PrismaErrorMessage[exception.code] || exception.code,
         errorTarget:
-          (exception.meta as PrismaMeta).target ||
-          (exception.meta as PrismaMeta).field_name,
+          (exception.meta as PrismaMeta)?.target ||
+          (exception.meta as PrismaMeta)?.field_name,
       },
     );
+  }
+}
+export class WsPrismaExceptionFilter {
+  catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
+    const client = host.switchToWs().getClient() as Socket;
+
+    const details = {
+      errorMessage: PrismaErrorMessage[exception.code] || exception.code,
+      errorTarget:
+        (exception.meta as PrismaMeta)?.target ||
+        (exception.meta as PrismaMeta)?.field_name,
+    };
+
+    Logger.error(details);
+    client.emit('error', details);
   }
 }
