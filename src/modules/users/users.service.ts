@@ -92,6 +92,43 @@ export class UsersService {
             user_tag: true,
             level: true,
             plan: true,
+            group: {
+              select: {
+                group_id: true,
+                title: true,
+                cover_image_url: true,
+                _count: {
+                  select: {
+                    group_user: true,
+                  },
+                },
+              },
+            },
+            group_user: {
+              select: {
+                group: {
+                  select: {
+                    group_id: true,
+                    title: true,
+                    cover_image_url: true,
+                    _count: {
+                      select: {
+                        group_user: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            article: {
+              select: {
+                article_id: true,
+                title: true,
+                cover_image_url: true,
+                created_at: true,
+                article_tag: true,
+              },
+            },
           },
         });
       } else {
@@ -102,6 +139,43 @@ export class UsersService {
             user_tag: true,
             level: true,
             plan: true,
+            group: {
+              select: {
+                group_id: true,
+                title: true,
+                cover_image_url: true,
+                _count: {
+                  select: {
+                    group_user: true,
+                  },
+                },
+              },
+            },
+            group_user: {
+              select: {
+                group: {
+                  select: {
+                    group_id: true,
+                    title: true,
+                    cover_image_url: true,
+                    _count: {
+                      select: {
+                        group_user: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            article: {
+              select: {
+                article_id: true,
+                title: true,
+                cover_image_url: true,
+                created_at: true,
+                article_tag: true,
+              },
+            },
           },
         });
       }
