@@ -173,6 +173,15 @@ export class AuthService {
             },
           },
         },
+        article: {
+          select: {
+            article_id: true,
+            title: true,
+            cover_image_url: true,
+            created_at: true,
+            article_tag: true,
+          },
+        },
       },
     });
     console.log(user);

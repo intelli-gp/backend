@@ -8,6 +8,4 @@ export interface ServerToClientEvents {
     username: string;
     status: 'online' | 'offline';
   }) => void;
-  // joinRoom: (client: Socket, room: string) => void;
-  // leaveRoom: (client: Socket, room: string) => void;
 }

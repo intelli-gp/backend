@@ -1,5 +1,7 @@
 import {
   Prisma,
+  article,
+  article_tag,
   group,
   group_user,
   level,
@@ -57,6 +59,22 @@ export class SerializedUser {
     value.map((tag) => tag.tag_name),
   )
   user_tag: string[];
+
+  @Expose({ name: 'Articles' })
+  @Transform(({ value }: { value: Prisma.articleWhereInput[] }) =>
+    value.map((article) => {
+      return {
+        ArticleID: article?.article_id,
+        ArticleTitle: article?.title,
+        ArticleImage: article?.cover_image_url,
+        ArticleTags: (article?.article_tag as article_tag[])?.map(
+          (tag) => tag.tag_name,
+        ),
+        ArticleCreatedAt: article?.created_at,
+      };
+    }),
+  )
+  article: article[];
 
   @Expose({ name: 'GroupsCreated' })
   @Transform(({ value }: { value: Prisma.groupWhereInput[] }) =>
