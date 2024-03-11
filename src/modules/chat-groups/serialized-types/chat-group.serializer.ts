@@ -1,18 +1,18 @@
 import { group, group_tag, group_user, user } from '@prisma/client';
-import { Expose, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
 
 export class SerializedChatGroup {
   @Expose({ name: 'ID' })
-  chat_group_id?: number;
+  group_id: number;
 
   @Expose({ name: 'GroupTitle' })
-  group_title?: string;
+  title: string;
 
   @Expose({ name: 'GroupDescription' })
-  group_description?: string;
+  description?: string;
 
   @Expose({ name: 'GroupCoverImageUrl' })
-  group_cover_image_url?: string;
+  cover_image_url?: string;
 
   @Expose({ name: 'CreatedAt' })
   created_at?: Date;
@@ -51,6 +51,9 @@ export class SerializedChatGroup {
     };
   })
   user?: user;
+
+  @Exclude()
+  created_by: number;
 
   constructor(partial: Partial<any>) {
     Object.assign(this, partial);

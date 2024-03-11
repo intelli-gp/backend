@@ -56,6 +56,16 @@ export class UsersService {
     return await this.prismaService.user.findUnique({ where: { user_id: id } });
   }
 
+  async updateUserConnectedStatus(
+    userId: number,
+    connected: boolean,
+  ): Promise<user | null> {
+    return await this.prismaService.user.update({
+      where: { user_id: userId },
+      data: { connected: connected },
+    });
+  }
+
   async updateUser(
     userData: user,
     updateUserDto: UpdateUserDto,
