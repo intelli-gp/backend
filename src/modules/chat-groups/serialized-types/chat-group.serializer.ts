@@ -29,7 +29,7 @@ export class SerializedChatGroup {
     ({ value }) =>
       value
         ?.filter((groupUser: group_user) => groupUser.joining_status !== false)
-        .map((groupUser: group_user) => {
+        ?.map((groupUser: group_user) => {
           return {
             ID: groupUser.user_id,
             Username: ((groupUser as any)?.user as user)?.username,

@@ -55,43 +55,45 @@ export class SerializedUser {
   active: boolean;
 
   @Expose({ name: 'UserTags' })
-  @Transform(({ value }: { value: user_tag[] }) =>
-    value.map((tag) => tag.tag_name),
+  @Transform(
+    ({ value }: { value: user_tag[] }) => value?.map((tag) => tag.tag_name),
   )
   user_tag: string[];
 
   @Expose({ name: 'Articles' })
-  @Transform(({ value }: { value: Prisma.articleWhereInput[] }) =>
-    value.map((article) => {
-      return {
-        ArticleID: article?.article_id,
-        ArticleTitle: article?.title,
-        ArticleImage: article?.cover_image_url,
-        ArticleTags: (article?.article_tag as article_tag[])?.map(
-          (tag) => tag.tag_name,
-        ),
-        ArticleCreatedAt: article?.created_at,
-      };
-    }),
+  @Transform(
+    ({ value }: { value: Prisma.articleWhereInput[] }) =>
+      value?.map((article) => {
+        return {
+          ArticleID: article?.article_id,
+          ArticleTitle: article?.title,
+          ArticleImage: article?.cover_image_url,
+          ArticleTags: (article?.article_tag as article_tag[])?.map(
+            (tag) => tag.tag_name,
+          ),
+          ArticleCreatedAt: article?.created_at,
+        };
+      }),
   )
   article: article[];
 
   @Expose({ name: 'GroupsCreated' })
-  @Transform(({ value }: { value: Prisma.groupWhereInput[] }) =>
-    value.map((group) => {
-      return {
-        GroupID: group?.group_id,
-        GroupName: group?.title,
-        GroupImage: group?.cover_image_url,
-        GroupUsersCount: (group as any)?._count?.group_user,
-      };
-    }),
+  @Transform(
+    ({ value }: { value: Prisma.groupWhereInput[] }) =>
+      value?.map((group) => {
+        return {
+          GroupID: group?.group_id,
+          GroupName: group?.title,
+          GroupImage: group?.cover_image_url,
+          GroupUsersCount: (group as any)?._count?.group_user,
+        };
+      }),
   )
   group: group[];
 
   @Expose({ name: 'GroupsJoined' })
   @Transform(({ value }: { value: Prisma.group_userWhereInput[] }) => {
-    return value.map((group_user) => {
+    return value?.map((group_user) => {
       return {
         GroupID: group_user?.group.group_id,
         GroupName: group_user?.group.title,
