@@ -11,41 +11,41 @@ export class SerializedArticle {
 
   title?: string;
 
-  @Expose({ name: 'coverImageUrl' })
+  @Expose({ name: 'CoverImage' })
   cover_image_url?: string;
 
-  @Expose({ name: 'createdAt' })
+  @Expose({ name: 'CreatedAt' })
   created_at?: Date;
 
-  @Expose({ name: 'updatedAt' })
+  @Expose({ name: 'UpdatedAt' })
   updated_at?: Date;
 
-  @Expose({ name: 'author' })
+  @Expose({ name: 'Author' })
   @Transform(({ value }: { value: user }) => {
     if (!value) return;
 
     return {
-      fullName: value?.full_name,
-      username: value?.username,
-      image: value?.image,
-      followersCount: (value as any).followed_by?.length,
+      Fullname: value?.full_name,
+      Username: value?.username,
+      ProfileImage: value?.image,
+      FollowersCount: (value as any).followed_by?.length,
     };
   })
   user?: user;
 
-  @Expose({ name: 'sections' })
+  @Expose({ name: 'Sections' })
   @Transform(
     ({ value }: { value: articles_content[] }) =>
       value?.map((content: articles_content) => {
         return {
-          value: content?.value,
-          contentType: content?.content_type,
+          Value: content?.value,
+          ContentType: content?.content_type,
         };
       }),
   )
   articles_content?: articles_content[];
 
-  @Expose({ name: 'tags' })
+  @Expose({ name: 'ArticleTags' })
   @Transform(
     ({ value }: { value: article_tag[] }) =>
       value?.map((tag: article_tag) => tag?.tag_name),

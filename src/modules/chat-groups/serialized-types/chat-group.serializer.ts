@@ -32,10 +32,10 @@ export class SerializedChatGroup {
         .map((groupUser: group_user) => {
           return {
             ID: groupUser.user_id,
-            username: ((groupUser as any)?.user as user)?.username,
-            profileImg: ((groupUser as any)?.user as user)?.cover_image,
-            joiningStatus: groupUser.joining_status,
-            type: groupUser.type,
+            Username: ((groupUser as any)?.user as user)?.username,
+            ProfileImage: ((groupUser as any)?.user as user)?.cover_image,
+            JoiningStatus: groupUser.joining_status,
+            Type: groupUser.type,
           };
         }),
   )
@@ -45,9 +45,9 @@ export class SerializedChatGroup {
   @Transform(({ value }) => {
     return {
       ID: value?.user_id,
-      username: value?.username,
-      email: value?.email,
-      profileImage: value?.profile_image_url,
+      Username: value?.username,
+      Email: value?.email,
+      ProfileImage: value?.profile_image_url,
     };
   })
   user?: user;
