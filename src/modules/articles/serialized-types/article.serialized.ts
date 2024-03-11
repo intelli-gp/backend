@@ -27,7 +27,7 @@ export class SerializedArticle {
 
     return {
       AuthorID: value?.user_id,
-      Fullname: value?.full_name,
+      FullName: value?.full_name,
       Username: value?.username,
       ProfileImage: value?.image,
       FollowersCount: (value as any).followed_by?.length,
