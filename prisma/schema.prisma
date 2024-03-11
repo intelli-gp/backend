@@ -155,6 +155,7 @@ model message {
   user_id    Int
   group_id   Int
   content    String
+  deleted    Boolean      @default(false)
   created_at DateTime?    @default(now())
   updated_at DateTime?    @updatedAt
   attachment attachment[]
@@ -277,6 +278,7 @@ model user {
   plan_id              Int       @default(1)
   renewal_date         DateTime  @db.Date
   subscription_date    DateTime  @db.Date
+  connected            Boolean   @default(false)
   active               Boolean   @default(false)
   hashed_refresh_token String?   @db.VarChar(100)
 
