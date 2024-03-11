@@ -9,6 +9,7 @@ export class SerializedArticle {
   @Exclude()
   user_id?: number;
 
+  @Expose({ name: 'Title' })
   title?: string;
 
   @Expose({ name: 'CoverImage' })
@@ -25,6 +26,7 @@ export class SerializedArticle {
     if (!value) return;
 
     return {
+      AuthorID: value?.user_id,
       Fullname: value?.full_name,
       Username: value?.username,
       ProfileImage: value?.image,
