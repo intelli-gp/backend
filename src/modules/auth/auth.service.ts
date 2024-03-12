@@ -150,11 +150,8 @@ export class AuthService {
             group_id: true,
             title: true,
             cover_image_url: true,
-            _count: {
-              select: {
-                group_user: true,
-              },
-            },
+            group_user: true,
+            group_tag: true,
           },
         },
         group_user: {
@@ -164,11 +161,8 @@ export class AuthService {
                 group_id: true,
                 title: true,
                 cover_image_url: true,
-                _count: {
-                  select: {
-                    group_user: true,
-                  },
-                },
+                group_user: true,
+                group_tag: true,
               },
             },
           },

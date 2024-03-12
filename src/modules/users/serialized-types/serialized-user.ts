@@ -3,6 +3,7 @@ import {
   article,
   article_tag,
   group,
+  group_tag,
   group_user,
   level,
   plan,
@@ -85,7 +86,13 @@ export class SerializedUser {
           ID: group?.group_id,
           GroupTitle: group?.title,
           GroupCoverImage: group?.cover_image_url,
-          GroupUsersCount: (group as any)?._count?.group_user,
+          GroupTags: (group?.group_tag as group_tag[])?.map(
+            (tag) => tag.tag_name,
+          ),
+          GroupUsersCount:
+            (group?.group_user as group_user[])?.filter(
+              (groupUser) => groupUser.joining_status,
+            )?.length || 0,
         };
       }),
   )
@@ -98,7 +105,14 @@ export class SerializedUser {
         GroupID: group_user?.group.group_id,
         GroupName: group_user?.group.title,
         GroupCoverImage: group_user?.group.cover_image_url,
-        GroupUsersCount: (group_user?.group as any)?._count.group_user,
+        GroupTags: (group_user?.group?.group_tag as group_tag[])?.map(
+          (tag) => tag.tag_name,
+        ),
+        GroupUsersCount:
+          (group_user?.group?.group_user as group_user[])?.filter(
+            (groupUser) => groupUser.joining_status,
+          )?.length || 0,
+        JoiningStatus: group_user?.joining_status,
       };
     });
   })
