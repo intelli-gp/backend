@@ -7,10 +7,12 @@ import {
 } from '@nestjs/websockets';
 import {
   BadRequestException,
+  ClassSerializerInterceptor,
   Injectable,
   Logger,
   UseFilters,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -31,8 +33,12 @@ import { user } from '@prisma/client';
 import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
-@WebSocketGateway({ namespace: 'chat-groups' })
+@WebSocketGateway({
+  namespace: 'chat-groups',
+  cors: true,
+})
 @UseFilters(new WebsocketExceptionsFilter(), new WsPrismaExceptionFilter())
+@UseInterceptors(ClassSerializerInterceptor)
 // @UseFilters(new CustomFilter())
 /**
  We use the guard even though we supplied a middleware before connecting for an 
