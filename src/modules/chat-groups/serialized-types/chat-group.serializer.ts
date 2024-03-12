@@ -33,8 +33,7 @@ export class SerializedChatGroup {
           return {
             ID: groupUser.user_id,
             Username: ((groupUser as any)?.user as user)?.username,
-            ProfileImage: ((groupUser as any)?.user as user)?.cover_image,
-            JoiningStatus: groupUser.joining_status,
+            ProfileImage: ((groupUser as any)?.user as user)?.image,
             Type: groupUser.type,
           };
         }),
@@ -42,12 +41,13 @@ export class SerializedChatGroup {
   group_user?: group_user[];
 
   @Expose({ name: 'GroupOwner' })
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: user }) => {
     return {
       ID: value?.user_id,
       Username: value?.username,
       Email: value?.email,
-      ProfileImage: value?.profile_image_url,
+      ProfileImage: value?.image,
+      CoverImage: value?.cover_image,
     };
   })
   user?: user;
