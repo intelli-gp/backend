@@ -82,9 +82,9 @@ export class SerializedUser {
     ({ value }: { value: Prisma.groupWhereInput[] }) =>
       value?.map((group) => {
         return {
-          GroupID: group?.group_id,
-          GroupName: group?.title,
-          GroupImage: group?.cover_image_url,
+          ID: group?.group_id,
+          GroupTitle: group?.title,
+          GroupCoverImage: group?.cover_image_url,
           GroupUsersCount: (group as any)?._count?.group_user,
         };
       }),
@@ -97,7 +97,7 @@ export class SerializedUser {
       return {
         GroupID: group_user?.group.group_id,
         GroupName: group_user?.group.title,
-        GroupImage: group_user?.group.cover_image_url,
+        GroupCoverImage: group_user?.group.cover_image_url,
         GroupUsersCount: (group_user?.group as any)?._count.group_user,
       };
     });

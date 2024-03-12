@@ -11,7 +11,7 @@ export class SerializedChatGroup {
   @Expose({ name: 'GroupDescription' })
   description?: string;
 
-  @Expose({ name: 'GroupCoverImageUrl' })
+  @Expose({ name: 'GroupCoverImage' })
   cover_image_url?: string;
 
   @Expose({ name: 'CreatedAt' })
