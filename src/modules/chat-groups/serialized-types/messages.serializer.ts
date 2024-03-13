@@ -39,12 +39,16 @@ export class SerializedMessage {
       ? 'This message has been deleted'
       : (partial?.content as string);
     this.User = {
-      UserID: partial?.user?.user_id,
+      ID: partial?.user?.user_id,
       Username: partial?.user?.username,
       FullName: partial?.user?.full_name,
       ProfileImage: partial?.user?.image,
     };
-    this.Attachment = partial?.attachment as attachment;
+    // this.Attachment = {
+    //   ID: partial?.attachment?.attachment_id,
+    //   URL: partial?.attachment?.url,
+    //   Type: partial?.attachment?.type,
+    // };
     this.CreatedAt = partial?.created_at as string;
   }
 }
