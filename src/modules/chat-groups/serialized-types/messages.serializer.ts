@@ -35,9 +35,12 @@ export class SerializedMessage {
     // Object.assign(this, partial);
     this.MessageID = Number(partial?.message_id);
     this.RoomID = `Chat-Group-${partial?.group_id}`;
-    this.Content = this.deleted
+    console.log('deletion status', partial?.deleted);
+    this.Content = partial.deleted
       ? 'This message has been deleted'
       : (partial?.content as string);
+
+    console.log('Content', this.Content);
     this.User = {
       ID: partial?.user?.user_id,
       Username: partial?.user?.username,
