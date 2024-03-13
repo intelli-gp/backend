@@ -1,3 +1,3 @@
 export const PointsExample = {
-  points: 20,
+  Points: 20,
 };
