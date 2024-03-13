@@ -31,6 +31,7 @@ import { EditMessageDto } from '../dto/edit-message.dto';
 import { DeleteMessageDto } from '../dto/delete-message.dto';
 import { user } from '@prisma/client';
 import { UsersService } from 'src/modules/users/users.service';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 @WebSocketGateway({
@@ -38,8 +39,7 @@ import { UsersService } from 'src/modules/users/users.service';
   cors: true,
 })
 @UseFilters(new WebsocketExceptionsFilter(), new WsPrismaExceptionFilter())
-@UseInterceptors(ClassSerializerInterceptor)
-// @UseFilters(new CustomFilter())
+@UseInterceptors(new ClassSerializerInterceptor(new Reflector()))
 /**
  We use the guard even though we supplied a middleware before connecting for an 
  extra layer of protection after connection each message sent will be checked for
