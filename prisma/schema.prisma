@@ -71,7 +71,7 @@ model attachment {
 
 model badges {
   badge_id        Int          @id @default(autoincrement())
-  title           String       @db.VarChar(255)
+  title           String       @unique @db.VarChar(255)
   description     String
   image_url       String       @db.VarChar(255)
   required_points Int
@@ -240,6 +240,7 @@ model user_badge {
   user        user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([user_id, badge_id])
+  @@index([user_id])
 }
 
 model user_tag {
