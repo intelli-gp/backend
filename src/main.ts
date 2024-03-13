@@ -8,11 +8,16 @@ import * as fs from 'fs';
 
 async function bootstrap() {
   const config = new ConfigService();
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: true,
+  });
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: config.get('FRONT_URL'),
+    origin: config
+      .get('FRONT_URL')
+      .substring(0, config.get('FRONT_URL').length - 1),
     credentials: true,
+    optionsSuccessStatus: 200,
   });
   app.use(cookieParser());
   app.useGlobalPipes(

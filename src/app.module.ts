@@ -14,6 +14,7 @@ import { TrimStringsPipe } from './utils/pipes/trim-string.pipe';
 import { PrismaExceptionFilter } from './exception-filters/prisma.filter';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { ChatGroupsModule } from './modules/chat-groups/chat-groups.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ChatGroupsModule } from './modules/chat-groups/chat-groups.module';
     ArticlesModule,
     StudyPlannerModule,
     ChatGroupsModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [
