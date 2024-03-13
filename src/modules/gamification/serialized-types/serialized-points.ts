@@ -10,6 +10,7 @@ export class SerializedPoints {
 
   constructor(partial: Partial<user>) {
     Object.assign(this, partial);
+    this.UpdatedPoints = partial.points;
   }
 
   @Exclude()
@@ -41,6 +42,9 @@ export class SerializedPoints {
 
   @Exclude()
   image: string;
+
+  @Exclude()
+  points: number;
 
   @Exclude()
   level_id: string;

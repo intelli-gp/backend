@@ -9,5 +9,5 @@ export class PointsDto {
   })
   @IsInt()
   @IsNotEmpty()
-  points: number;
+  Points: number;
 }

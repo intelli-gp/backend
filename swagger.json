@@ -1339,7 +1339,127 @@
                       "type": "object",
                       "properties": null,
                       "example": {
-                        "points": 20
+                        "Points": 20
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "errorMessage": [
+                          "depending on the error, this will be a string or an array of strings"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
+    "/api/gamification/add-badge": {
+      "post": {
+        "operationId": "GamificationController_addBadge",
+        "summary": "Add a badge",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BadgeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Badge added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "BadgeId": 3
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "errorMessage": [
+                          "depending on the error, this will be a string or an array of strings"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
+    "/api/gamification/add-user-badge": {
+      "post": {
+        "operationId": "GamificationController_addBadges",
+        "summary": "Add a badge to a certain user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserBadgeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Badges added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "BadgeId": 3
                       }
                     }
                   }
@@ -1693,14 +1813,58 @@
       "PointsDto": {
         "type": "object",
         "properties": {
-          "points": {
+          "Points": {
             "type": "number",
             "description": "The points to be added to the user",
             "example": 20
           }
         },
         "required": [
-          "points"
+          "Points"
+        ]
+      },
+      "BadgeDto": {
+        "type": "object",
+        "properties": {
+          "Title": {
+            "type": "string",
+            "description": "badge title",
+            "example": "initial badge"
+          },
+          "Description": {
+            "type": "string",
+            "description": "badge description",
+            "example": "initial badge description"
+          },
+          "ImageUrl": {
+            "type": "string",
+            "description": "badge image url",
+            "example": "https://example.com/image.png"
+          },
+          "RequiredPoints": {
+            "type": "number",
+            "description": "required points to get the badge",
+            "example": 100
+          }
+        },
+        "required": [
+          "Title",
+          "Description",
+          "ImageUrl",
+          "RequiredPoints"
+        ]
+      },
+      "UserBadgeDto": {
+        "type": "object",
+        "properties": {
+          "BadgeId": {
+            "type": "number",
+            "description": "The badge id to be added to the user",
+            "example": 3
+          }
+        },
+        "required": [
+          "BadgeId"
         ]
       }
     }
