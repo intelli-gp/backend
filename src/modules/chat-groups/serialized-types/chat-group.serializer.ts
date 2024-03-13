@@ -1,4 +1,4 @@
-import { group, group_tag, group_user, user } from '@prisma/client';
+import { Prisma, group, group_tag, group_user, user } from '@prisma/client';
 import { Exclude, Expose, Transform } from 'class-transformer';
 
 export class SerializedChatGroup {
@@ -29,12 +29,14 @@ export class SerializedChatGroup {
     ({ value }) =>
       value
         ?.filter((groupUser: group_user) => groupUser.joining_status !== false)
-        ?.map((groupUser: group_user) => {
+        ?.map((groupUser: Prisma.group_userWhereInput) => {
           return {
             ID: groupUser.user_id,
-            Username: ((groupUser as any)?.user as user)?.username,
-            ProfileImage: ((groupUser as any)?.user as user)?.image,
+            FullName: groupUser?.user?.full_name,
+            Username: groupUser?.user?.username,
+            ProfileImage: groupUser?.user?.image,
             Type: groupUser.type,
+            ConnectedStatus: groupUser?.user?.connected,
           };
         }),
   )
@@ -44,10 +46,10 @@ export class SerializedChatGroup {
   @Transform(({ value }: { value: user }) => {
     return {
       ID: value?.user_id,
+      FullName: value?.full_name,
       Username: value?.username,
       Email: value?.email,
       ProfileImage: value?.image,
-      CoverImage: value?.cover_image,
     };
   })
   user?: user;

@@ -185,16 +185,18 @@ export class ChatGroupsGateway {
   @SubscribeMessage('typing')
   typing(
     @MessageBody() dto: IsTypingDto,
-    @WsGetCurrentUser('username') username,
+    @WsGetCurrentUser() user: user,
     @ConnectedSocket() client: Socket,
   ) {
     // get group name
     const groupTitle = this.createGroupTitle(dto.GroupID);
 
     // broadcast emit that this client is typing except this client himself
-    client
-      .to(groupTitle)
-      .emit('isTyping', { isTyping: dto.IsTyping, username });
+    client.to(groupTitle).emit('isTyping', {
+      IsTyping: dto.IsTyping,
+      Username: user.username,
+      FullName: user.full_name,
+    });
   }
 
   @SubscribeMessage('deleteMessage')
