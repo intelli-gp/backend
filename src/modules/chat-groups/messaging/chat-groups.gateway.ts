@@ -158,7 +158,7 @@ export class ChatGroupsGateway {
     this.gatewayLogger.log(`Joining room ${groupTitle}`);
     const messages = await this.messagingService.getMessages(dto.ChatGroupId);
     client.join(groupTitle);
-    this.wss.to(groupTitle).emit(
+    client.emit(
       'allMessages',
       messages.map((message) => {
         return new SerializedMessage(message);
