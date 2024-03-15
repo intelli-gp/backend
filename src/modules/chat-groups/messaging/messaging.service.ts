@@ -37,6 +37,8 @@ export class MessagingService {
     this.notificationsService.emitChatNotification(
       new SerializedMessage(newMessage as unknown as Prisma.messageWhereInput),
     );
+
+    return newMessage;
   }
 
   async deleteMessage(messageId: number, userId: number) {
