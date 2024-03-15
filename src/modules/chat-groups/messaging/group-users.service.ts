@@ -27,4 +27,25 @@ export class GroupUsersService {
 
     return true;
   }
+
+  async toggleJoinSocketRoom(
+    userId: number,
+    groupId: number,
+    isInRoom: boolean,
+  ) {
+    this.groupUsersLogger.debug(`Joining user ${userId} to group ${groupId}`);
+    await this.prismaService.group_user.update({
+      where: {
+        group_id_user_id: {
+          group_id: groupId,
+          user_id: userId,
+        },
+      },
+      data: {
+        inRoom: {
+          set: !isInRoom,
+        },
+      },
+    });
+  }
 }

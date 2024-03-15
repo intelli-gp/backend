@@ -29,7 +29,7 @@ import { WsPrismaExceptionFilter } from 'src/exception-filters/prisma.filter';
 import { SerializedMessage } from '../serialized-types/messages.serializer';
 import { EditMessageDto } from '../dto/edit-message.dto';
 import { DeleteMessageDto } from '../dto/delete-message.dto';
-import { user } from '@prisma/client';
+import { Prisma, user } from '@prisma/client';
 import { UsersService } from 'src/modules/users/users.service';
 import { Reflector } from '@nestjs/core';
 
@@ -124,7 +124,11 @@ export class ChatGroupsGateway {
     this.gatewayLogger.log(
       `Creating message in room ${data.GroupID} with content ${data.Content}`,
     );
-
+    if (
+      !(await this.groupUsersService.isUserMemberOfGroup(userId, data.GroupID))
+    ) {
+      throw new BadRequestException('User is not a member of this group');
+    }
     const messagePayload = await this.messagingService.createMessage(
       data.GroupID,
       userId,
@@ -135,7 +139,12 @@ export class ChatGroupsGateway {
 
     this.wss
       .to(groupTitle)
-      .emit('newMessage', new SerializedMessage(messagePayload));
+      .emit(
+        'newMessage',
+        new SerializedMessage(
+          messagePayload as unknown as Prisma.messageWhereInput,
+        ),
+      );
   }
 
   @SubscribeMessage('joinRoom')
@@ -153,6 +162,12 @@ export class ChatGroupsGateway {
       throw new BadRequestException('User is not a member of this group');
     }
 
+    await this.groupUsersService.toggleJoinSocketRoom(
+      userId,
+      dto.ChatGroupId,
+      false,
+    );
+
     const groupTitle = this.createGroupTitle(dto.ChatGroupId);
 
     this.gatewayLogger.log(`Joining room ${groupTitle}`);
@@ -167,13 +182,25 @@ export class ChatGroupsGateway {
   }
 
   @SubscribeMessage('leaveRoom')
-  leaveRoom(
+  async leaveRoom(
+    @WsGetCurrentUser('user_id') userId: number,
     @ConnectedSocket() client: Socket,
     @MessageBody() dto: JoinChatGroupDto,
   ) {
-    // TODO: add logic to check if user is in this room
-    // TODO: add logic to check if room exists
-    // TODO: change the group_user status
+    if (
+      !(await this.groupUsersService.isUserMemberOfGroup(
+        userId,
+        dto.ChatGroupId,
+      ))
+    ) {
+      throw new BadRequestException('User is not a member of this group');
+    }
+
+    await this.groupUsersService.toggleJoinSocketRoom(
+      userId,
+      dto.ChatGroupId,
+      true,
+    );
 
     const groupTitle = this.createGroupTitle(dto.ChatGroupId);
 
