@@ -62,7 +62,19 @@ export class UsersService {
   ): Promise<user | null> {
     return await this.prismaService.user.update({
       where: { user_id: userId },
-      data: { connected: connected },
+      data: {
+        connected: connected,
+        ...(connected
+          ? {}
+          : {
+              group_user: {
+                updateMany: {
+                  where: { user_id: userId },
+                  data: { inRoom: false },
+                },
+              },
+            }),
+      },
     });
   }
 

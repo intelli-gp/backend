@@ -8,7 +8,7 @@ export class NotificationController {
 
   constructor(private readonly eventsService: EventsService) {}
 
-  @Public()
+  // @Public()
   @Sse('events')
   events() {
     return this.eventsService.subscribe();
@@ -17,6 +17,9 @@ export class NotificationController {
   @Public()
   @Post('emit')
   async emit() {
-    await this.eventsService.emit('Hello World');
+    await this.eventsService.emit({
+      eventName: 'warning',
+      message: 1,
+    });
   }
 }

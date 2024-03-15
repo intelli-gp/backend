@@ -1,10 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Injectable, Logger } from '@nestjs/common';
+import { Prisma, group_user } from '@prisma/client';
+import { NotificationService } from 'src/modules/notification/notification.service';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { SerializedMessage } from '../serialized-types/messages.serializer';
 
 @Injectable()
 export class MessagingService {
-  constructor(private readonly prismaService: PrismaService) {}
+  private messagingLogger = new Logger('MessagingService');
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly notificationsService: NotificationService,
+  ) {}
 
   async getMessages(groupId: number) {
     return await this.prismaService.message.findMany({
@@ -17,7 +23,7 @@ export class MessagingService {
     });
   }
   async createMessage(groupId: number, userId: number, messageContent: string) {
-    return await this.prismaService.message.create({
+    const newMessage = await this.prismaService.message.create({
       data: {
         content: messageContent,
         group_id: groupId,
@@ -27,6 +33,10 @@ export class MessagingService {
         user: true,
       },
     });
+
+    this.notificationsService.emitChatNotification(
+      new SerializedMessage(newMessage as unknown as Prisma.messageWhereInput),
+    );
   }
 
   async deleteMessage(messageId: number, userId: number) {
