@@ -17,6 +17,9 @@ export class MessagingService {
       where: {
         group_id: groupId,
       },
+      orderBy: {
+        created_at: 'asc',
+      },
       include: {
         user: true,
       },
