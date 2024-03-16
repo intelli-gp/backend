@@ -23,8 +23,7 @@ export class SerializedMessage {
 
   CreatedAt: string;
 
-  @Exclude()
-  deleted: boolean;
+  IsDeleted: boolean;
 
   @Exclude()
   updated_at: Date;
@@ -47,6 +46,7 @@ export class SerializedMessage {
       FullName: partial?.user?.full_name,
       ProfileImage: partial?.user?.image,
     };
+    this.IsDeleted = partial?.deleted as boolean;
     // this.Attachment = {
     //   ID: partial?.attachment?.attachment_id,
     //   URL: partial?.attachment?.url,
