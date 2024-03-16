@@ -44,7 +44,7 @@ export class MessagingService {
   async deleteMessage(messageId: number, userId: number) {
     //  let only message owner or group owner delete the message
 
-    const deletedMessage = await this.prismaService.message.update({
+    await this.prismaService.message.updateMany({
       where: {
         OR: [
           {
@@ -58,13 +58,23 @@ export class MessagingService {
             },
           },
         ],
-      } as Prisma.messageWhereUniqueInput,
+      },
       data: { deleted: true },
     });
 
+    const deletedMessageData = await this.prismaService.message.findUnique({
+      where: {
+        message_id: messageId,
+      },
+    });
+
+    this.messagingLogger.debug({ deletedMessageData });
+
     return {
-      messagesAfterDeletion: await this.getMessages(deletedMessage.group_id),
-      groupId: deletedMessage.group_id,
+      messagesAfterDeletion: await this.getMessages(
+        deletedMessageData.group_id,
+      ),
+      groupId: deletedMessageData.group_id,
     };
   }
 
