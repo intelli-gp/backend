@@ -34,18 +34,45 @@ export class GroupUsersService {
     isInRoom: boolean,
   ) {
     this.groupUsersLogger.debug(`Joining user ${userId} to group ${groupId}`);
-    await this.prismaService.group_user.update({
-      where: {
-        group_id_user_id: {
-          group_id: groupId,
-          user_id: userId,
+    await this.prismaService.$transaction(async (prisma) => {
+      const updatedGroupUser = await prisma.group_user.update({
+        where: {
+          group_id_user_id: {
+            group_id: groupId,
+            user_id: userId,
+          },
         },
-      },
-      data: {
-        inRoom: {
-          set: !isInRoom,
+        include: {
+          group: {
+            include: {
+              message: true,
+            },
+          },
         },
-      },
+        data: {
+          inRoom: !isInRoom,
+        },
+      });
+
+      const messagesAvailableToRead = updatedGroupUser.group.message.filter(
+        (message) => {
+          return message.user_id !== userId;
+        },
+      );
+
+      this.groupUsersLogger.debug({ messagesAvailableToRead });
+      // Notice: Skip duplicates does not work with MongoDB or SQLServer
+      // read all messages in this room
+      const readStatus = await prisma.messages_read_status.createMany({
+        data: messagesAvailableToRead.map((message) => {
+          return {
+            message_id: message.message_id,
+            user_id: userId,
+          };
+        }),
+        skipDuplicates: true,
+      });
+      this.groupUsersLogger.debug({ readStatus });
     });
   }
 }

@@ -64,7 +64,7 @@ export class UsersService {
       where: { user_id: userId },
       data: {
         connected: connected,
-        ...(connected
+        ...(!connected
           ? {}
           : {
               group_user: {

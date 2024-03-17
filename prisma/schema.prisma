@@ -152,16 +152,27 @@ model message_ai {
 }
 
 model message {
-  message_id Int          @id @default(autoincrement())
+  message_id           Int                    @id @default(autoincrement())
+  user_id              Int
+  group_id             Int
+  content              String
+  deleted              Boolean                @default(false)
+  created_at           DateTime?              @default(now())
+  updated_at           DateTime?              @updatedAt
+  attachment           attachment[]
+  group                group                  @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
+  user                 user                   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  messages_read_status messages_read_status[]
+}
+
+model messages_read_status {
+  message_id Int
   user_id    Int
-  group_id   Int
-  content    String
-  deleted    Boolean      @default(false)
-  created_at DateTime?    @default(now())
-  updated_at DateTime?    @updatedAt
-  attachment attachment[]
-  group      group        @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
-  user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  read_at    DateTime @default(now())
+  message    message  @relation(fields: [message_id], references: [message_id], onDelete: Cascade, onUpdate: Cascade)
+  user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([message_id, user_id])
 }
 
 model notification {
@@ -283,21 +294,22 @@ model user {
   active               Boolean   @default(false)
   hashed_refresh_token String?   @db.VarChar(100)
 
-  ai_output      ai_output[]
-  article        article[]
-  group_user     group_user[]
-  group          group[]
-  message_ai     message_ai[]
-  message        message[]
-  notification   notification[]
-  payment_method payment_method[]
-  task           task[]
-  user_badge     user_badge[]
-  user_tag       user_tag[]
-  level          level            @relation(fields: [level_id], references: [level_id], onDelete: Cascade, onUpdate: Cascade)
-  plan           plan             @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
-  following      user_follower[]  @relation("following")
-  followed_by    user_follower[]  @relation("followed_by")
+  ai_output            ai_output[]
+  article              article[]
+  group_user           group_user[]
+  group                group[]
+  message_ai           message_ai[]
+  message              message[]
+  notification         notification[]
+  payment_method       payment_method[]
+  task                 task[]
+  user_badge           user_badge[]
+  user_tag             user_tag[]
+  level                level                  @relation(fields: [level_id], references: [level_id], onDelete: Cascade, onUpdate: Cascade)
+  plan                 plan                   @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
+  following            user_follower[]        @relation("following")
+  followed_by          user_follower[]        @relation("followed_by")
+  messages_read_status messages_read_status[]
 }
 
 enum GroupUserTypeEnum {

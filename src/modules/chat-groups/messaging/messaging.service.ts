@@ -26,12 +26,32 @@ export class MessagingService {
     });
   }
   async createMessage(groupId: number, userId: number, messageContent: string) {
+    const groupUsersIds = await this.prismaService.group_user.findMany({
+      where: {
+        group_id: groupId,
+        inRoom: true,
+        NOT: {
+          user_id: userId,
+        },
+      },
+      select: {
+        user_id: true,
+      },
+    });
+
     const newMessage = await this.prismaService.message.create({
       data: {
         content: messageContent,
         group_id: groupId,
         user_id: userId,
+        messages_read_status: {
+          createMany: {
+            data: groupUsersIds,
+            skipDuplicates: true,
+          },
+        },
       },
+
       include: {
         user: true,
       },
