@@ -4,19 +4,8 @@ import { Exclude, Expose, Transform } from 'class-transformer';
 export class SerializedMessage {
   MessageID: number;
 
-  @Transform(({ value }) => {
-    return `Chat-Group-${value}`;
-  })
-  RoomID: string;
-
-  @Transform(({ value }: { value: user }) => {
-    return value?.username;
-  })
   User: any;
 
-  @Transform(({ value, obj }: { value: string; obj: message }) => {
-    return obj.deleted ? 'This message has been deleted' : value;
-  })
   Content: string;
 
   Attachment: attachment;
@@ -24,6 +13,8 @@ export class SerializedMessage {
   CreatedAt: string;
 
   IsDeleted: boolean;
+
+  GroupID: number;
 
   @Exclude()
   updated_at: Date;
@@ -33,8 +24,6 @@ export class SerializedMessage {
   ) {
     // Object.assign(this, partial);
     this.MessageID = Number(partial?.message_id);
-    this.RoomID = `Chat-Group-${partial?.group_id}`;
-    console.log('deletion status', partial?.deleted);
     this.Content = partial.deleted
       ? 'This message has been deleted'
       : (partial?.content as string);
@@ -52,6 +41,7 @@ export class SerializedMessage {
     //   URL: partial?.attachment?.url,
     //   Type: partial?.attachment?.type,
     // };
+    this.GroupID = partial?.group_id as number;
     this.CreatedAt = partial?.created_at as string;
   }
 }
