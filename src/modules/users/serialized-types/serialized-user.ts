@@ -102,7 +102,7 @@ export class SerializedUser {
   @Transform(({ value }: { value: Prisma.group_userWhereInput[] }) => {
     return value?.map((group_user) => {
       return {
-        GroupID: group_user?.group.group_id,
+        ID: group_user?.group.group_id,
         GroupName: group_user?.group.title,
         GroupCoverImage: group_user?.group.cover_image_url,
         GroupTags: (group_user?.group?.group_tag as group_tag[])?.map(

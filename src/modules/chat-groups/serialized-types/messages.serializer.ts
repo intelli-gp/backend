@@ -6,6 +6,7 @@ import {
   user,
 } from '@prisma/client';
 import { Exclude, Expose, Transform } from 'class-transformer';
+import { SerializedChatGroup } from './chat-group.serializer';
 
 export class SerializedMessage {
   MessageID: number;
@@ -19,8 +20,6 @@ export class SerializedMessage {
   CreatedAt: string;
 
   IsDeleted: boolean;
-
-  GroupID: number;
 
   // TODO: link all serializer types
   Group: any;
@@ -57,7 +56,7 @@ export class SerializedMessage {
     this.CreatedAt = partial?.created_at as string;
     if (isNotification) {
       this.Group = {
-        GroupID: partial?.group?.group_id,
+        ID: partial?.group?.group_id,
         GroupName: partial?.group?.title,
         GroupCoverImage: partial?.group?.cover_image_url,
       };
