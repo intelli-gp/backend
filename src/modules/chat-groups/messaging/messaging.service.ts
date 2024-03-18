@@ -65,11 +65,15 @@ export class MessagingService {
 
       include: {
         user: true,
+        group: true,
       },
     });
 
     this.notificationsService.emitChatNotification(
-      new SerializedMessage(newMessage as unknown as Prisma.messageWhereInput),
+      new SerializedMessage(
+        newMessage as unknown as Prisma.messageWhereInput,
+        true,
+      ),
     );
 
     return newMessage;

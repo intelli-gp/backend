@@ -22,6 +22,9 @@ export class SerializedMessage {
 
   GroupID: number;
 
+  // TODO: link all serializer types
+  Group: any;
+
   MessageReadBy: any[];
 
   @Exclude()
@@ -29,6 +32,7 @@ export class SerializedMessage {
 
   constructor(
     partial: Partial<Omit<Prisma.messageWhereInput, 'AND' | 'OR' | 'NOT'>>,
+    isNotification = false,
   ) {
     // Object.assign(this, partial);
     this.MessageID = Number(partial?.message_id);
@@ -49,18 +53,14 @@ export class SerializedMessage {
     //   URL: partial?.attachment?.url,
     //   Type: partial?.attachment?.type,
     // };
-    this.GroupID = partial?.group_id as number;
+
     this.CreatedAt = partial?.created_at as string;
-    // this.MessageReadBy = (
-    //   partial?.messages_read_status as Prisma.messages_read_statusWhereInput[]
-    // )?.map((messageReadInfo) => {
-    //   return {
-    //     UserID: messageReadInfo?.user?.user_id,
-    //     Username: messageReadInfo?.user?.username,
-    //     FullName: messageReadInfo?.user?.full_name,
-    //     ProfileImage: messageReadInfo?.user?.image,
-    //     ReadAt: messageReadInfo?.read_at,
-    //   };
-    // });
+    if (isNotification) {
+      this.Group = {
+        GroupID: partial?.group?.group_id,
+        GroupName: partial?.group?.title,
+        GroupCoverImage: partial?.group?.cover_image_url,
+      };
+    }
   }
 }
