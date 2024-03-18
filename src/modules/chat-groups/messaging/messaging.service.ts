@@ -25,6 +25,17 @@ export class MessagingService {
       },
     });
   }
+
+  async getMessageReadStatus(messageId: number) {
+    return await this.prismaService.messages_read_status.findMany({
+      where: {
+        message_id: messageId,
+      },
+      include: {
+        user: true,
+      },
+    });
+  }
   async createMessage(groupId: number, userId: number, messageContent: string) {
     const groupUsersIds = await this.prismaService.group_user.findMany({
       where: {

@@ -1,4 +1,5 @@
 import { SerializedMessage } from '../../serialized-types/messages.serializer';
+import { SerializedReadMessageInfo } from '../../serialized-types/read-messages.serializer';
 
 export type IsTypingSerialized = {
   IsTyping: boolean;
@@ -8,11 +9,13 @@ export type IsTypingSerialized = {
 
 export interface ServerToClientEvents {
   isTyping: (data: IsTypingSerialized) => void;
-  newMessage: (message: SerializedMessage) => void;
   allMessages: (messages: SerializedMessage[]) => void;
+  newMessage: (message: SerializedMessage) => void;
   userStatus: (data: {
     username: string;
     status: 'online' | 'offline';
   }) => void;
   error: (data: { message: string }) => void;
+  messageInfo: (data: SerializedReadMessageInfo[]) => void;
+  newMessageReadInfo: (data: SerializedReadMessageInfo) => void;
 }

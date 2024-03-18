@@ -9,4 +9,5 @@ export interface ClientToServerEvents {
   typing: (data: IsTypingDto) => void;
   editMessage: (data: EditMessageDto) => void;
   deleteMessage: (data: DeleteMessageDto) => void;
+  getMessageInfo: (data: DeleteMessageDto) => void;
 }

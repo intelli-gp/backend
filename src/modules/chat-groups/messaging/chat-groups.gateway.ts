@@ -32,6 +32,7 @@ import { DeleteMessageDto } from '../dto/delete-message.dto';
 import { Prisma, user } from '@prisma/client';
 import { UsersService } from 'src/modules/users/users.service';
 import { Reflector } from '@nestjs/core';
+import { SerializedReadMessageInfo } from '../serialized-types/read-messages.serializer';
 
 @Injectable()
 @WebSocketGateway({
@@ -67,7 +68,11 @@ export class ChatGroupsGateway {
     return `Chat-Group-${groupId}`;
   }
 
-  afterInit(client: Socket) {
+  createMessageInfoRoomTitle(messageId: number) {
+    return `Message-${messageId}-Info`;
+  }
+
+  async afterInit(client: Socket) {
     this.gatewayLogger.log('ChatGroupsGateway initialized');
     /*
     We use this way of middleware using at the afterInit that is exposed to us by nestjs 
@@ -78,6 +83,9 @@ export class ChatGroupsGateway {
     Notice: This type assertion is necessary because the client.use() method Types are wrong
     */
     client.use(WsAuthMiddleware() as any);
+
+    // Reset All connection if the server is restarted
+    await this.usersService.resetUsersConnectedStatus();
   }
 
   async handleConnection(@ConnectedSocket() client: Socket) {
@@ -96,6 +104,7 @@ export class ChatGroupsGateway {
       username: currentUser.username,
       status: 'online',
     });
+    // TODO: handle message delivered Status here
   }
 
   async handleDisconnect(client: Socket) {
@@ -162,7 +171,7 @@ export class ChatGroupsGateway {
       throw new BadRequestException('User is not a member of this group');
     }
 
-    await this.groupUsersService.toggleJoinSocketRoom(
+    const readMessages = await this.groupUsersService.toggleJoinSocketRoom(
       userId,
       dto.ChatGroupId,
       false,
@@ -179,6 +188,13 @@ export class ChatGroupsGateway {
         return new SerializedMessage(message);
       }),
     );
+
+    // TODO: Emit to all users in every message Room that this user has read the message
+    readMessages.forEach((readMessage) => {
+      this.wss
+        .to(groupTitle)
+        .emit('newMessageReadInfo', new SerializedReadMessageInfo(readMessage));
+    });
   }
 
   @SubscribeMessage('leaveRoom')
@@ -231,8 +247,11 @@ export class ChatGroupsGateway {
     @MessageBody() dto: DeleteMessageDto,
     @WsGetCurrentUser('user_id') userId: number,
   ) {
+    this.gatewayLogger.debug({ deleteMessageData: dto });
     const { messagesAfterDeletion, groupId } =
       await this.messagingService.deleteMessage(dto.MessageID, userId);
+
+    this.gatewayLogger.debug({ messagesAfterDeletion, groupId });
 
     const groupTitle = this.createGroupTitle(groupId);
 
@@ -249,6 +268,7 @@ export class ChatGroupsGateway {
     @MessageBody() data: EditMessageDto,
     @WsGetCurrentUser('user_id') userId: number,
   ) {
+    this.gatewayLogger.debug({ messageData: data });
     const { messagesAfterEdit, groupId } =
       await this.messagingService.editMessage(
         data.MessageID,
@@ -256,12 +276,37 @@ export class ChatGroupsGateway {
         data.Content,
       );
 
+    this.gatewayLogger.debug({ messagesAfterEdit, groupId });
+
     const groupTitle = this.createGroupTitle(groupId);
 
     this.wss.to(groupTitle).emit(
       'allMessages',
       messagesAfterEdit.map((message) => {
         return new SerializedMessage(message);
+      }),
+    );
+  }
+
+  @SubscribeMessage('getMessageInfo')
+  async getMessageInfo(
+    @MessageBody() data: DeleteMessageDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const messageReadStatusInfo =
+      await this.messagingService.getMessageReadStatus(data.MessageID);
+    const messageInfoRoomTitle = this.createMessageInfoRoomTitle(
+      data.MessageID,
+    );
+
+    this.gatewayLogger.debug({ messageReadStatusInfo });
+    this.gatewayLogger.debug({ messageInfoRoomTitle });
+
+    client.join(messageInfoRoomTitle);
+    client.emit(
+      'messageInfo',
+      messageReadStatusInfo.map((singleMessageReadStatusInfo) => {
+        return new SerializedReadMessageInfo(singleMessageReadStatusInfo);
       }),
     );
   }

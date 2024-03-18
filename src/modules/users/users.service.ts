@@ -56,6 +56,22 @@ export class UsersService {
     return await this.prismaService.user.findUnique({ where: { user_id: id } });
   }
 
+  async resetUsersConnectedStatus() {
+    await this.prismaService.$transaction(async (prisma) => {
+      await prisma.user.updateMany({
+        data: {
+          connected: false,
+        },
+      });
+
+      await prisma.group_user.updateMany({
+        data: {
+          inRoom: false,
+        },
+      });
+    });
+  }
+
   async updateUserConnectedStatus(
     userId: number,
     connected: boolean,
@@ -64,7 +80,7 @@ export class UsersService {
       where: { user_id: userId },
       data: {
         connected: connected,
-        ...(!connected
+        ...(connected
           ? {}
           : {
               group_user: {
