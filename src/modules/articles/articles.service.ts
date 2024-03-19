@@ -37,6 +37,30 @@ export class ArticlesService {
     });
     return articles;
   }
+
+  async getArticlesCreatedByUser(
+    paginationData: PaginationDto,
+    userId: number,
+  ) {
+    const articles = await this.prismaService.article.findMany({
+      take: paginationData.limit,
+      skip: paginationData.offset,
+      where: {
+        user_id: userId,
+      },
+      include: {
+        article_tag: true,
+        user: {
+          include: {
+            followed_by: true,
+          },
+        },
+        articles_content: true,
+      },
+    });
+    return articles;
+  }
+
   async createArticle(data: CreateArticleDto, userId: number) {
     const { title, coverImageUrl, tags, sections } = data;
     const sectionsPayload = sections.map(([value, content_type]) => ({

@@ -27,14 +27,34 @@ export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
   @Public()
+  @Get()
   @ApiResponse({
     status: 200,
     description: 'Returns articles',
     schema: swaggerSuccessExample(null, MultipleArticlesExample),
   })
-  @Get()
   async getArticles(@Query() paginationData: PaginationDto) {
     const articles = await this.articlesService.getAllArticles(paginationData);
+    return sendSuccessResponse(
+      articles.map((article) => new SerializedArticle(article)),
+    );
+  }
+
+  // TODO: look up convention to name similar endpoints
+  @Get('/created')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns articles created by user',
+    schema: swaggerSuccessExample(null, MultipleArticlesExample),
+  })
+  async getArticlesCreatedByUser(
+    @Query() paginationData: PaginationDto,
+    @GetCurrentUser('user_id') userId: number,
+  ) {
+    const articles = await this.articlesService.getArticlesCreatedByUser(
+      paginationData,
+      userId,
+    );
     return sendSuccessResponse(
       articles.map((article) => new SerializedArticle(article)),
     );
