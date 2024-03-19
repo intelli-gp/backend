@@ -206,7 +206,7 @@ export class ChatGroupsGateway {
 
     groupedMessages.forEach((groupedMessage) => {
       const messageRoom = this.createMessageInfoRoomTitle(
-        readMessages[0].message_id,
+        groupedMessage[0].message_id,
       );
       client.to(messageRoom).emit(
         'newMessageReadInfo',
