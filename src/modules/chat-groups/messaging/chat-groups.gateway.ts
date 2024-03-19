@@ -313,4 +313,16 @@ export class ChatGroupsGateway {
       }),
     );
   }
+
+  @SubscribeMessage('leaveMessageInfoRoom')
+  async leaveMessageInfoRoom(
+    @MessageBody() data: DeleteMessageDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const messageInfoRoomTitle = this.createMessageInfoRoomTitle(
+      data.MessageID,
+    );
+
+    client.leave(messageInfoRoomTitle);
+  }
 }

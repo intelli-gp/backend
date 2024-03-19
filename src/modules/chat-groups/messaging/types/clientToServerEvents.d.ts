@@ -10,4 +10,5 @@ export interface ClientToServerEvents {
   editMessage: (data: EditMessageDto) => void;
   deleteMessage: (data: DeleteMessageDto) => void;
   getMessageInfo: (data: DeleteMessageDto) => void;
+  leaveMessageInfoRoom: (data: DeleteMessageDto) => void;
 }
