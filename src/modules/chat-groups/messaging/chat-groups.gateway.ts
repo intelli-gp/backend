@@ -189,10 +189,13 @@ export class ChatGroupsGateway {
       }),
     );
 
-    // TODO: Emit to all users in every message Room that this user has read the message
+    // Emit to all users in every message Room that this user has read the message
     readMessages.forEach((readMessage) => {
+      const messageRoom = this.createMessageInfoRoomTitle(
+        readMessage.message_id,
+      );
       this.wss
-        .to(groupTitle)
+        .to(messageRoom)
         .emit('newMessageReadInfo', new SerializedReadMessageInfo(readMessage));
     });
   }
