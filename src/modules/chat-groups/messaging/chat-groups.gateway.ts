@@ -194,7 +194,7 @@ export class ChatGroupsGateway {
       const messageRoom = this.createMessageInfoRoomTitle(
         readMessage.message_id,
       );
-      this.wss
+      client
         .to(messageRoom)
         .emit('newMessageReadInfo', new SerializedReadMessageInfo(readMessage));
     });
