@@ -29,7 +29,7 @@ import { UpdatePermissionDto } from './dto/update-permission.dto';
 @Controller('chat-groups')
 @ApiTags('Chat Groups')
 export class ChatGroupsController {
-  private logger = new Logger('ChatGroupsController');
+  private chatGroupControllerLogger = new Logger('ChatGroupsController');
   constructor(private readonly chatGroupsService: ChatGroupsService) {}
   @Post()
   @ApiResponse({
@@ -42,7 +42,7 @@ export class ChatGroupsController {
     @Body() dto: CreateChatGroupDto,
   ) {
     const chatGroup = await this.chatGroupsService.createChatGroup(dto, userId);
-    Logger.log(chatGroup);
+    this.chatGroupControllerLogger.log(chatGroup);
     return sendSuccessResponse(new SerializedChatGroup(chatGroup));
   }
   @Get()
@@ -66,6 +66,55 @@ export class ChatGroupsController {
     );
   }
 
+  @Get('/joined')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns groups array of joined groups by current user',
+    schema: swaggerSuccessExample(null, multipleGroupsExample),
+  })
+  async GetUserJoinedChatGroups(
+    @Query() paginationData: PaginationDto,
+    @GetCurrentUser('user_id') userId,
+  ) {
+    const chatGroups = await this.chatGroupsService.getChatGroupsJoinedByUser(
+      paginationData,
+      userId,
+    );
+    return sendSuccessResponse(
+      chatGroups.map((chatGroup) => new SerializedChatGroup(chatGroup)),
+    );
+  }
+
+  @Get('/created')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns groups array of created groups by current user',
+    schema: swaggerSuccessExample(null, multipleGroupsExample),
+  })
+  async getUserCreatedChatGroups(
+    @Query() paginationData: PaginationDto,
+    @GetCurrentUser('user_id') userId,
+  ) {
+    const chatGroups = await this.chatGroupsService.getChatGroupsCreatedByUser(
+      paginationData,
+      userId,
+    );
+    return sendSuccessResponse(
+      chatGroups.map((chatGroup) => new SerializedChatGroup(chatGroup)),
+    );
+  }
+
+  // @Get('/:ID([0-9]+)')
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Returns single group',
+  //   schema: swaggerSuccessExample(null, singleGroupExample),
+  // })
+  // async getSingleChatGroup(@Param() dto: GetSingleChatGroupDto) {
+  //   const chatGroup = await this.chatGroupsService.getSingleChatGroup(dto.ID);
+  //   return sendSuccessResponse(new SerializedChatGroup(chatGroup));
+  // }
+
   @Patch('/:ID([0-9]+)')
   @ApiResponse({
     status: 200,
@@ -77,7 +126,7 @@ export class ChatGroupsController {
     @Param() groupIdentifier: GetChatGroupsDto,
     @GetCurrentUser('user_id') userId,
   ) {
-    this.logger.debug({ dto, groupIdentifier, userId });
+    this.chatGroupControllerLogger.debug({ dto, groupIdentifier, userId });
     const chatGroup = await this.chatGroupsService.updateChatGroup(
       groupIdentifier.ID,
       dto,

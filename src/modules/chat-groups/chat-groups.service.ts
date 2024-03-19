@@ -102,6 +102,57 @@ export class ChatGroupsService {
     }
   }
 
+  async getChatGroupsJoinedByUser(
+    paginationData: PaginationDto,
+    userId: number,
+  ): Promise<group[]> {
+    const chatGroups = await this.prismaService.group.findMany({
+      take: paginationData.limit,
+      skip: paginationData.offset,
+      where: {
+        group_user: {
+          some: {
+            user_id: userId,
+            joining_status: true,
+          },
+        },
+      },
+      include: {
+        group_tag: true,
+        group_user: {
+          include: {
+            user: true,
+          },
+        },
+        user: true,
+      },
+    });
+    return chatGroups;
+  }
+
+  async getChatGroupsCreatedByUser(
+    paginationData: PaginationDto,
+    userId: number,
+  ): Promise<group[]> {
+    const chatGroups = await this.prismaService.group.findMany({
+      take: paginationData.limit,
+      skip: paginationData.offset,
+      where: {
+        created_by: userId,
+      },
+      include: {
+        group_tag: true,
+        group_user: {
+          include: {
+            user: true,
+          },
+        },
+        user: true,
+      },
+    });
+    return chatGroups;
+  }
+
   async updateChatGroup(
     chatGroupId: number,
     updateData: UpdateChatGroupDto,

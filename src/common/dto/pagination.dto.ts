@@ -12,11 +12,11 @@ export class PaginationDto {
   @IsOptional()
   @ToInteger()
   @IsPositive()
-  limit: number;
+  limit: number = 50;
 
   @ApiProperty({ example: 1, description: 'Page number', required: false })
   @IsOptional()
   @ToInteger()
   @IsGteZero()
-  offset: number;
+  offset: number = 0;
 }
