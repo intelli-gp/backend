@@ -2,8 +2,10 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
   Patch,
   UseFilters,
   UseInterceptors,
@@ -17,6 +19,7 @@ import { user } from '@prisma/client';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { SwaggerLoginExample } from '../auth/swagger-examples';
+import { GetSingleUserDto } from './dto/get-user.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -40,6 +43,19 @@ export class UsersController {
     );
     return sendSuccessResponse({
       updatedUser,
+    });
+  }
+
+  @Get('/:Username')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User updated successfully',
+    schema: swaggerSuccessExample(SwaggerLoginExample),
+  })
+  async getSingleUser(@Param() dto: GetSingleUserDto) {
+    const user = await this.usersService.getUserByUsername(dto.Username);
+    return sendSuccessResponse({
+      user: new SerializedUser(user),
     });
   }
 }

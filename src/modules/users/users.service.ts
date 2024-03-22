@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { user } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -46,14 +46,68 @@ export class UsersService {
     return await this.prismaService.user.findMany();
   }
 
-  async getUserByUsername(username: string): Promise<user | null> {
-    return await this.prismaService.user.findUnique({
-      where: { username: username },
-    });
-  }
-
   async getUserById(id: number): Promise<user | null> {
     return await this.prismaService.user.findUnique({ where: { user_id: id } });
+  }
+
+  async getUserByUsername(username: string) {
+    // TODO: do as docs say and add an index to improve performance
+    // cite: case insensitive filtering in prisma
+    /**
+     *      We need case sensitive search here so implement above remarks in email instead
+     *   of lowering the case in the dto
+     */
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        username,
+      },
+      include: {
+        user_tag: true,
+        level: true,
+        plan: true,
+        group: {
+          select: {
+            group_id: true,
+            title: true,
+            cover_image_url: true,
+            _count: {
+              select: {
+                group_user: true,
+              },
+            },
+          },
+        },
+        group_user: {
+          select: {
+            group: {
+              select: {
+                group_id: true,
+                title: true,
+                cover_image_url: true,
+                _count: {
+                  select: {
+                    group_user: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        article: {
+          select: {
+            article_id: true,
+            title: true,
+            cover_image_url: true,
+            created_at: true,
+            article_tag: true,
+          },
+        },
+      },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    return user;
   }
 
   async resetUsersConnectedStatus() {
