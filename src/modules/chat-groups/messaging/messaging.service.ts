@@ -65,11 +65,22 @@ export class MessagingService {
 
       include: {
         user: true,
-        group: true,
+        group: {
+          include: {
+            group_user: true,
+          },
+        },
       },
     });
 
+    const eligibleUsersForNotification = newMessage.group.group_user.filter(
+      (groupUser: group_user) => {
+        return groupUser.user_id !== userId && !groupUser.inRoom;
+      },
+    );
+
     this.notificationsService.emitChatNotification(
+      eligibleUsersForNotification,
       new SerializedMessage(
         newMessage as unknown as Prisma.messageWhereInput,
         true,

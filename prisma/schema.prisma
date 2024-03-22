@@ -163,6 +163,7 @@ model message {
   group                group                  @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
   user                 user                   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   messages_read_status messages_read_status[]
+  message_notification message_notification[]
 }
 
 model messages_read_status {
@@ -175,15 +176,15 @@ model messages_read_status {
   @@id([message_id, user_id])
 }
 
-model notification {
-  notification_id Int       @id @default(autoincrement())
-  title           String    @db.VarChar(255)
-  content         String
-  created_at      DateTime? @default(now())
-  updated_at      DateTime? @updatedAt
-  seen            Boolean
-  user_id         Int
-  user            user      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+model message_notification {
+  user_id    Int
+  message_id Int
+  createdAt  DateTime @default(now())
+  isViewed   Boolean  @default(false)
+  message    message  @relation(fields: [message_id], references: [message_id], onDelete: Cascade, onUpdate: Cascade)
+  user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([message_id, user_id])
 }
 
 model payment_method {
@@ -300,7 +301,6 @@ model user {
   group                group[]
   message_ai           message_ai[]
   message              message[]
-  notification         notification[]
   payment_method       payment_method[]
   task                 task[]
   user_badge           user_badge[]
@@ -310,6 +310,7 @@ model user {
   following            user_follower[]        @relation("following")
   followed_by          user_follower[]        @relation("followed_by")
   messages_read_status messages_read_status[]
+  message_notification message_notification[]
 }
 
 enum GroupUserTypeEnum {
