@@ -11,112 +11,45 @@ import {
   user_tag,
 } from '@prisma/client';
 import { Exclude, Expose, Transform } from 'class-transformer';
+import { SerializedArticle } from 'src/modules/articles/serialized-types/article.serialized';
+import { SerializedChatGroup } from 'src/modules/chat-groups/serialized-types/chat-group.serializer';
 
 export class SerializedUser {
-  @Expose({ name: 'ID' })
-  user_id: string;
+  ID: number;
 
-  @Expose({ name: 'FullName' })
-  full_name: string;
+  FullName: string;
 
-  @Expose({ name: 'Username' })
-  username: string;
+  Username: string;
 
-  @Expose({ name: 'DOB' })
-  dob: Date;
+  DOB: string;
 
-  @Expose({ name: 'Bio' })
-  bio: string;
+  Bio: string;
 
-  @Expose({ name: 'Email' })
-  email: string;
+  Email: string;
 
-  @Expose({ name: 'PhoneNumber' })
-  phone_number: string;
+  PhoneNumber: string;
 
-  @Expose({ name: 'ProfileImage' })
-  image: string;
+  ProfileImage: string;
 
-  @Expose({ name: 'CoverImage' })
-  cover_image: string;
+  CoverImage: string;
 
-  @Expose({ name: 'SubscriptionPlan' })
-  plan: plan;
+  SubscriptionPlan: plan;
 
-  @Expose({ name: 'UserLevel' })
-  level: level;
+  UserLevel: level;
 
-  @Expose({ name: 'Connected' })
-  connected: boolean;
+  Connected: boolean;
 
-  @Expose({ name: 'HashedRefreshToken' })
-  hashed_refresh_token: string;
+  HashedRefreshToken: string;
 
-  @Expose({ name: 'Active' })
-  active: boolean;
+  Active: boolean;
 
-  @Expose({ name: 'UserTags' })
-  @Transform(
-    ({ value }: { value: user_tag[] }) => value?.map((tag) => tag.tag_name),
-  )
-  user_tag: string[];
+  UserTags: string[];
 
-  @Expose({ name: 'Articles' })
-  @Transform(
-    ({ value }: { value: Prisma.articleWhereInput[] }) =>
-      value?.map((article) => {
-        return {
-          ArticleID: article?.article_id,
-          ArticleTitle: article?.title,
-          ArticleImage: article?.cover_image_url,
-          ArticleTags: (article?.article_tag as article_tag[])?.map(
-            (tag) => tag.tag_name,
-          ),
-          ArticleCreatedAt: article?.created_at,
-        };
-      }),
-  )
-  article: article[];
+  Articles: SerializedArticle[];
 
-  @Expose({ name: 'GroupsCreated' })
-  @Transform(
-    ({ value }: { value: Prisma.groupWhereInput[] }) =>
-      value?.map((group) => {
-        return {
-          ID: group?.group_id,
-          GroupTitle: group?.title,
-          GroupCoverImage: group?.cover_image_url,
-          GroupTags: (group?.group_tag as group_tag[])?.map(
-            (tag) => tag.tag_name,
-          ),
-          GroupUsersCount:
-            (group?.group_user as group_user[])?.filter(
-              (groupUser) => groupUser.joining_status,
-            )?.length || 0,
-        };
-      }),
-  )
-  group: group[];
+  GroupsCreated: SerializedChatGroup[];
 
-  @Expose({ name: 'GroupsJoined' })
-  @Transform(({ value }: { value: Prisma.group_userWhereInput[] }) => {
-    return value?.map((group_user) => {
-      return {
-        ID: group_user?.group.group_id,
-        GroupName: group_user?.group.title,
-        GroupCoverImage: group_user?.group.cover_image_url,
-        GroupTags: (group_user?.group?.group_tag as group_tag[])?.map(
-          (tag) => tag.tag_name,
-        ),
-        GroupUsersCount:
-          (group_user?.group?.group_user as group_user[])?.filter(
-            (groupUser) => groupUser.joining_status,
-          )?.length || 0,
-        JoiningStatus: group_user?.joining_status,
-      };
-    });
-  })
-  group_user: group_user;
+  GroupsJoined: SerializedChatGroup[];
 
   @Exclude()
   renewal_date: Date;
@@ -133,7 +66,48 @@ export class SerializedUser {
   @Exclude()
   plan_id: number;
 
-  constructor(partial: Partial<user>) {
-    Object.assign(this, partial);
+  constructor(partial: Partial<Prisma.userWhereInput>) {
+    this.ID = +partial?.user_id;
+    this.FullName = partial?.full_name as string;
+    this.Username = partial?.username as string;
+    this.DOB = partial?.dob as string;
+    this.Bio = partial?.bio as string;
+    this.Email = partial?.email as string;
+    this.PhoneNumber = partial?.phone_number as string;
+    this.ProfileImage = partial?.image as string;
+    this.CoverImage = partial?.cover_image as string;
+    this.Connected = partial?.connected as boolean;
+    this.HashedRefreshToken = partial?.hashed_refresh_token as string;
+
+    this.UserTags =
+      (partial?.user_tag as user_tag[])?.map((tag) => tag.tag_name) || [];
+
+    if (partial?.article)
+      this.Articles = (partial?.article as article[]).map((article) => {
+        return new SerializedArticle(article);
+      });
+
+    if (partial?.group)
+      this.GroupsCreated = (partial?.group as Prisma.groupWhereInput[]).map(
+        (group) => {
+          return {
+            ...new SerializedChatGroup(group),
+            GroupUsersCount:
+              (group?.group_user as group_user[])?.filter(
+                (groupUser) => groupUser.joining_status,
+              )?.length || 0,
+          };
+        },
+      );
+
+    if (partial?.group_user)
+      this.GroupsJoined = (
+        partial?.group_user as Prisma.group_userWhereInput[]
+      ).map((group_user) => {
+        return {
+          ...new SerializedChatGroup(group_user.group),
+          JoiningStatus: group_user.joining_status,
+        };
+      });
   }
 }

@@ -1,10 +1,15 @@
-import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  UnauthorizedException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './types/token.payload';
 import { ConfigService } from '@nestjs/config';
 import { Tokens } from './types/tokens';
-import { user } from '@prisma/client';
+import { Prisma, user } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
 import { compare, hashS10 } from 'src/utils/bcrypt';
 import { SignUpDto } from './dto/signup.dto';
@@ -21,6 +26,7 @@ import { SerializedUser } from '../users/serialized-types/serialized-user';
 
 @Injectable()
 export class AuthService {
+  private readonly authServiceLogger = new Logger(AuthService.name);
   constructor(
     private readonly prismaService: PrismaService,
     private readonly jwt: JwtService,
@@ -107,21 +113,22 @@ export class AuthService {
       },
     });
     if (user) {
-      const serializedUser = new SerializedUser(user);
+      const serializedUser = new SerializedUser(user as Prisma.userWhereInput);
 
       return { user: serializedUser, state: 'login' };
     }
 
     // TODO: discuss the plan and level assumption
-    const incompleteUserData = new SerializedUser({
+    const incompleteUserData = {
       username: userProfile.displayName,
       full_name:
         userProfile._json.given_name + ' ' + userProfile._json.family_name,
       email: userProfile._json.email,
       points: 0,
       image: userProfile._json.picture,
-    });
-    return { user: incompleteUserData, state: 'signup' };
+    };
+    const serializedUser = new SerializedUser(incompleteUserData);
+    return { user: serializedUser, state: 'signup' };
   }
 
   async refreshTokens(refreshToken: string, userId: number): Promise<Tokens> {
@@ -221,8 +228,8 @@ export class AuthService {
   async googleLogin(userData: SerializedUser, res: Response) {
     console.log('here in google callback');
     const { accessToken, refreshToken } = await this.issueTokens({
-      userEmail: userData.email,
-      userId: +userData.user_id,
+      userEmail: userData.Email,
+      userId: +userData.ID,
     });
 
     sendRefreshToken(res, refreshToken);
