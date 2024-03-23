@@ -105,7 +105,7 @@ export class AuthController {
       verificationData.username,
       verificationData.token,
     );
-    if (verified) return res.redirect(this.config.get('FRONT_URL') + '#/app');
+    if (verified) return res.redirect(this.config.get('FRONT_URL') + '/app');
     throw new BadRequestException('broken link');
   }
 

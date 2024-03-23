@@ -17,6 +17,7 @@ import { Cache } from 'cache-manager';
 import { v4 as uuid } from 'uuid';
 import { loginResult } from './types/login.response';
 import { sendRefreshToken } from 'src/utils/response-handler/success.response-handler';
+import { SerializedUser } from '../users/serialized-types/serialized-user';
 
 @Injectable()
 export class AuthService {
@@ -105,17 +106,21 @@ export class AuthService {
         plan: true,
       },
     });
-    if (user) return { user, state: 'login' };
+    if (user) {
+      const serializedUser = new SerializedUser(user);
+
+      return { user: serializedUser, state: 'login' };
+    }
 
     // TODO: discuss the plan and level assumption
-    const incompleteUserData = {
+    const incompleteUserData = new SerializedUser({
       username: userProfile.displayName,
       full_name:
         userProfile._json.given_name + ' ' + userProfile._json.family_name,
       email: userProfile._json.email,
       points: 0,
       image: userProfile._json.picture,
-    } as user;
+    });
     return { user: incompleteUserData, state: 'signup' };
   }
 
@@ -213,28 +218,28 @@ export class AuthService {
     return true;
   }
 
-  async googleLogin(userData: user, res: Response) {
+  async googleLogin(userData: SerializedUser, res: Response) {
     console.log('here in google callback');
     const { accessToken, refreshToken } = await this.issueTokens({
       userEmail: userData.email,
-      userId: userData.user_id,
+      userId: +userData.user_id,
     });
 
     sendRefreshToken(res, refreshToken);
 
     res.redirect(
       this.config.get('FRONT_URL') +
-        '#/auth/login/?token=' +
+        '/auth/login/?token=' +
         accessToken +
         '&user=' +
         JSON.stringify(userData),
     );
   }
 
-  async googleSignup(incompleteUserData: user, res: Response) {
+  async googleSignup(incompleteUserData: SerializedUser, res: Response) {
     res.redirect(
       this.config.get('FRONT_URL') +
-        '#/auth/signup/?userData=' +
+        '/auth/signup/?userData=' +
         JSON.stringify(incompleteUserData),
     );
   }
