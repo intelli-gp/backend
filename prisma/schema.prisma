@@ -283,7 +283,7 @@ model user {
   dob                  DateTime? @db.Date
   points               Int?      @default(0)
   full_name            String    @db.VarChar(100)
-  bio                  String?   @db.VarChar(512)
+  bio                  String?   @db.VarChar(2000)
   cover_image          String?   @db.VarChar(255)
   phone_number         String?   @db.VarChar(50)
   image                String?
