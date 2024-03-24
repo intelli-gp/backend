@@ -80,7 +80,6 @@ export class SerializedUser {
 
     partial?.cover_image && (this.CoverImage = partial?.cover_image as string);
 
-    console.log('connected status', partial?.connected);
     if (partial?.connected !== null && partial?.connected !== undefined)
       this.Connected = partial?.connected as boolean;
 

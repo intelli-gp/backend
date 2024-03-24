@@ -39,7 +39,6 @@ export class SerializedMessage {
       ? 'This message has been deleted'
       : (partial?.content as string);
 
-    console.log('Content', this.Content);
     this.User = {
       ID: partial?.user?.user_id,
       Username: partial?.user?.username,

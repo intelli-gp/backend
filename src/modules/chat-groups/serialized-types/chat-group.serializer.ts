@@ -37,8 +37,6 @@ export class SerializedChatGroup {
 
     this.UpdatedAt = partial?.updated_at as string;
 
-    console.log('group tags', partial?.group_tag);
-
     this.GroupTags =
       (partial?.group_tag as group_tag[])?.map((tag) => tag.tag_name) || [];
 
