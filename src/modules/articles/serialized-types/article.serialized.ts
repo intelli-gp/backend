@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { article, article_tag, articles_content, user } from '@prisma/client';
 import { Exclude, Expose, Transform } from 'class-transformer';
+import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 
 export class SerializedArticle {
   @Expose({ name: 'ID' })
@@ -26,11 +27,8 @@ export class SerializedArticle {
     if (!value) return;
 
     return {
-      AuthorID: value?.user_id,
-      FullName: value?.full_name,
-      Username: value?.username,
-      ProfileImage: value?.image,
-      FollowersCount: (value as any).followed_by?.length,
+      ...new SerializedUser(value),
+      FollowersCount: (value as any).followed_by?.length || 0,
     };
   })
   user?: user;

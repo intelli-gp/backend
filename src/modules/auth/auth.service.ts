@@ -157,37 +157,6 @@ export class AuthService {
         user_tag: true,
         level: true,
         plan: true,
-        group: {
-          select: {
-            group_id: true,
-            title: true,
-            cover_image_url: true,
-            group_user: true,
-            group_tag: true,
-          },
-        },
-        group_user: {
-          select: {
-            group: {
-              select: {
-                group_id: true,
-                title: true,
-                cover_image_url: true,
-                group_user: true,
-                group_tag: true,
-              },
-            },
-          },
-        },
-        article: {
-          select: {
-            article_id: true,
-            title: true,
-            cover_image_url: true,
-            created_at: true,
-            article_tag: true,
-          },
-        },
       },
     });
     console.log(user);

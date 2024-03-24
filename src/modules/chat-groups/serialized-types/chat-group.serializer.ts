@@ -1,63 +1,56 @@
-import { Prisma, group, group_tag, group_user, user } from '@prisma/client';
+import { Prisma, group_tag } from '@prisma/client';
 import { Exclude, Expose, Transform } from 'class-transformer';
+import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 
 export class SerializedChatGroup {
-  @Expose({ name: 'ID' })
-  group_id: number;
+  ID: number;
 
-  @Expose({ name: 'GroupTitle' })
-  title: string;
+  GroupTitle: string;
 
-  @Expose({ name: 'GroupDescription' })
-  description?: string;
+  GroupDescription?: string;
 
-  @Expose({ name: 'GroupCoverImage' })
-  cover_image_url?: string;
+  GroupCoverImage?: string;
 
-  @Expose({ name: 'CreatedAt' })
-  created_at?: Date;
+  CreatedAt?: string;
 
-  @Expose({ name: 'UpdatedAt' })
-  updated_at?: Date;
+  UpdatedAt?: string;
 
-  @Expose({ name: 'GroupTags' })
-  @Transform(({ value }) => value?.map((tag: group_tag) => tag.tag_name))
-  group_tag?: group_tag[];
+  GroupTags?: string[];
 
-  @Expose({ name: 'GroupMembers' })
-  @Transform(
-    ({ value }) =>
-      value
-        ?.filter((groupUser: group_user) => groupUser.joining_status !== false)
-        ?.map((groupUser: Prisma.group_userWhereInput) => {
-          return {
-            ID: groupUser.user_id,
-            FullName: groupUser?.user?.full_name,
-            Username: groupUser?.user?.username,
-            ProfileImage: groupUser?.user?.image,
-            Type: groupUser.type,
-            ConnectedStatus: groupUser?.user?.connected,
-          };
-        }),
-  )
-  group_user?: group_user[];
+  GroupMembers?: SerializedUser[];
 
-  @Expose({ name: 'GroupOwner' })
-  @Transform(({ value }: { value: user }) => {
-    return {
-      ID: value?.user_id,
-      FullName: value?.full_name,
-      Username: value?.username,
-      Email: value?.email,
-      ProfileImage: value?.image,
-    };
-  })
-  user?: user;
+  GroupOwner?: SerializedUser;
 
   @Exclude()
   created_by: number;
 
-  constructor(partial: Partial<any>) {
-    Object.assign(this, partial);
+  constructor(partial: Partial<Prisma.groupWhereInput>) {
+    this.ID = +partial?.group_id;
+
+    this.GroupTitle = partial?.title as string;
+
+    this.GroupDescription = partial?.description as string;
+
+    this.GroupCoverImage = partial?.cover_image_url as string;
+
+    this.CreatedAt = partial?.created_at as string;
+
+    this.UpdatedAt = partial?.updated_at as string;
+
+    console.log('group tags', partial?.group_tag);
+
+    this.GroupTags =
+      (partial?.group_tag as group_tag[])?.map((tag) => tag.tag_name) || [];
+
+    this.GroupOwner = new SerializedUser(partial?.user);
+
+    this.GroupMembers = (partial?.group_user as Prisma.group_userWhereInput[])
+      ?.filter((groupUser) => groupUser.joining_status !== false)
+      .map((groupUser) => {
+        return {
+          ...new SerializedUser(groupUser?.user),
+          Type: groupUser.type,
+        };
+      });
   }
 }

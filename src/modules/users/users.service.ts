@@ -70,6 +70,8 @@ export class UsersService {
             group_id: true,
             title: true,
             cover_image_url: true,
+            user: true,
+            group_tag: true,
             _count: {
               select: {
                 group_user: true,
@@ -84,6 +86,8 @@ export class UsersService {
                 group_id: true,
                 title: true,
                 cover_image_url: true,
+                group_tag: true,
+                user: true,
                 _count: {
                   select: {
                     group_user: true,
@@ -100,6 +104,7 @@ export class UsersService {
             cover_image_url: true,
             created_at: true,
             article_tag: true,
+            user: true,
           },
         },
       },

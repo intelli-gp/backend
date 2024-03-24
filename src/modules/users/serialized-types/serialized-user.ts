@@ -1,16 +1,12 @@
 import {
   Prisma,
   article,
-  article_tag,
-  group,
-  group_tag,
   group_user,
   level,
   plan,
-  user,
   user_tag,
 } from '@prisma/client';
-import { Exclude, Expose, Transform } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import { SerializedArticle } from 'src/modules/articles/serialized-types/article.serialized';
 import { SerializedChatGroup } from 'src/modules/chat-groups/serialized-types/chat-group.serializer';
 
@@ -70,17 +66,30 @@ export class SerializedUser {
     this.ID = +partial?.user_id;
     this.FullName = partial?.full_name as string;
     this.Username = partial?.username as string;
-    this.DOB = partial?.dob as string;
-    this.Bio = partial?.bio as string;
-    this.Email = partial?.email as string;
-    this.PhoneNumber = partial?.phone_number as string;
-    this.ProfileImage = partial?.image as string;
-    this.CoverImage = partial?.cover_image as string;
-    this.Connected = partial?.connected as boolean;
-    this.HashedRefreshToken = partial?.hashed_refresh_token as string;
 
-    this.UserTags =
-      (partial?.user_tag as user_tag[])?.map((tag) => tag.tag_name) || [];
+    partial?.bio && (this.Bio = partial?.bio as string);
+
+    partial?.dob && (this.DOB = partial?.dob as string);
+
+    partial?.email && (this.Email = partial?.email as string);
+
+    partial?.phone_number &&
+      (this.PhoneNumber = partial?.phone_number as string);
+
+    partial?.image && (this.ProfileImage = partial?.image as string);
+
+    partial?.cover_image && (this.CoverImage = partial?.cover_image as string);
+
+    console.log('connected status', partial?.connected);
+    if (partial?.connected !== null && partial?.connected !== undefined)
+      this.Connected = partial?.connected as boolean;
+
+    this.HashedRefreshToken &&
+      (this.HashedRefreshToken = partial?.hashed_refresh_token as string);
+
+    partial?.user_tag &&
+      (this.UserTags =
+        (partial?.user_tag as user_tag[]).map((tag) => tag.tag_name) || []);
 
     if (partial?.article)
       this.Articles = (partial?.article as article[]).map((article) => {
