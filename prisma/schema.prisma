@@ -284,6 +284,7 @@ model user {
   points               Int?      @default(0)
   full_name            String    @db.VarChar(100)
   bio                  String?   @db.VarChar(2000)
+  headline             String?   @db.VarChar(255)
   cover_image          String?   @db.VarChar(255)
   phone_number         String?   @db.VarChar(50)
   image                String?

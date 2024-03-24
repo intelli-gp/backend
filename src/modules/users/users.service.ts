@@ -39,6 +39,9 @@ export class UsersService {
 
     userData.dob !== undefined && (userDataInput.dob = new Date(userData.dob));
 
+    userData.headline !== undefined &&
+      (userDataInput.headline = userData.headline);
+
     return userDataInput;
   }
 

@@ -64,6 +64,14 @@ export class UpdateUserDto {
 
   @ApiProperty({
     required: false,
+    example: 'Software Engineer',
+  })
+  @IsString()
+  @IsOptional()
+  headline: string;
+
+  @ApiProperty({
+    required: false,
     example: ['gaming', 'programming', 'backend'],
   })
   @IsArray()

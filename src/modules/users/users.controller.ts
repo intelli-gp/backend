@@ -9,6 +9,7 @@ import {
   Patch,
   UseFilters,
   UseInterceptors,
+  Logger,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
@@ -24,6 +25,7 @@ import { GetSingleUserDto } from './dto/get-user.dto';
 @Controller('users')
 @ApiTags('Users')
 export class UsersController {
+  private readonly usersControllerLogger = new Logger(UsersController.name);
   constructor(private readonly usersService: UsersService) {}
 
   @Patch()
@@ -53,9 +55,10 @@ export class UsersController {
     schema: swaggerSuccessExample(SwaggerLoginExample),
   })
   async getSingleUser(@Param() dto: GetSingleUserDto) {
-    const user = await this.usersService.getUserByUsername(dto.Username);
+    const foundUser = await this.usersService.getUserByUsername(dto.Username);
+
     return sendSuccessResponse({
-      user: new SerializedUser(user as Prisma.userWhereInput),
+      user: new SerializedUser(foundUser as Prisma.userWhereInput),
     });
   }
 }
