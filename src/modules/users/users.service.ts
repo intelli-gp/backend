@@ -74,6 +74,11 @@ export class UsersService {
             title: true,
             cover_image_url: true,
             user: true,
+            group_user: {
+              include: {
+                user: true,
+              },
+            },
             group_tag: true,
             _count: {
               select: {
@@ -90,6 +95,11 @@ export class UsersService {
                 title: true,
                 cover_image_url: true,
                 group_tag: true,
+                group_user: {
+                  include: {
+                    user: true,
+                  },
+                },
                 user: true,
                 _count: {
                   select: {
