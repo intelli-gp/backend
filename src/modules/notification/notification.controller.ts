@@ -16,18 +16,18 @@ export class NotificationController {
 
   // @Public()
   @Sse('events')
-  events() {
-    return this.eventsService.subscribe();
+  async events(@GetCurrentUser('user_id') userId: number) {
+    return await this.eventsService.subscribe(userId);
   }
 
-  @Public()
-  @Post('emit')
-  async emit() {
-    await this.eventsService.emit({
-      eventName: 'warning',
-      message: 1,
-    });
-  }
+  // @Public()
+  // @Post('emit')
+  // async emit() {
+  //   await this.eventsService.emit({
+  //     eventName: 'warning',
+  //     message: 1,
+  //   });
+  // }
 
   @Patch('/messages/view/:MessageID')
   async markMessagesAsViewed(

@@ -38,7 +38,7 @@ export class NotificationService {
         message_id: data.MessageID,
       })),
     });
-    await this.eventsService.emit({
+    await this.eventsService.emit(eligibleUsersForNotification, {
       eventName: 'chat-group-message',
       message: data,
     });

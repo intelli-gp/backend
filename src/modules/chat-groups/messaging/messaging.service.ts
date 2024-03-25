@@ -75,7 +75,11 @@ export class MessagingService {
 
     const eligibleUsersForNotification = newMessage.group.group_user.filter(
       (groupUser: group_user) => {
-        return groupUser.user_id !== userId && !groupUser.inRoom;
+        return (
+          groupUser.user_id !== userId &&
+          !groupUser.inRoom &&
+          groupUser.joining_status
+        );
       },
     );
 
