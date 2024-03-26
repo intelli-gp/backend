@@ -5,7 +5,7 @@ import { SseEvents } from './types/events';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { group, group_user, user } from '@prisma/client';
 
-const TTLTime = 6; // 6 seconds
+const TTLTime = 50; // 6 seconds
 
 @Injectable()
 export class EventsService {
