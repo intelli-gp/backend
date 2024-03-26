@@ -21,6 +21,8 @@ export class SerializedUser {
 
   Bio: string;
 
+  Headline: string;
+
   Email: string;
 
   PhoneNumber: string;
@@ -66,6 +68,8 @@ export class SerializedUser {
     this.ID = +partial?.user_id;
     this.FullName = partial?.full_name as string;
     this.Username = partial?.username as string;
+
+    partial?.headline && (this.Headline = partial?.headline as string);
 
     partial?.bio && (this.Bio = partial?.bio as string);
 
