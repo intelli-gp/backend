@@ -236,7 +236,7 @@ export default class templates {
   }
   static reset_password(data: { email: string; token: string }): string {
     const { email, token } = data;
-    const targetUrl = `${process.env.FRONT_URL}/#/auth/reset-password?email=${email}&token=${token}`;
+    const targetUrl = `${process.env.FRONT_URL}/auth/reset-password?email=${email}&token=${token}`;
     return `
 <!DOCTYPE html>
   <html>
