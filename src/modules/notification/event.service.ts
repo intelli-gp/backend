@@ -1,9 +1,8 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Observable, fromEvent } from 'rxjs';
+import { Injectable, Logger } from '@nestjs/common';
+import { fromEvent } from 'rxjs';
 import { EventEmitter } from 'events';
 import { SseEvents } from './types/events';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
-import { group, group_user, user } from '@prisma/client';
+import { group_user, user } from '@prisma/client';
 
 const TTLTime = 50; // 6 seconds
 
@@ -15,14 +14,11 @@ export class EventsService {
   private readonly ttlMap = new Map<string, number>();
   private cleanupTimer: NodeJS.Timeout;
 
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {
+  constructor() {
     this.emitter = new EventEmitter();
   }
 
-  cleanupExpiredEntries(ttlMap: Map<string, number>) {
-    // console.log('Cleaning up expired entries');
-    // console.log(ttlMap.entries());
-
+  cleanupExpiredEntries() {
     for (const [key, ttl] of this.ttlMap?.entries()) {
       if (Date.now() > ttl) {
         this.clients.delete(key);
@@ -44,7 +40,7 @@ export class EventsService {
     // Start a cleanup timer if one doesn't exist
     if (!this.cleanupTimer) {
       this.cleanupTimer = setInterval(() => {
-        this.cleanupExpiredEntries(this.ttlMap);
+        this.cleanupExpiredEntries();
       }, 1000); // Check every second
     }
   }
@@ -59,9 +55,6 @@ export class EventsService {
     fromEvent(this.emitter, 'notifications').subscribe((data) =>
       clientEmitter.emit('notifications', data),
     );
-    this.eventsServiceLogger.debug({
-      client: this.cacheManager.get('sse-user-' + userId),
-    });
 
     return fromEvent(clientEmitter, 'notifications');
   }
