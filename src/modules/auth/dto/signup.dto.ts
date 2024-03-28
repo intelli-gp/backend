@@ -3,6 +3,7 @@ import {
   IsDateString,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsPhoneNumber,
   Length,
 } from 'class-validator';
@@ -46,4 +47,8 @@ export class SignUpDto {
   @IsDateString()
   @IsValidAge(13)
   dob: string;
+
+  @ApiProperty({ required: false, example: 'http://image.com' })
+  @IsOptional()
+  image: string;
 }

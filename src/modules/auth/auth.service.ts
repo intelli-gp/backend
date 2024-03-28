@@ -242,11 +242,13 @@ export class AuthService {
       username: signUpDto.username,
       email: signUpDto.email,
       phone_number: signUpDto.phoneNumber,
+      image: signUpDto.image,
       dob,
       subscription_date: new Date(),
       level_id: 1,
       plan_id: 1,
     };
+    
     const user = await this.prismaService.user.create({
       data: { ...userData },
       include: {
