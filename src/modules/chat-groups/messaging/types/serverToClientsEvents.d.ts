@@ -1,5 +1,5 @@
-import { SerializedMessage } from '../../serialized-types/messages.serializer';
-import { SerializedReadMessageInfo } from '../../serialized-types/read-messages.serializer';
+import { SerializedMessage } from '../../serialized-types/messages/messages.serializer';
+import { SerializedReadMessageInfo } from '../../serialized-types/messages/read-messages.serializer';
 
 export type IsTypingSerialized = {
   IsTyping: boolean;

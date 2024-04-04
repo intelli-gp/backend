@@ -6,7 +6,7 @@ import {
   user,
 } from '@prisma/client';
 import { Exclude, Expose, Transform } from 'class-transformer';
-import { SerializedChatGroup } from './chat-group.serializer';
+import { SerializedChatGroup } from '../chat-group/chat-group.serializer';
 
 export class SerializedMessage {
   MessageID: number;

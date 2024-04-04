@@ -26,13 +26,13 @@ import { GroupUsersService } from './group-users.service';
 import { WsGetCurrentUser } from 'src/modules/auth/ParamDecorator';
 import { MessagingService } from './messaging.service';
 import { WsPrismaExceptionFilter } from 'src/exception-filters/prisma.filter';
-import { SerializedMessage } from '../serialized-types/messages.serializer';
+import { SerializedMessage } from '../serialized-types/messages/messages.serializer';
 import { EditMessageDto } from '../dto/edit-message.dto';
 import { DeleteMessageDto } from '../dto/delete-message.dto';
 import { Prisma, messages_read_status, user } from '@prisma/client';
 import { UsersService } from 'src/modules/users/users.service';
 import { Reflector } from '@nestjs/core';
-import { SerializedReadMessageInfo } from '../serialized-types/read-messages.serializer';
+import { SerializedReadMessageInfo } from '../serialized-types/messages/read-messages.serializer';
 
 @Injectable()
 @WebSocketGateway({

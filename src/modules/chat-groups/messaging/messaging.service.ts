@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Prisma, group_user } from '@prisma/client';
 import { NotificationService } from 'src/modules/notification/notification.service';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
-import { SerializedMessage } from '../serialized-types/messages.serializer';
+import { SerializedMessage } from '../serialized-types/messages/messages.serializer';
 
 @Injectable()
 export class MessagingService {

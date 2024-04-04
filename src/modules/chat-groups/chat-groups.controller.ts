@@ -18,7 +18,7 @@ import {
   JoinChatGroupDto,
   GetSingleChatGroupDto,
 } from './dto';
-import { SerializedChatGroup } from './serialized-types/chat-group.serializer';
+import { SerializedChatGroup } from './serialized-types/chat-group/chat-group.serializer';
 import { GetCurrentUser } from '../auth/ParamDecorator';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';

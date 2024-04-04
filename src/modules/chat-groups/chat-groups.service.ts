@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { CreateChatGroupDto } from './dto/create-chat-group.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { DeserializedChatGroup } from './serialized-types/chat-group.deserializer';
+import { DeserializedChatGroup } from './serialized-types/chat-group/chat-group.deserializer';
 import { PaginationDto } from 'src/common/dto';
 import { GroupUserTypeEnum, group, group_user } from '@prisma/client';
 import { UpdateChatGroupDto } from './dto/update-chat-group.dto';

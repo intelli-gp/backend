@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventsService } from './event.service';
-import { SerializedMessage } from '../chat-groups/serialized-types/messages.serializer';
+import { SerializedMessage } from '../chat-groups/serialized-types/messages/messages.serializer';
 import { PrismaService } from '../prisma/prisma.service';
 import { group_user } from '@prisma/client';
 
@@ -15,6 +15,7 @@ export class NotificationService {
   ) {}
 
   async markMessageNotificationAsViewed(userId: number, messageId: number) {
+    // Will no longer be needed with the new approach neither will the table
     await this.prismaService.message_notification.update({
       where: {
         message_id_user_id: {
