@@ -1,9 +1,13 @@
-import { Controller, Logger, Param, Patch, Post, Sse } from '@nestjs/common';
+import { Controller, Get, Logger, Param, Patch, Sse } from '@nestjs/common';
 import { EventsService } from './event.service';
-import { GetCurrentUser, Public } from 'src/modules/auth/ParamDecorator';
+import { GetCurrentUser } from 'src/modules/auth/ParamDecorator';
 import { DeleteMessageDto } from '../chat-groups/dto/delete-message.dto';
 import { NotificationService } from './notification.service';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
+import { SerializedMessagesNotifications } from './serilaized-types/message-notification.serialized';
+import { ApiResponse } from '@nestjs/swagger';
+import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
+import { multipleUserNotificationsResponseExample } from './swagger-examples';
 
 @Controller('notifications')
 export class NotificationController {
@@ -28,6 +32,25 @@ export class NotificationController {
   //     message: 1,
   //   });
   // }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Get all messages notifications for the user',
+    schema: swaggerSuccessExample(
+      null,
+      multipleUserNotificationsResponseExample,
+    ),
+  })
+  @Get('/messages')
+  async getMessagesNotifications(@GetCurrentUser('user_id') userId) {
+    this.logger.log(`Getting messages for user ${userId}`);
+    const messagesNotifications =
+      await this.notificationsService.getGroupUserMessageNotifications(userId);
+
+    return messagesNotifications.map((messageNotification) => {
+      return new SerializedMessagesNotifications(messageNotification);
+    });
+  }
 
   @Patch('/messages/view/:MessageID')
   async markMessagesAsViewed(

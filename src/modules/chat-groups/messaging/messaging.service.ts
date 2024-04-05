@@ -18,7 +18,7 @@ export class MessagingService {
         group_id: groupId,
       },
       orderBy: {
-        created_at: 'asc',
+        message_id: 'asc',
       },
       include: {
         user: true,

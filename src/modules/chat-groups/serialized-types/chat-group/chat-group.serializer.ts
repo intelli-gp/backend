@@ -40,7 +40,7 @@ export class SerializedChatGroup {
     this.GroupTags =
       (partial?.group_tag as group_tag[])?.map((tag) => tag.tag_name) || [];
 
-    this.GroupOwner = new SerializedUser(partial?.user);
+    partial?.user && (this.GroupOwner = new SerializedUser(partial?.user));
 
     this.GroupMembers = (partial?.group_user as Prisma.group_userWhereInput[])
       ?.filter((groupUser) => groupUser.joining_status !== false)

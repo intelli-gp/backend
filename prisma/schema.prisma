@@ -36,6 +36,16 @@ model article_tag {
   @@id([article_id, tag_name])
 }
 
+model article_like {
+  article_id Int
+  user_id    Int
+  liked_at   DateTime @default(now())
+  article    article  @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
+  user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([article_id, user_id])
+}
+
 model article {
   article_id       Int                @id @default(autoincrement())
   title            String             @db.VarChar(255)
@@ -46,6 +56,7 @@ model article {
   article_tag      article_tag[]
   user             user               @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   articles_content articles_content[]
+  liked_by         article_like[]
 }
 
 model articles_content {
@@ -107,15 +118,17 @@ model group_tag {
 }
 
 model group_user {
-  group_id       Int
-  user_id        Int
-  type           GroupUserTypeEnum @default(MEMBER)
-  inRoom         Boolean           @default(false)
-  joined_at      DateTime          @default(now())
-  left_at        DateTime?         @db.Date
-  joining_status Boolean           @default(true)
-  group          group             @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
-  user           user              @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  group_id            Int
+  user_id             Int
+  type                GroupUserTypeEnum @default(MEMBER)
+  inRoom              Boolean           @default(false)
+  isNotificationMuted Boolean           @default(false)
+  last_read           DateTime?         @default(now())
+  joined_at           DateTime          @default(now())
+  left_at             DateTime?         @db.Date
+  joining_status      Boolean           @default(true)
+  group               group             @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
+  user                user              @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([group_id, user_id])
 }
@@ -292,6 +305,7 @@ model user {
   plan_id              Int       @default(1)
   renewal_date         DateTime  @db.Date
   subscription_date    DateTime  @db.Date
+  isNotificationMuted  Boolean   @default(false)
   connected            Boolean   @default(false)
   active               Boolean   @default(false)
   hashed_refresh_token String?   @db.VarChar(100)
@@ -312,6 +326,7 @@ model user {
   followed_by          user_follower[]        @relation("followed_by")
   messages_read_status messages_read_status[]
   message_notification message_notification[]
+  liked_articles       article_like[]
 }
 
 enum GroupUserTypeEnum {

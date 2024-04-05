@@ -8,7 +8,7 @@ import {
 } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 import { SerializedArticle } from 'src/modules/articles/serialized-types/article.serialized';
-import { SerializedChatGroup } from 'src/modules/chat-groups/serialized-types/chat-group.serializer';
+import { SerializedChatGroup } from 'src/modules/chat-groups/serialized-types/chat-group/chat-group.serializer';
 
 export class SerializedUser {
   ID: number;

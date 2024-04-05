@@ -7,6 +7,7 @@ import {
 } from '@prisma/client';
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { SerializedChatGroup } from '../chat-group/chat-group.serializer';
+import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 
 export class SerializedMessage {
   MessageID: number;
@@ -33,18 +34,12 @@ export class SerializedMessage {
     partial: Partial<Omit<Prisma.messageWhereInput, 'AND' | 'OR' | 'NOT'>>,
     isNotification = false,
   ) {
-    // Object.assign(this, partial);
     this.MessageID = Number(partial?.message_id);
-    this.Content = partial.deleted
+    this.Content = partial?.deleted
       ? 'This message has been deleted'
       : (partial?.content as string);
 
-    this.User = {
-      ID: partial?.user?.user_id,
-      Username: partial?.user?.username,
-      FullName: partial?.user?.full_name,
-      ProfileImage: partial?.user?.image,
-    };
+    this.User = new SerializedUser(partial?.user);
     this.IsDeleted = partial?.deleted as boolean;
     // this.Attachment = {
     //   ID: partial?.attachment?.attachment_id,
@@ -54,11 +49,7 @@ export class SerializedMessage {
 
     this.CreatedAt = partial?.created_at as string;
     if (isNotification) {
-      this.Group = {
-        ID: partial?.group?.group_id,
-        GroupName: partial?.group?.title,
-        GroupCoverImage: partial?.group?.cover_image_url,
-      };
+      this.Group = new SerializedChatGroup(partial?.group);
     }
   }
 }
