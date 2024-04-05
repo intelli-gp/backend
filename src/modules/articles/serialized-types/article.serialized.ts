@@ -75,7 +75,7 @@ export class SerializedArticle {
       return !articleComment?.deleted;
     });
     // serialize filtered comments
-    const serializedValues = filteredValues.map(
+    const serializedValues = filteredValues?.map(
       (FilteredArticleComment: article_comment) => {
         return new SerializedArticleComment(FilteredArticleComment);
       },
