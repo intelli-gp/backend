@@ -199,14 +199,13 @@ model message {
   attachment           attachment[]
   group                group                  @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
   user                 user                   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
-  message_notification message_notification[]
+  messages_read_status messages_read_status[]
 }
 
-model message_notification {
-  user_id    Int
+model messages_read_status {
   message_id Int
-  createdAt  DateTime @default(now())
-  isViewed   Boolean  @default(false)
+  user_id    Int
+  read_at    DateTime @default(now())
   message    message  @relation(fields: [message_id], references: [message_id], onDelete: Cascade, onUpdate: Cascade)
   user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -337,10 +336,10 @@ model user {
   plan                  plan                   @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
   following             user_follower[]        @relation("following")
   followed_by           user_follower[]        @relation("followed_by")
-  message_notification  message_notification[]
   liked_articles        article_like[]
   article_comment       article_comment[]
   article_comment_likes article_comment_like[]
+  messages_read_status  messages_read_status[]
 }
 
 enum GroupUserTypeEnum {

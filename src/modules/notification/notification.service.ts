@@ -92,21 +92,6 @@ export class NotificationService {
     return messagesNotifications;
   }
 
-  async markMessageNotificationAsViewed(userId: number, messageId: number) {
-    // Will no longer be needed with the new approach neither will the table
-    await this.prismaService.message_notification.update({
-      where: {
-        message_id_user_id: {
-          message_id: messageId,
-          user_id: userId,
-        },
-      },
-      data: {
-        isViewed: true,
-      },
-    });
-  }
-
   async emitChatNotification(
     eligibleUsersForNotification: group_user[],
     data: SerializedMessage,
