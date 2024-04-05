@@ -31,6 +31,7 @@ import { PaginationDto } from 'src/common/dto';
 import { MultipleArticlesExample } from './swagger-examples/multiple-articles.example';
 import { SerializedUser } from '../users/serialized-types/serialized-user';
 import { SerializedArticleComment } from './serialized-types/article-comment.serializer';
+import { Prisma } from '@prisma/client';
 
 @Controller('articles')
 @ApiTags('Articles')
@@ -120,6 +121,18 @@ export class ArticlesController {
     return sendSuccessResponse(new SerializedUser(articleLike.user));
   }
 
+  @Post('/:articleId([0-9]+)/comment/:commentId([0-9]+)/like')
+  async toggleLikeOnArticleComment(
+    @GetCurrentUser('user_id') userId: number,
+    @Param() filterData: GetCommentDto,
+  ) {
+    const commentLike = await this.articlesService.toggleLikeArticleComment(
+      filterData.commentId,
+      userId,
+    );
+    return sendSuccessResponse(new SerializedUser(commentLike.user));
+  }
+
   @ApiResponse({
     status: 201,
     description: 'Returns created comment',
@@ -136,7 +149,9 @@ export class ArticlesController {
       userId,
       commentData.Content,
     );
-    return sendSuccessResponse(new SerializedArticleComment(comment));
+    return sendSuccessResponse(
+      new SerializedArticleComment(comment as Prisma.article_commentWhereInput),
+    );
   }
 
   @ApiResponse({
@@ -157,7 +172,9 @@ export class ArticlesController {
       userId,
       updatedCommentData.Content,
     );
-    return sendSuccessResponse(new SerializedArticleComment(comment));
+    return sendSuccessResponse(
+      new SerializedArticleComment(comment as Prisma.article_commentWhereInput),
+    );
   }
 
   @ApiResponse({

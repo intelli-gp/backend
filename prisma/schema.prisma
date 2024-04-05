@@ -47,15 +47,26 @@ model article_like {
 }
 
 model article_comment {
-  comment_id Int      @id @default(autoincrement())
-  article_id Int
-  user_id    Int
-  md_content String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  deleted    Boolean  @default(false)
-  article    article  @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
-  user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  comment_id           Int                    @id @default(autoincrement())
+  article_id           Int
+  user_id              Int
+  md_content           String
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @updatedAt
+  deleted              Boolean                @default(false)
+  article              article                @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
+  user                 user                   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  article_comment_likes article_comment_like[]
+}
+
+model article_comment_like {
+  comment_id      Int
+  user_id         Int
+  liked_at        DateTime        @default(now())
+  article_comment article_comment @relation(fields: [comment_id], references: [comment_id], onDelete: Cascade, onUpdate: Cascade)
+  user            user            @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([comment_id, user_id])
 }
 
 model article {
@@ -69,7 +80,7 @@ model article {
   user             user               @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   articles_content articles_content[]
   article_likes    article_like[]
-  article_comments  article_comment[]
+  article_comments article_comment[]
 }
 
 model articles_content {
@@ -341,6 +352,7 @@ model user {
   message_notification message_notification[]
   liked_articles       article_like[]
   article_comment      article_comment[]
+  article_comment_likes article_comment_like[]
 }
 
 enum GroupUserTypeEnum {

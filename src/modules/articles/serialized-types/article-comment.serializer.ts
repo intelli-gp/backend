@@ -12,6 +12,8 @@ export class SerializedArticleComment {
 
   Commenter: SerializedUser;
 
+  LikedBy: SerializedUser[];
+
   constructor(
     partial: Partial<
       Omit<Prisma.article_commentWhereInput, 'AND' | 'OR' | 'NOT'>
@@ -22,5 +24,10 @@ export class SerializedArticleComment {
     this.CreatedAt = partial?.created_at as string;
     this.ArticleID = +partial?.article_id as number;
     this.Commenter = new SerializedUser(partial?.user);
+    this.LikedBy = (
+      partial?.article_comment_likes as Prisma.article_comment_likeWhereInput[]
+    )?.map((articleCommentLike) => {
+      return new SerializedUser(articleCommentLike?.user);
+    });
   }
 }

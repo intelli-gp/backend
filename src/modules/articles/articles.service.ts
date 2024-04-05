@@ -39,6 +39,11 @@ export class ArticlesService {
         article_comments: {
           include: {
             user: true,
+            article_comment_likes: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },
@@ -63,6 +68,11 @@ export class ArticlesService {
         article_comments: {
           include: {
             user: true,
+            article_comment_likes: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },
@@ -99,6 +109,11 @@ export class ArticlesService {
         article_comments: {
           include: {
             user: true,
+            article_comment_likes: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },
@@ -137,6 +152,11 @@ export class ArticlesService {
         article_comments: {
           include: {
             user: true,
+            article_comment_likes: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },
@@ -183,6 +203,11 @@ export class ArticlesService {
       },
       include: {
         user: true,
+        article_comment_likes: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
     return comment;
@@ -204,6 +229,11 @@ export class ArticlesService {
       },
       include: {
         user: true,
+        article_comment_likes: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
     if (!comment)
@@ -268,6 +298,43 @@ export class ArticlesService {
       return await this.prismaService.article_like.create({
         data: {
           article_id: articleId,
+          user_id: userId,
+        },
+        include: {
+          user: true,
+        },
+      });
+    }
+  }
+  async toggleLikeArticleComment(commentId: number, userId: number) {
+    // TODO: decide whether or not to delete the like or just add an invisible flag
+    const likeExists = await this.prismaService.article_comment_like.findUnique(
+      {
+        where: {
+          comment_id_user_id: {
+            comment_id: commentId,
+            user_id: userId,
+          },
+        },
+      },
+    );
+
+    if (likeExists) {
+      return await this.prismaService.article_comment_like.delete({
+        where: {
+          comment_id_user_id: {
+            comment_id: commentId,
+            user_id: userId,
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+    } else {
+      return await this.prismaService.article_comment_like.create({
+        data: {
+          comment_id: commentId,
           user_id: userId,
         },
         include: {

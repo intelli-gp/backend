@@ -6,6 +6,7 @@ export const singleCommentExample = {
   CreatedAt: '2024-04-05T15:43:53.161Z',
   ArticleID: 1,
   Commenter: singleEmbeddedUserExample,
+  LikedBy: [singleEmbeddedUserExample, singleEmbeddedUserExample],
 };
 
 export const articleExample = {
