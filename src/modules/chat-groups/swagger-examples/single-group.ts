@@ -1,31 +1,22 @@
+import { singleEmbeddedUserExample } from 'src/modules/users/swagger-examples';
+
 export const singleGroupExample = {
-  ID: 1,
-  GroupTitle: 'Example Group',
-  GroupDescription: 'This is an example group description.',
-  GroupCoverImageUrl: 'https://example.com/group-cover.jpg',
-  CreatedAt: '2024-03-09T08:00:00.000Z',
-  UpdatedAt: '2024-03-09T08:30:00.000Z',
-  GroupTags: ['Tag1', 'Tag2', 'Tag3'],
+  ID: 7,
+  GroupTitle: 'Dummy Title Updated',
+  GroupDescription: 'Dummy Description',
+  GroupCoverImage: 'www.google.com',
+  CreatedAt: '2024-02-17T21:09:02.050Z',
+  UpdatedAt: '2024-03-05T16:14:17.355Z',
+  GroupTags: ['software', 'backend', 'web-development'],
+  GroupOwner: singleEmbeddedUserExample,
   GroupMembers: [
     {
-      ID: 1,
-      username: 'user1',
-      profileImg: 'https://example.com/user1-profile.jpg',
-      joiningStatus: true,
-      type: 'admin',
+      ...singleEmbeddedUserExample,
+      Type: 'ADMIN',
     },
     {
-      ID: 2,
-      username: 'user2',
-      profileImg: 'https://example.com/user2-profile.jpg',
-      joiningStatus: true,
-      type: 'member',
+      ...singleEmbeddedUserExample,
+      Type: 'MEMBER',
     },
   ],
-  GroupOwner: {
-    ID: 3,
-    username: 'owner',
-    email: 'owner@example.com',
-    profileImage: 'https://example.com/owner-profile.jpg',
-  },
 };

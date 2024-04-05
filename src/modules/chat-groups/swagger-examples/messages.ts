@@ -3,7 +3,6 @@ export const SingleMessageExample = {
   RoomID: 'Chat-Group-456',
   Username: 'john_doe',
   Content: 'Hello world!',
-  Attachment: 'example.jpg',
 };
 
 export const multipleMessagesExample = [
