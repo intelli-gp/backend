@@ -176,24 +176,12 @@ model message {
   group                group                  @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
   user                 user                   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   messages_read_status messages_read_status[]
-  message_notification message_notification[]
 }
 
 model messages_read_status {
   message_id Int
   user_id    Int
   read_at    DateTime @default(now())
-  message    message  @relation(fields: [message_id], references: [message_id], onDelete: Cascade, onUpdate: Cascade)
-  user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@id([message_id, user_id])
-}
-
-model message_notification {
-  user_id    Int
-  message_id Int
-  createdAt  DateTime @default(now())
-  isViewed   Boolean  @default(false)
   message    message  @relation(fields: [message_id], references: [message_id], onDelete: Cascade, onUpdate: Cascade)
   user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -325,7 +313,6 @@ model user {
   following            user_follower[]        @relation("following")
   followed_by          user_follower[]        @relation("followed_by")
   messages_read_status messages_read_status[]
-  message_notification message_notification[]
   liked_articles       article_like[]
 }
 
