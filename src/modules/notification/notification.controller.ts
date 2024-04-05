@@ -52,7 +52,7 @@ export class NotificationController {
     });
   }
 
-  @Patch('/messages/view/:MessageID')
+  @Patch('/messages/view/:MessageID([0-9]+)')
   async markMessagesAsViewed(
     @GetCurrentUser('user_id') userId,
     @Param() dto: DeleteMessageDto,

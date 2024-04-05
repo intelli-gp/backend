@@ -1,5 +1,13 @@
 import { singleEmbeddedUserExample } from 'src/modules/users/swagger-examples';
 
+export const singleCommentExample = {
+  ID: 2,
+  Content: 'Test comment',
+  CreatedAt: '2024-04-05T15:43:53.161Z',
+  ArticleID: 1,
+  Commenter: singleEmbeddedUserExample,
+};
+
 export const articleExample = {
   ID: 1,
   Title: 'My article title updated',
@@ -28,4 +36,5 @@ export const articleExample = {
     },
   ],
   LikedBy: [singleEmbeddedUserExample, singleEmbeddedUserExample],
+  Comments: [singleCommentExample, singleCommentExample],
 };

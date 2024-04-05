@@ -7,9 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { TagsService } from '../tags/tags.service';
-import { articles_content } from '@prisma/client';
 import { UpdateArticleDto } from './dto';
-import { SerializedArticle } from './serialized-types/article.serialized';
 import { DeserializedArticle } from './serialized-types/article.deserializer';
 import { PaginationDto } from 'src/common/dto';
 
@@ -38,9 +36,41 @@ export class ArticlesService {
             user: true,
           },
         },
+        article_comments: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
     return articles;
+  }
+
+  async getArticle(articleId: number) {
+    const article = await this.prismaService.article.findUnique({
+      where: {
+        article_id: articleId,
+      },
+      include: {
+        article_tag: true,
+        user: true,
+        articles_content: true,
+        article_likes: {
+          include: {
+            user: true,
+          },
+        },
+        article_comments: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!article) throw new NotFoundException('Article not found');
+
+    return article;
   }
 
   async getArticlesCreatedByUser(
@@ -62,6 +92,11 @@ export class ArticlesService {
         },
         articles_content: true,
         article_likes: {
+          include: {
+            user: true,
+          },
+        },
+        article_comments: {
           include: {
             user: true,
           },
@@ -94,6 +129,16 @@ export class ArticlesService {
         article_tag: true,
         user: true,
         articles_content: true,
+        article_likes: {
+          include: {
+            user: true,
+          },
+        },
+        article_comments: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
     await this.tagsService.addTagsForEntities(
@@ -119,26 +164,81 @@ export class ArticlesService {
     return addedArticle;
   }
 
-  async getArticle(articleId: number) {
-    const article = await this.prismaService.article.findUnique({
-      where: {
+  /**
+   *
+   * @param articleId the id of the article you want to comment on
+   * @param userId the id of the user commenting
+   * @param commentContent The comment to be added in markdown
+   */
+  async createCommentOnArticle(
+    articleId: number,
+    userId: number,
+    commentContent: string,
+  ) {
+    const comment = await this.prismaService.article_comment.create({
+      data: {
         article_id: articleId,
+        user_id: userId,
+        md_content: commentContent,
       },
       include: {
-        article_tag: true,
         user: true,
-        articles_content: true,
-        article_likes: {
-          include: {
-            user: true,
-          },
-        },
       },
     });
+    return comment;
+  }
 
-    if (!article) throw new NotFoundException('Article not found');
+  async updateCommentOnArticle(
+    commentId: number,
+    userId: number,
+    commentContent: string,
+  ) {
+    // Allow only the user who created the comment to update it
+    const comment = await this.prismaService.article_comment.update({
+      where: {
+        comment_id: commentId,
+        user_id: userId,
+      },
+      data: {
+        md_content: commentContent,
+      },
+      include: {
+        user: true,
+      },
+    });
+    if (!comment)
+      throw new NotFoundException('Comment not found or unauthorized');
+    return comment;
+  }
 
-    return article;
+  async deleteCommentOnArticle(
+    commentId: number,
+    articleId: number,
+    userId: number,
+  ) {
+    /**
+     * Users allowed to delete a comment
+     * 1. The user who created the comment
+     * 2. The user who created the article
+     */
+    // Comments are not truly deleted but hidden for community moderation (toxicity check, etc..)
+    // TODO: decide whether deleted comments are entirely hidden or just marked as deleted in UI
+    await this.prismaService.article_comment.updateMany({
+      where: {
+        OR: [
+          { comment_id: commentId, user_id: userId, article_id: articleId },
+          {
+            comment_id: commentId,
+            article: {
+              user_id: userId,
+            },
+          },
+        ],
+      },
+      data: {
+        deleted: true,
+      },
+    });
   }
 
   async toggleLikeArticle(articleId: number, userId: number) {

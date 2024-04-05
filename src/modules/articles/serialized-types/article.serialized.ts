@@ -2,12 +2,15 @@ import { Logger } from '@nestjs/common';
 import {
   Prisma,
   article,
+  article_comment,
+  article_like,
   article_tag,
   articles_content,
   user,
 } from '@prisma/client';
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
+import { SerializedArticleComment } from './article-comment.serializer';
 
 export class SerializedArticle {
   @Expose({ name: 'ID' })
@@ -63,7 +66,24 @@ export class SerializedArticle {
     ({ value }: { value: Prisma.article_likeWhereInput[] }) =>
       value?.map((articleLike) => new SerializedUser(articleLike?.user)),
   )
-  article_likes?: user[];
+  article_likes?: article_like[];
+
+  @Expose({ name: 'Comments' })
+  @Transform(({ value }: { value: article_comment[] }) => {
+    // filter out deleted comments
+    const filteredValues = value?.filter((articleComment: article_comment) => {
+      return !articleComment?.deleted;
+    });
+    // serialize filtered comments
+    const serializedValues = filteredValues.map(
+      (FilteredArticleComment: article_comment) => {
+        return new SerializedArticleComment(FilteredArticleComment);
+      },
+    );
+
+    return serializedValues;
+  })
+  article_comments?: article_comment[];
 
   constructor(partial: Partial<article>) {
     // assign values to object

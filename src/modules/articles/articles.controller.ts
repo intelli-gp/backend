@@ -15,12 +15,22 @@ import { sendSuccessResponse } from 'src/utils/response-handler/success.response
 import { SerializedArticle } from './serialized-types/article.serialized';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
-import { CreateArticleExample, likeArticleExample } from './swagger-examples';
-import { DeleteArticleDto, UpdateArticleDto } from './dto';
+import {
+  CreateArticleExample,
+  commentOnArticleExample,
+  likeArticleExample,
+} from './swagger-examples';
+import {
+  CreateCommentDto,
+  DeleteArticleDto,
+  GetCommentDto,
+  UpdateArticleDto,
+} from './dto';
 import { GetArticleDto } from './dto/get-article.dto';
 import { PaginationDto } from 'src/common/dto';
 import { MultipleArticlesExample } from './swagger-examples/multiple-articles.example';
 import { SerializedUser } from '../users/serialized-types/serialized-user';
+import { SerializedArticleComment } from './serialized-types/article-comment.serializer';
 
 @Controller('articles')
 @ApiTags('Articles')
@@ -84,7 +94,7 @@ export class ArticlesController {
     schema: swaggerSuccessExample(null, CreateArticleExample),
   })
   @Public()
-  @Get('/:articleId')
+  @Get('/:articleId([0-9]+)')
   async getArticle(@Param() articleData: DeleteArticleDto) {
     const article = await this.articlesService.getArticle(
       articleData.articleId,
@@ -97,7 +107,7 @@ export class ArticlesController {
     description: 'Toggle like on article',
     schema: swaggerSuccessExample(null, likeArticleExample),
   })
-  @Post('/:articleId/toggle-like')
+  @Post('/:articleId([0-9]+)/toggle-like')
   async toggleLikeArticle(
     @GetCurrentUser('user_id') userId: number,
     @Param() articleData: DeleteArticleDto,
@@ -111,11 +121,68 @@ export class ArticlesController {
   }
 
   @ApiResponse({
+    status: 201,
+    description: 'Returns created comment',
+    schema: swaggerSuccessExample(null, commentOnArticleExample),
+  })
+  @Post('/:articleId([0-9]+)/comment')
+  async commentOnArticle(
+    @Body() commentData: CreateCommentDto,
+    @GetCurrentUser('user_id') userId: number,
+    @Param() articleData: DeleteArticleDto,
+  ) {
+    const comment = await this.articlesService.createCommentOnArticle(
+      articleData.articleId,
+      userId,
+      commentData.Content,
+    );
+    return sendSuccessResponse(new SerializedArticleComment(comment));
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Returns updated comment',
+    schema: swaggerSuccessExample(null, commentOnArticleExample),
+  })
+  @Patch('/:articleId([0-9]+)/comment/:commentId([0-9]+)')
+  async updateCommentOnArticle(
+    @Body() updatedCommentData: CreateCommentDto,
+    @GetCurrentUser('user_id') userId: number,
+    @Param() updateFilters: GetCommentDto,
+  ) {
+    // TODO: decide whether to remove the articleId from the filters as it is not used as of now
+
+    const comment = await this.articlesService.updateCommentOnArticle(
+      updateFilters.commentId,
+      userId,
+      updatedCommentData.Content,
+    );
+    return sendSuccessResponse(new SerializedArticleComment(comment));
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Returns confirmation for deletion',
+  })
+  @Delete('/:articleId([0-9]+)/comment/:commentId([0-9]+)')
+  async deleteCommentOnArticle(
+    @GetCurrentUser('user_id') userId: number,
+    @Param() deletionFilters: GetCommentDto,
+  ) {
+    await this.articlesService.deleteCommentOnArticle(
+      deletionFilters.articleId,
+      deletionFilters.commentId,
+      userId,
+    );
+    return sendSuccessResponse('Comment deleted successfully');
+  }
+
+  @ApiResponse({
     status: 200,
     description: 'Returns updated article',
     schema: swaggerSuccessExample(null, CreateArticleExample),
   })
-  @Patch('/:articleId')
+  @Patch('/:articleId([0-9]+)')
   async updateArticle(
     @Body() articleData: UpdateArticleDto,
     @Param() articleIdentifier: GetArticleDto,
@@ -133,7 +200,7 @@ export class ArticlesController {
     status: 200,
     description: 'Return confirmation for deletion',
   })
-  @Delete('/:articleId')
+  @Delete('/:articleId([0-9]+)')
   async deleteArticle(
     @GetCurrentUser('user_id') userId: number,
     @Param() articleData: DeleteArticleDto,

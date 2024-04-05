@@ -46,6 +46,18 @@ model article_like {
   @@id([article_id, user_id])
 }
 
+model article_comment {
+  comment_id Int      @id @default(autoincrement())
+  article_id Int
+  user_id    Int
+  md_content String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted    Boolean  @default(false)
+  article    article  @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
+  user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+}
+
 model article {
   article_id       Int                @id @default(autoincrement())
   title            String             @db.VarChar(255)
@@ -56,7 +68,8 @@ model article {
   article_tag      article_tag[]
   user             user               @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   articles_content articles_content[]
-  article_likes         article_like[]
+  article_likes    article_like[]
+  article_comments  article_comment[]
 }
 
 model articles_content {
@@ -327,6 +340,7 @@ model user {
   messages_read_status messages_read_status[]
   message_notification message_notification[]
   liked_articles       article_like[]
+  article_comment      article_comment[]
 }
 
 enum GroupUserTypeEnum {
