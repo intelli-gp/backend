@@ -1,24 +1,31 @@
+import { singleEmbeddedUserExample } from 'src/modules/users/swagger-examples';
+
 export const articleExample = {
   ID: 1,
-  title: 'My article title',
-  createdAt: '2024-01-12T14:21:45.574Z',
-  updatedAt: '2024-01-12T14:21:45.583Z',
-  coverImageUrl: 'www.google.com/url/to/image.jpg',
-  tags: ['tag1', 'tag2'],
-  author: {
-    full_name: 'John Doe',
-    username: 'john11',
-    image: 'www.google.com/url/to/image.jpg',
-    followersCount: 0,
+  Title: 'My article title updated',
+  CreatedAt: '2024-02-21T19:52:10.423Z',
+  UpdatedAt: '2024-02-21T20:33:01.069Z',
+  CoverImage: 'www.google.com/url/to/image.jpg',
+  ArticleTags: ['tag2', 'tag3', 'tag4'],
+  Author: {
+    ID: 1,
+    FullName: 'John',
+    Username: 'John3142',
+    DOB: '2011-01-04T00:00:00.000Z',
+    Email: 'johndoe.22@gmail.com',
+    PhoneNumber: '+201050790880',
+    Connected: false,
+    FollowersCount: 0,
   },
-  sections: [
+  Sections: [
     {
-      value: 'valueOfSection1',
-      contentType: 'text',
+      Value: 'valueOfSection3434343422',
+      ContentType: 'text',
     },
     {
-      value: 'typeOfSection1',
-      contentType: 'text',
+      Value: 'typeOfSection1',
+      ContentType: 'text',
     },
   ],
+  LikedBy: [singleEmbeddedUserExample, singleEmbeddedUserExample],
 };

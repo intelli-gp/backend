@@ -15,11 +15,12 @@ import { sendSuccessResponse } from 'src/utils/response-handler/success.response
 import { SerializedArticle } from './serialized-types/article.serialized';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
-import { CreateArticleExample } from './swagger-examples';
+import { CreateArticleExample, likeArticleExample } from './swagger-examples';
 import { DeleteArticleDto, UpdateArticleDto } from './dto';
 import { GetArticleDto } from './dto/get-article.dto';
 import { PaginationDto } from 'src/common/dto';
 import { MultipleArticlesExample } from './swagger-examples/multiple-articles.example';
+import { SerializedUser } from '../users/serialized-types/serialized-user';
 
 @Controller('articles')
 @ApiTags('Articles')
@@ -89,6 +90,24 @@ export class ArticlesController {
       articleData.articleId,
     );
     return sendSuccessResponse(new SerializedArticle(article));
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Toggle like on article',
+    schema: swaggerSuccessExample(null, likeArticleExample),
+  })
+  @Post('/:articleId/toggle-like')
+  async toggleLikeArticle(
+    @GetCurrentUser('user_id') userId: number,
+    @Param() articleData: DeleteArticleDto,
+  ) {
+    // TODO: may need to divide this to two endpoints as removing the like add nothing to the server resources
+    const articleLike = await this.articlesService.toggleLikeArticle(
+      articleData.articleId,
+      userId,
+    );
+    return sendSuccessResponse(new SerializedUser(articleLike.user));
   }
 
   @ApiResponse({

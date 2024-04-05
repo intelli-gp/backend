@@ -33,6 +33,11 @@ export class ArticlesService {
           },
         },
         articles_content: true,
+        article_likes: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
     return articles;
@@ -56,6 +61,11 @@ export class ArticlesService {
           },
         },
         articles_content: true,
+        article_likes: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
     return articles;
@@ -118,6 +128,11 @@ export class ArticlesService {
         article_tag: true,
         user: true,
         articles_content: true,
+        article_likes: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
 
@@ -126,6 +141,41 @@ export class ArticlesService {
     return article;
   }
 
+  async toggleLikeArticle(articleId: number, userId: number) {
+    const likeExists = await this.prismaService.article_like.findUnique({
+      where: {
+        article_id_user_id: {
+          article_id: articleId,
+          user_id: userId,
+        },
+      },
+    });
+
+    if (likeExists) {
+      // TODO: decide whether to delete the like or just add an invisible flag
+      return await this.prismaService.article_like.delete({
+        where: {
+          article_id_user_id: {
+            article_id: articleId,
+            user_id: userId,
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+    } else {
+      return await this.prismaService.article_like.create({
+        data: {
+          article_id: articleId,
+          user_id: userId,
+        },
+        include: {
+          user: true,
+        },
+      });
+    }
+  }
   async updateArticle(
     articleData: UpdateArticleDto,
     articleId: number,

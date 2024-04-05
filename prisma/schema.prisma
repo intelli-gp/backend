@@ -56,7 +56,7 @@ model article {
   article_tag      article_tag[]
   user             user               @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   articles_content articles_content[]
-  liked_by         article_like[]
+  article_likes         article_like[]
 }
 
 model articles_content {

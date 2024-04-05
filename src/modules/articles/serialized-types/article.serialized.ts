@@ -1,5 +1,11 @@
 import { Logger } from '@nestjs/common';
-import { article, article_tag, articles_content, user } from '@prisma/client';
+import {
+  Prisma,
+  article,
+  article_tag,
+  articles_content,
+  user,
+} from '@prisma/client';
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 
@@ -51,6 +57,13 @@ export class SerializedArticle {
       value?.map((tag: article_tag) => tag?.tag_name),
   )
   article_tag?: article_tag[];
+
+  @Expose({ name: 'LikedBy' })
+  @Transform(
+    ({ value }: { value: Prisma.article_likeWhereInput[] }) =>
+      value?.map((articleLike) => new SerializedUser(articleLike?.user)),
+  )
+  article_likes?: user[];
 
   constructor(partial: Partial<article>) {
     // assign values to object
