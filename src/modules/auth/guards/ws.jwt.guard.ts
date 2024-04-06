@@ -33,10 +33,10 @@ export class WsJwtGuard implements CanActivate {
 
     const config = new ConfigService<ConfigType>();
 
-    // const { authorization } = client.handshake.headers;
-    const { token } = client.handshake.auth;
-    wsValidationLogger.debug({ token });
-    // const token: string = authorization?.split(' ')[1];
+    const { authorization } = client.handshake.headers;
+    // const { token } = client.handshake.auth;
+    // wsValidationLogger.debug({ token });
+    const token: string = authorization?.split(' ')[1];
     try {
       const payload = verify(token, config.get('ACCESS_TOKEN_SECRET'));
       wsValidationLogger.debug({ payload });

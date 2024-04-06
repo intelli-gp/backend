@@ -29,10 +29,11 @@ import { WsPrismaExceptionFilter } from 'src/exception-filters/prisma.filter';
 import { SerializedMessage } from '../serialized-types/messages/messages.serializer';
 import { EditMessageDto } from '../dto/edit-message.dto';
 import { DeleteMessageDto } from '../dto/delete-message.dto';
-import { Prisma, messages_read_status, user } from '@prisma/client';
+import { Prisma, user } from '@prisma/client';
 import { UsersService } from 'src/modules/users/users.service';
 import { Reflector } from '@nestjs/core';
 import { SerializedReadMessageInfo } from '../serialized-types/messages/read-messages.serializer';
+import { MessageReadReceipt } from './types/message-read';
 
 @Injectable()
 @WebSocketGateway({
@@ -190,7 +191,7 @@ export class ChatGroupsGateway {
     );
 
     // Emit to all users in every message Room that this user has read the message
-    const groupedMessages: messages_read_status[][] = Object.values(
+    const groupedMessages: MessageReadReceipt[][] = Object.values(
       readMessages.reduce((acc, obj) => {
         const messageId = obj.message_id;
         if (!acc[messageId]) {
@@ -312,7 +313,7 @@ export class ChatGroupsGateway {
     @ConnectedSocket() client: Socket,
   ) {
     const messageReadStatusInfo =
-      await this.messagingService.getMessageReadStatus(data.MessageID);
+      await this.messagingService.getMessageReadReceipts(data.MessageID);
     const messageInfoRoomTitle = this.createMessageInfoRoomTitle(
       data.MessageID,
     );

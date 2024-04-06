@@ -47,15 +47,15 @@ model article_like {
 }
 
 model article_comment {
-  comment_id           Int                    @id @default(autoincrement())
-  article_id           Int
-  user_id              Int
-  md_content           String
-  created_at           DateTime               @default(now())
-  updated_at           DateTime               @updatedAt
-  deleted              Boolean                @default(false)
-  article              article                @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
-  user                 user                   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  comment_id            Int                    @id @default(autoincrement())
+  article_id            Int
+  user_id               Int
+  md_content            String
+  created_at            DateTime               @default(now())
+  updated_at            DateTime               @updatedAt
+  deleted               Boolean                @default(false)
+  article               article                @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
+  user                  user                   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   article_comment_likes article_comment_like[]
 }
 
@@ -147,7 +147,7 @@ model group_user {
   type                GroupUserTypeEnum @default(MEMBER)
   inRoom              Boolean           @default(false)
   isNotificationMuted Boolean           @default(false)
-  last_read           DateTime?         @default(now())
+  last_read           DateTime?         @updatedAt
   joined_at           DateTime          @default(now())
   left_at             DateTime?         @db.Date
   joining_status      Boolean           @default(true)
@@ -199,18 +199,7 @@ model message {
   attachment           attachment[]
   group                group                  @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
   user                 user                   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
-  messages_read_status messages_read_status[]
   message_notification message_notification[]
-}
-
-model messages_read_status {
-  message_id Int
-  user_id    Int
-  read_at    DateTime @default(now())
-  message    message  @relation(fields: [message_id], references: [message_id], onDelete: Cascade, onUpdate: Cascade)
-  user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@id([message_id, user_id])
 }
 
 model message_notification {
@@ -334,24 +323,23 @@ model user {
   active               Boolean   @default(false)
   hashed_refresh_token String?   @db.VarChar(100)
 
-  ai_output            ai_output[]
-  article              article[]
-  group_user           group_user[]
-  group                group[]
-  message_ai           message_ai[]
-  message              message[]
-  payment_method       payment_method[]
-  task                 task[]
-  user_badge           user_badge[]
-  user_tag             user_tag[]
-  level                level                  @relation(fields: [level_id], references: [level_id], onDelete: Cascade, onUpdate: Cascade)
-  plan                 plan                   @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
-  following            user_follower[]        @relation("following")
-  followed_by          user_follower[]        @relation("followed_by")
-  messages_read_status messages_read_status[]
-  message_notification message_notification[]
-  liked_articles       article_like[]
-  article_comment      article_comment[]
+  ai_output             ai_output[]
+  article               article[]
+  group_user            group_user[]
+  group                 group[]
+  message_ai            message_ai[]
+  message               message[]
+  payment_method        payment_method[]
+  task                  task[]
+  user_badge            user_badge[]
+  user_tag              user_tag[]
+  level                 level                  @relation(fields: [level_id], references: [level_id], onDelete: Cascade, onUpdate: Cascade)
+  plan                  plan                   @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
+  following             user_follower[]        @relation("following")
+  followed_by           user_follower[]        @relation("followed_by")
+  message_notification  message_notification[]
+  liked_articles        article_like[]
+  article_comment       article_comment[]
   article_comment_likes article_comment_like[]
 }
 

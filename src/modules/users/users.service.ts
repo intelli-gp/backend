@@ -137,6 +137,7 @@ export class UsersService {
       });
 
       await prisma.group_user.updateMany({
+        where: { inRoom: true },
         data: {
           inRoom: false,
         },

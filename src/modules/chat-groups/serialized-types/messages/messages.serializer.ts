@@ -1,11 +1,5 @@
-import {
-  Prisma,
-  attachment,
-  message,
-  messages_read_status,
-  user,
-} from '@prisma/client';
-import { Exclude, Expose, Transform } from 'class-transformer';
+import { Prisma, attachment } from '@prisma/client';
+import { Exclude } from 'class-transformer';
 import { SerializedChatGroup } from '../chat-group/chat-group.serializer';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 

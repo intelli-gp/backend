@@ -310,6 +310,7 @@ export class ChatGroupsService {
       },
       data: {
         type: permissionLevel,
+        last_read: currentUser.last_read,
       },
     });
     if (!updatedTargetUser) {

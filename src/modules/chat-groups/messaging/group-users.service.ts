@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { MessageReadReceipt } from './types/message-read';
 
 @Injectable()
 export class GroupUsersService {
@@ -43,6 +44,7 @@ export class GroupUsersService {
           },
         },
         include: {
+          user: true,
           group: {
             include: {
               message: true,
@@ -57,34 +59,25 @@ export class GroupUsersService {
       if (!isInRoom) {
         const messagesAvailableToRead = updatedGroupUser.group.message.filter(
           (message) => {
-            return message.user_id !== userId;
+            return (
+              // updatedGroupUser.last_read >= message.created_at &&
+              message.user_id !== userId
+            );
           },
         );
 
-        this.groupUsersLogger.debug({ messagesAvailableToRead });
-        // Notice: Skip duplicates does not work with MongoDB or SQLServer
-        // read all messages in this room
-        await prisma.messages_read_status.createMany({
-          data: messagesAvailableToRead.map((message) => {
+        const readMessages: MessageReadReceipt[] = messagesAvailableToRead.map(
+          (message) => {
             return {
               message_id: message.message_id,
               user_id: userId,
+              read_at: updatedGroupUser.last_read,
+              user: updatedGroupUser.user,
             };
-          }),
-
-          skipDuplicates: true,
-        });
-
-        const readMessages = await prisma.messages_read_status.findMany({
-          where: {
-            message_id: {
-              in: messagesAvailableToRead.map((message) => message.message_id),
-            },
           },
-          include: {
-            user: true,
-          },
-        });
+        );
+        this.groupUsersLogger.debug({ messagesAvailableToRead });
+
         this.groupUsersLogger.debug({ readMessages });
         return readMessages;
       }

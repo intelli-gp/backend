@@ -3,6 +3,7 @@ import { Prisma, group_user } from '@prisma/client';
 import { NotificationService } from 'src/modules/notification/notification.service';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { SerializedMessage } from '../serialized-types/messages/messages.serializer';
+import { MessageReadReceipt } from './types/message-read';
 
 @Injectable()
 export class MessagingService {
@@ -26,41 +27,54 @@ export class MessagingService {
     });
   }
 
-  async getMessageReadStatus(messageId: number) {
-    return await this.prismaService.messages_read_status.findMany({
-      where: {
-        message_id: messageId,
-      },
-      include: {
-        user: true,
-      },
-    });
-  }
-  async createMessage(groupId: number, userId: number, messageContent: string) {
-    const groupUsersIds = await this.prismaService.group_user.findMany({
-      where: {
-        group_id: groupId,
-        inRoom: true,
-        NOT: {
-          user_id: userId,
+  async getMessageReadReceipts(messageId: number) {
+    // get the message read status dynamically without the need of a table for it
+    const messageWithGroupAndGroupUsers =
+      await this.prismaService.message.findUnique({
+        where: {
+          message_id: messageId,
         },
-      },
-      select: {
-        user_id: true,
-      },
-    });
+        include: {
+          group: {
+            include: {
+              group_user: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
+    const messageOwner = messageWithGroupAndGroupUsers.user_id;
+    const messageCreationDate = messageWithGroupAndGroupUsers.created_at;
+    const groupUsers = messageWithGroupAndGroupUsers.group.group_user;
+    const readReceipts: MessageReadReceipt[] = groupUsers
+      .filter((groupUser) => {
+        return (
+          groupUser.last_read >= messageCreationDate &&
+          groupUser.user_id !== messageOwner
+        );
+      })
+      .map((groupUser: Prisma.group_userWhereInput) => {
+        return {
+          message_id: messageId,
+          user_id: groupUser?.user_id,
+          read_at: groupUser?.last_read,
+          user: groupUser?.user,
+        } as MessageReadReceipt;
+      });
+    this.messagingLogger.debug({ readReceipts });
+    return readReceipts;
+  }
+
+  async createMessage(groupId: number, userId: number, messageContent: string) {
     const newMessage = await this.prismaService.message.create({
       data: {
         content: messageContent,
         group_id: groupId,
         user_id: userId,
-        messages_read_status: {
-          createMany: {
-            data: groupUsersIds,
-            skipDuplicates: true,
-          },
-        },
       },
 
       include: {
@@ -70,6 +84,16 @@ export class MessagingService {
             group_user: true,
           },
         },
+      },
+    });
+
+    // updating the last read status of group users
+    await this.prismaService.group_user.updateMany({
+      where: {
+        inRoom: true,
+      },
+      data: {
+        inRoom: true,
       },
     });
 
