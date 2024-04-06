@@ -19,6 +19,7 @@ jobs:
       - name: Build
         run: npm run build
   deploy:
+    needs: Build
     runs-on: ubuntu-latest
     steps:
       - name: Deploy application
@@ -26,7 +27,7 @@ jobs:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           HOSTNAME: ${{ secrets.HOSTNAME }}
           USERNAME: ${{ secrets.USERNAME }}
-          FRONT_CD_SCRIPT_PATH: ${{ secrets.BACK_CD_SCRIPT_PATH }}
+          BACK_CD_SCRIPT_PATH: ${{ secrets.BACK_CD_SCRIPT_PATH }}
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           echo "$BACK_CD_SCRIPT_PATH" > back_cd_script_path
