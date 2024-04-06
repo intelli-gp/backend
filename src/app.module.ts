@@ -15,11 +15,17 @@ import { PrismaExceptionFilter } from './exception-filters/prisma.filter';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { ChatGroupsModule } from './modules/chat-groups/chat-groups.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'frontend', 'dist'),
+      exclude: ['/api*'],
     }),
     PrismaModule,
     AuthModule,
