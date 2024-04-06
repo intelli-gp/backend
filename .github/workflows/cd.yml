@@ -1,0 +1,35 @@
+name: Dev Deployment
+
+on:
+  push:
+    branches: [dev, deployment]
+  pull_request:
+    branches: [dev, deployment]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy application
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOSTNAME: ${{ secrets.HOSTNAME }}
+          USERNAME: ${{ secrets.USERNAME }}
+          FRONT_CD_SCRIPT_PATH: ${{ secrets.BACK_CD_SCRIPT_PATH }}
+        run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          echo "$BACK_CD_SCRIPT_PATH" > back_cd_script_path
+          echo "$USERNAME" > username
+          echo "$HOSTNAME" > hostname
+          ssh -o StrictHostKeyChecking=no -i private_key "$USERNAME@$HOSTNAME" "$BACK_CD_SCRIPT_PATH"
