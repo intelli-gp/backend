@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PointsDto } from './dto/points.dto';
 import { BadgeDto, UserBadgeDto } from './dto/badges.dto';
+import { PaginationDto } from 'src/common/dto';
 
 @Injectable()
 export class GamificationService {
@@ -64,6 +65,17 @@ export class GamificationService {
     });
 
     return badge;
+  }
+
+  getLeaderboard(pagination: PaginationDto) {
+    if (pagination && pagination.limit && pagination.offset > -1) {
+      return this.prismaService.user.findMany({
+        orderBy: { points: 'desc' },
+        take: pagination.limit,
+        skip: pagination.offset,
+      });
+    } else
+      return this.prismaService.user.findMany({ orderBy: { points: 'desc' } });
   }
 
   private async checkBadge(user_id: number, badge_id: number, prisma) {

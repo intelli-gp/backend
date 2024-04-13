@@ -2,10 +2,12 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Patch,
   Post,
+  Query,
   UseFilters,
 } from '@nestjs/common';
 import { GamificationService } from './gamification.service';
@@ -29,6 +31,8 @@ import {
   SerializedUserBadge,
 } from './serialized-types/serialized-badges';
 import { PrismaExceptionFilter } from 'src/exception-filters/prisma.filter';
+import { PaginationDto } from 'src/common/dto';
+import { SerializedLeaderboard } from './serialized-types/serialized-leaderboard';
 
 @ApiTags('gamification')
 @Controller('gamification')
@@ -96,6 +100,21 @@ export class GamificationController {
     return sendSuccessResponse(
       new SerializedUserBadge(
         await this.gamificationService.addUserBadge(userId, badgeDto),
+      ),
+    );
+  }
+
+  @Get('leaderboard')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get the leaderboard' })
+  @ApiOkResponse({
+    description: 'Leaderboard retrieved successfully',
+    schema: swaggerSuccessExample(null, PointsExample),
+  })
+  async getLeaderboard(@Query() pagination: PaginationDto) {
+    return sendSuccessResponse(
+      (await this.gamificationService.getLeaderboard(pagination)).map(
+        (user) => new SerializedLeaderboard(user),
       ),
     );
   }
