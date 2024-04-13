@@ -1,0 +1,103 @@
+[
+  {
+    "database": "intelli_gp",
+    "schema": "public",
+    "index": "mujedd_articles",
+    "nodes": {
+      "table": "article",
+      "columns": [
+        "article_id",
+        "title"
+      ],
+      "children": [
+        {
+          "table": "tag",
+          "label": "tags",
+          "columns": [
+            "tag_name"
+          ],
+          "relationship": {
+            "variant": "scalar",
+            "type": "one_to_many",
+            "through_tables": [
+              "article_tag"
+            ]
+          }
+        },
+        {
+          "table": "articles_content",
+          "label": "content",
+          "columns": [
+            "value"
+          ],
+          "relationship": {
+            "variant": "scalar",
+            "type": "one_to_many"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "database": "intelli_gp",
+    "schema": "public",
+    "index": "mujedd_groups",
+    "nodes": {
+      "table": "group",
+      "columns": [
+        "group_id",
+        "title",
+        "description"
+      ],
+      "children": [
+        {
+          "table": "tag",
+          "label": "tags",
+          "columns": [
+            "tag_name"
+          ],
+          "relationship": {
+            "variant": "scalar",
+            "type": "one_to_many",
+            "through_tables": [
+              "group_tag"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "database": "intelli_gp",
+    "schema": "public",
+    "index": "mujedd_users",
+    "nodes": {
+      "table": "user",
+      "columns": [
+        "user_id",
+        "username",
+        "email",
+        "full_name",
+        "bio",
+        "headline",
+        "phone_number"
+      ],
+      "children": [
+        {
+          "table": "tag",
+          "label": "tags",
+          "columns": [
+            "tag_name"
+          ],
+          "relationship": {
+            "variant": "scalar",
+            "type": "one_to_many",
+            "through_tables": [
+              "user_tag"
+            ]
+          }
+        }
+      ]
+    }
+  }
+]
