@@ -8,6 +8,7 @@ import * as fs from 'fs';
 
 async function bootstrap() {
   const config = new ConfigService();
+  
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.enableCors({
@@ -21,6 +22,7 @@ async function bootstrap() {
       // transform: true,
     }),
   );
+
   if (config.get('ENABLE_SWAGGER') === 'true') {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('INTELLI GP')
