@@ -55,9 +55,14 @@ export class NotificationService {
       if (!readTimeThreshold) {
         return;
       }
-      // Get all messages in the group that the user has not read yet
+      /**
+       * Get all messages in the group that the user has not read yet
+       * by checking the last read of the group user and comparing it to the message created At
+       * Note: These messages cannot be created by the user himself
+       */
       const unreadMessages = groupUser?.group?.message.filter(
-        (message) => message.created_at > readTimeThreshold,
+        (message) =>
+          message.created_at > readTimeThreshold && message.user_id !== userId,
       );
 
       this.NotificationServiceLogger.debug({
