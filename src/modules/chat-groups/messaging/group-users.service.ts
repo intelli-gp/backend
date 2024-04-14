@@ -35,6 +35,9 @@ export class GroupUsersService {
     isInRoom: boolean,
   ) {
     this.groupUsersLogger.debug(`Joining user ${userId} to group ${groupId}`);
+
+    const currentDate = new Date();
+
     return await this.prismaService.$transaction(async (prisma) => {
       const updatedGroupUser = await prisma.group_user.update({
         where: {
@@ -53,6 +56,7 @@ export class GroupUsersService {
         },
         data: {
           inRoom: !isInRoom,
+          last_read: currentDate,
         },
       });
 

@@ -147,7 +147,7 @@ model group_user {
   type                GroupUserTypeEnum @default(MEMBER)
   inRoom              Boolean           @default(false)
   isNotificationMuted Boolean           @default(false)
-  last_read           DateTime?         @updatedAt
+  last_read           DateTime?         @default(now())
   joined_at           DateTime          @default(now())
   left_at             DateTime?         @db.Date
   joining_status      Boolean           @default(true)

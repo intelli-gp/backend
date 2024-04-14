@@ -77,9 +77,9 @@ export class NotificationService {
       const unreadMessagesCount = unreadMessages.length;
 
       if (unreadMessagesCount > 0) {
-        this.NotificationServiceLogger.debug({
-          GroupMessages: groupUser?.group?.message,
-        });
+        // this.NotificationServiceLogger.debug({
+        //   GroupMessages: groupUser?.group?.message,
+        // });
         this.NotificationServiceLogger.debug({ unreadMessages });
       }
       // A precautionary measure to avoid circular JSON
