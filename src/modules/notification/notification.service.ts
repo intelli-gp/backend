@@ -101,12 +101,6 @@ export class NotificationService {
     eligibleUsersForNotification: group_user[],
     data: SerializedMessage,
   ) {
-    await this.prismaService.message_notification.createMany({
-      data: eligibleUsersForNotification.map((user) => ({
-        user_id: user.user_id,
-        message_id: data.MessageID,
-      })),
-    });
     await this.eventsService.emit(eligibleUsersForNotification, {
       eventName: 'chat-group-message',
       message: data,
