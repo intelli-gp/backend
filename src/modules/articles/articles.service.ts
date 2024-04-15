@@ -429,7 +429,7 @@ export class ArticlesService {
   }
 
   private async addTagsToUser(articleId: number, userId: number) {
-    const user_tag = await this.prismaService
+    const tagsAdded = await this.prismaService
       .$transaction(async (prisma) => {
         const articleTags = await prisma.article.findUnique({
           where: {
@@ -450,7 +450,6 @@ export class ArticlesService {
         console.log(e.message);
         return false;
       });
-
-    console.log(user_tag);
+    return tagsAdded;
   }
 }
