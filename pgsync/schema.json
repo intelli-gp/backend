@@ -7,17 +7,19 @@
       "table": "article",
       "columns": [
         "article_id",
-        "title"
+        "title",
+        "updated_at",
+        "cover_image_url"
       ],
       "children": [
         {
           "table": "tag",
-          "label": "tags",
+          "label": "article_tag",
           "columns": [
             "tag_name"
           ],
           "relationship": {
-            "variant": "scalar",
+            "variant": "object",
             "type": "one_to_many",
             "through_tables": [
               "article_tag"
@@ -26,13 +28,28 @@
         },
         {
           "table": "articles_content",
-          "label": "content",
+          "label": "articles_content",
           "columns": [
-            "value"
+            "value",
+            "content_type"
           ],
           "relationship": {
-            "variant": "scalar",
+            "variant": "object",
             "type": "one_to_many"
+          }
+        },
+        {
+          "table": "user",
+          "label": "user",
+          "columns": [
+            "user_id",
+            "full_name",
+            "username",
+            "image"
+          ],
+          "relationship": {
+            "variant": "object",
+            "type": "one_to_one"
           }
         }
       ]
@@ -47,17 +64,18 @@
       "columns": [
         "group_id",
         "title",
-        "description"
+        "description",
+        "cover_image_url"
       ],
       "children": [
         {
           "table": "tag",
-          "label": "tags",
+          "label": "group_tag",
           "columns": [
             "tag_name"
           ],
           "relationship": {
-            "variant": "scalar",
+            "variant": "object",
             "type": "one_to_many",
             "through_tables": [
               "group_tag"
@@ -80,7 +98,8 @@
         "full_name",
         "bio",
         "headline",
-        "phone_number"
+        "phone_number",
+        "image"
       ],
       "children": [
         {
