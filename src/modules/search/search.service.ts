@@ -170,7 +170,7 @@ export class SearchService {
               'email^3',
               'headline^2',
               'phone_number^2',
-              '*tags.tag_name^2',
+              '*tag.tag_name^2',
               'articles_content.value^2',
               'description',
               'bio',

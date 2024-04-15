@@ -104,12 +104,12 @@
       "children": [
         {
           "table": "tag",
-          "label": "tags",
+          "label": "user_tag",
           "columns": [
             "tag_name"
           ],
           "relationship": {
-            "variant": "scalar",
+            "variant": "object",
             "type": "one_to_many",
             "through_tables": [
               "user_tag"
