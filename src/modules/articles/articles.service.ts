@@ -80,6 +80,8 @@ export class ArticlesService {
 
     if (!article) throw new NotFoundException('Article not found');
 
+    // add tags to user for recommendation (system only not visible to users)
+    this.addTagsToUser(articleId, article.user_id);
     return article;
   }
 
@@ -415,6 +417,7 @@ export class ArticlesService {
     );
     return updatedArticle;
   }
+
   async deleteArticle(articleId: number, userId: number) {
     await this.prismaService.article.delete({
       where: {
@@ -423,5 +426,31 @@ export class ArticlesService {
       },
     });
     return true;
+  }
+
+  private async addTagsToUser(articleId: number, userId: number) {
+    const user_tag = await this.prismaService
+      .$transaction(async (prisma) => {
+        const articleTags = await prisma.article.findUnique({
+          where: {
+            article_id: articleId,
+          },
+          select: {
+            article_tag: true,
+          },
+        });
+        const tags = articleTags.article_tag.map((tag) => {
+          return tag.tag_name;
+        });
+
+        await this.tagsService.addTagsToUserSystem(tags, userId, prisma);
+        return true;
+      })
+      .catch((e) => {
+        console.log(e.message);
+        return false;
+      });
+
+    console.log(user_tag);
   }
 }
