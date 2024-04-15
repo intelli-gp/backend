@@ -6,6 +6,7 @@ import { SerializedArticle } from '../articles/serialized-types/article.serializ
 import { SerializedUser } from '../users/serialized-types/serialized-user';
 import { SerializedChatGroup } from '../chat-groups/serialized-types/chat-group/chat-group.serializer';
 import { PaginationDto } from 'src/common/dto';
+import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
 
 // TODO: add swagger decorators
 // TODO: remove @Public()
@@ -25,7 +26,9 @@ export class SearchController {
       paginationData.offset,
       paginationData.limit,
     );
-    return usersSearchResult.map((user) => new SerializedUser(user));
+    return sendSuccessResponse(
+      usersSearchResult.map((user) => new SerializedUser(user)),
+    );
   }
 
   @Get('articles')
@@ -39,7 +42,9 @@ export class SearchController {
       paginationData.offset,
       paginationData.limit,
     );
-    return articleSearchResult.map((article) => new SerializedArticle(article));
+    return sendSuccessResponse(
+      articleSearchResult.map((article) => new SerializedArticle(article)),
+    );
   }
 
   @Get('chat-groups')
@@ -53,7 +58,9 @@ export class SearchController {
       paginationData.offset,
       paginationData.limit,
     );
-    return groupsSearchResult.map((group) => new SerializedChatGroup(group));
+    return sendSuccessResponse(
+      groupsSearchResult.map((group) => new SerializedChatGroup(group)),
+    );
   }
 
   @Get()
@@ -81,6 +88,6 @@ export class SearchController {
     serializedResult.users = generalSearchResult.users.map(
       (user) => new SerializedUser(user),
     );
-    return serializedResult;
+    return sendSuccessResponse(serializedResult);
   }
 }
