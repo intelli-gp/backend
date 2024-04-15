@@ -36,12 +36,18 @@ export class SearchService {
   });
   private readonly SearchLogger = new Logger('SearchService');
 
-  async searchUsers(searchTerm: string): Promise<UserSearchResult[]> {
+  async searchUsers(
+    searchTerm: string,
+    from: number,
+    size: number,
+  ): Promise<UserSearchResult[]> {
     this.SearchLogger.log(`Initiate users search query about "${searchTerm}"`);
 
     try {
       let queryResult = await this.ElasticClient.search({
         index: INDICES_NAMES.USERS,
+        from,
+        size,
         query: {
           multi_match: {
             query: searchTerm,
@@ -67,7 +73,11 @@ export class SearchService {
     }
   }
 
-  async searchArticles(searchTerm: string): Promise<ArticleSearchResult[]> {
+  async searchArticles(
+    searchTerm: string,
+    from: number,
+    size: number,
+  ): Promise<ArticleSearchResult[]> {
     this.SearchLogger.log(
       `Initiate articles search query about "${searchTerm}"`,
     );
@@ -75,10 +85,16 @@ export class SearchService {
     try {
       let queryResult = await this.ElasticClient.search<ArticleSearchResult>({
         index: INDICES_NAMES.ARTICLES,
+        from,
+        size,
         query: {
           multi_match: {
             query: searchTerm,
-            fields: ['title^3', 'tags^2', 'content'],
+            fields: [
+              'title^3',
+              'article_tag.tag_name^2',
+              'articles_content.value',
+            ],
             fuzziness: FUZZINESS,
           },
         },
@@ -93,16 +109,22 @@ export class SearchService {
     }
   }
 
-  async searchGroups(searchTerm: string): Promise<GroupSearchResult[]> {
+  async searchGroups(
+    searchTerm: string,
+    from: number,
+    size: number,
+  ): Promise<GroupSearchResult[]> {
     this.SearchLogger.log(`Initiate groups search query about "${searchTerm}"`);
 
     try {
       let queryResult = await this.ElasticClient.search({
         index: INDICES_NAMES.CHAT_GROUPS,
+        from,
+        size,
         query: {
           multi_match: {
             query: searchTerm,
-            fields: ['title^3', 'tags^2', 'description'],
+            fields: ['title^3', 'group_tag.tag_name^2', 'description'],
             fuzziness: FUZZINESS,
           },
         },
@@ -116,7 +138,11 @@ export class SearchService {
     }
   }
 
-  async generalSearch(searchTerm: string): Promise<GeneralSearchResult> {
+  async generalSearch(
+    searchTerm: string,
+    from: number,
+    size: number,
+  ): Promise<GeneralSearchResult> {
     this.SearchLogger.log(
       `Initiate general search query about "${searchTerm}"`,
     );
@@ -131,6 +157,8 @@ export class SearchService {
       let queryResult = await this.ElasticClient.search<
         ArticleSearchResult | GroupSearchResult | UserSearchResult
       >({
+        from,
+        size,
         index: '_all',
         query: {
           multi_match: {
@@ -142,8 +170,8 @@ export class SearchService {
               'email^3',
               'headline^2',
               'phone_number^2',
-              'tags^2',
-              'content^2',
+              '*tags.tag_name^2',
+              'articles_content.value^2',
               'description',
               'bio',
             ],

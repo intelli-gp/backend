@@ -2,6 +2,10 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { SearchService } from './search.service';
 import { Public } from '../auth/ParamDecorator';
 import { SearchDto } from './dto/search.dto';
+import { SerializedArticle } from '../articles/serialized-types/article.serialized';
+import { SerializedUser } from '../users/serialized-types/serialized-user';
+import { SerializedChatGroup } from '../chat-groups/serialized-types/chat-group/chat-group.serializer';
+import { PaginationDto } from 'src/common/dto';
 
 // TODO: add swagger decorators
 // TODO: remove @Public()
@@ -12,25 +16,71 @@ export class SearchController {
 
   @Get('users')
   @Public()
-  async searchUsers(@Query() searchDto: SearchDto) {
-    return await this.searchService.searchUsers(searchDto.searchTerm);
+  async searchUsers(
+    @Query() searchDto: SearchDto,
+    @Query() paginationData: PaginationDto,
+  ) {
+    let usersSearchResult = await this.searchService.searchUsers(
+      searchDto.searchTerm,
+      paginationData.offset,
+      paginationData.limit,
+    );
+    return usersSearchResult.map((user) => new SerializedUser(user));
   }
 
   @Get('articles')
   @Public()
-  async searchArticles(@Query() searchDto: SearchDto) {
-    return await this.searchService.searchArticles(searchDto.searchTerm);
+  async searchArticles(
+    @Query() searchDto: SearchDto,
+    @Query() paginationData: PaginationDto,
+  ) {
+    let articleSearchResult = await this.searchService.searchArticles(
+      searchDto.searchTerm,
+      paginationData.offset,
+      paginationData.limit,
+    );
+    return articleSearchResult.map((article) => new SerializedArticle(article));
   }
 
   @Get('chat-groups')
   @Public()
-  async searchGroups(@Query() searchDto: SearchDto) {
-    return await this.searchService.searchGroups(searchDto.searchTerm);
+  async searchGroups(
+    @Query() searchDto: SearchDto,
+    @Query() paginationData: PaginationDto,
+  ) {
+    let groupsSearchResult = await this.searchService.searchGroups(
+      searchDto.searchTerm,
+      paginationData.offset,
+      paginationData.limit,
+    );
+    return groupsSearchResult.map((group) => new SerializedChatGroup(group));
   }
 
   @Get()
   @Public()
-  async generalSearch(@Query() searchDto: SearchDto) {
-    return await this.searchService.generalSearch(searchDto.searchTerm);
+  async generalSearch(
+    @Query() searchDto: SearchDto,
+    @Query() paginationData: PaginationDto,
+  ) {
+    let generalSearchResult = await this.searchService.generalSearch(
+      searchDto.searchTerm,
+      paginationData.offset,
+      paginationData.limit,
+    );
+    let serializedResult = {
+      articles: [] as SerializedArticle[],
+      users: [] as SerializedUser[],
+      groups: [] as SerializedChatGroup[],
+    };
+    serializedResult.articles = generalSearchResult.articles.map(
+      (article) => new SerializedArticle(article),
+    );
+    serializedResult.groups = generalSearchResult.groups.map(
+      (group) => new SerializedChatGroup(group),
+    );
+    serializedResult.users = generalSearchResult.users.map(
+      (user) => new SerializedUser(user),
+    );
+    return serializedResult;
   }
 }
