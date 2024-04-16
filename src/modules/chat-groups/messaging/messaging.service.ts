@@ -87,13 +87,15 @@ export class MessagingService {
       },
     });
 
+    const currentDate = new Date();
+
     // updating the last read status of group users
     await this.prismaService.group_user.updateMany({
       where: {
         inRoom: true,
       },
       data: {
-        inRoom: true,
+        last_read: currentDate,
       },
     });
 
