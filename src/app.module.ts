@@ -17,6 +17,7 @@ import { ChatGroupsModule } from './modules/chat-groups/chat-groups.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CoursesModule } from './modules/courses/courses.module';
 
 @Module({
   imports: [
@@ -35,12 +36,14 @@ import { join } from 'path';
       store: redisStore,
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
+      max: 100,
     }),
     TagsModule,
     ArticlesModule,
     StudyPlannerModule,
     ChatGroupsModule,
     NotificationModule,
+    CoursesModule,
   ],
   controllers: [],
   providers: [
