@@ -11,6 +11,18 @@
         "updated_at",
         "cover_image_url"
       ],
+      "transform": {
+        "mapping": {
+          "article_id": {
+            "type": "integer",
+            "index": false
+          },
+          "cover_image_url": {
+            "type": "text",
+            "index": false
+          }
+        }
+      },
       "children": [
         {
           "table": "tag",
@@ -67,6 +79,18 @@
         "description",
         "cover_image_url"
       ],
+      "transform": {
+        "mapping": {
+          "group_id": {
+            "type": "integer",
+            "index": false
+          },
+          "cover_image_url": {
+            "type": "text",
+            "index": false
+          }
+        }
+      },
       "children": [
         {
           "table": "tag",
@@ -101,6 +125,18 @@
         "phone_number",
         "image"
       ],
+      "transform": {
+        "mapping": {
+          "user_id": {
+            "type": "integer",
+            "index": false
+          },
+          "image": {
+            "type": "text",
+            "index": false
+          }
+        }
+      },
       "children": [
         {
           "table": "tag",
@@ -117,6 +153,60 @@
           }
         }
       ]
+    }
+  },
+  {
+    "database": "intelli_gp",
+    "schema": "public",
+    "index": "mujedd_user_suggestions",
+    "nodes": {
+      "table": "user",
+      "columns": [
+        "full_name"
+      ],
+      "transform": {
+        "mapping": {
+          "full_name": {
+            "type": "completion"
+          }
+        }
+      }
+    }
+  },
+  {
+    "database": "intelli_gp",
+    "schema": "public",
+    "index": "mujedd_article_suggestions",
+    "nodes": {
+      "table": "article",
+      "columns": [
+        "title"
+      ],
+      "transform": {
+        "mapping": {
+          "title": {
+            "type": "completion"
+          }
+        }
+      }
+    }
+  },
+  {
+    "database": "intelli_gp",
+    "schema": "public",
+    "index": "mujedd_group_suggestions",
+    "nodes": {
+      "table": "group",
+      "columns": [
+        "title"
+      ],
+      "transform": {
+        "mapping": {
+          "title": {
+            "type": "completion"
+          }
+        }
+      }
     }
   }
 ]
