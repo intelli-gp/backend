@@ -3,6 +3,7 @@ import { CoursesController } from './courses.controller';
 import { CoursesService } from './courses.service';
 import { HttpModule } from '@nestjs/axios';
 import { HttpUdemyConfigService } from 'src/configs/http-service/udemy.config';
+import { TagsService } from '../tags/tags.service';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { HttpUdemyConfigService } from 'src/configs/http-service/udemy.config';
     }),
   ],
   controllers: [CoursesController],
-  providers: [CoursesService],
+  providers: [CoursesService, TagsService],
 })
 export class CoursesModule {}
