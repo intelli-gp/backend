@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { SearchService } from './search.service';
+import { SUGGESTION_TYPE, SearchService } from './search.service';
 import { Public } from '../auth/ParamDecorator';
 import { SearchDto } from './dto/search.dto';
 import { SerializedArticle } from '../articles/serialized-types/article.serialized';
@@ -89,5 +89,15 @@ export class SearchController {
       (user) => new SerializedUser(user),
     );
     return sendSuccessResponse(serializedResult);
+  }
+
+  @Get('autocomplete')
+  @Public()
+  async autocomplete(
+    @Query('searchTerm') searchTerm: string,
+    @Query('type') type: SUGGESTION_TYPE,
+  ) {
+    let result = await this.searchService.autocomplete(searchTerm, type);
+    return sendSuccessResponse(result);
   }
 }

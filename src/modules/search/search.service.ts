@@ -9,7 +9,11 @@ import {
   GroupSearchResult,
   UserSearchResult,
 } from './types/search';
-import { SearchHit } from '@elastic/elasticsearch/lib/api/types';
+import {
+  SearchCompletionSuggestOption,
+  SearchHit,
+  SearchPhraseSuggestOption,
+} from '@elastic/elasticsearch/lib/api/types';
 
 const config = new ConfigService();
 
@@ -17,9 +21,19 @@ enum INDICES_NAMES {
   ARTICLES = 'mujedd_articles',
   CHAT_GROUPS = 'mujedd_groups',
   USERS = 'mujedd_users',
+  USER_SUGGESTIONS = 'mujedd_user_suggestions',
+  ARTICLE_SUGGESTIONS = 'mujedd_article_suggestions',
+  CHAT_GROUP_SUGGESTIONS = 'mujedd_group_suggestions',
 }
 
-const FUZZINESS = 1; // https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html#fuzziness
+export enum SUGGESTION_TYPE {
+  ARTICLE = 'article',
+  CHAT_GROUP = 'group',
+  USER = 'user',
+  ALL = 'all',
+}
+
+const FUZZINESS = `AUTO`; // https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html#fuzziness
 
 @Injectable()
 export class SearchService {
@@ -159,7 +173,7 @@ export class SearchService {
       >({
         from,
         size,
-        index: '_all',
+        index: `${INDICES_NAMES.ARTICLES},${INDICES_NAMES.CHAT_GROUPS},${INDICES_NAMES.USERS}`,
         query: {
           multi_match: {
             query: searchTerm,
@@ -198,6 +212,59 @@ export class SearchService {
     } catch (error) {
       this.SearchLogger.error(`Error in general search : ${error}`);
       return emptySearchResult;
+    }
+  }
+
+  async autocomplete(
+    searchTerm: string,
+    suggestType: SUGGESTION_TYPE = SUGGESTION_TYPE.ALL,
+  ): Promise<string[]> {
+    this.SearchLogger.log(`Initiate suggestion query on type ${suggestType}`);
+
+    let index: string = `${INDICES_NAMES.ARTICLE_SUGGESTIONS},${INDICES_NAMES.CHAT_GROUP_SUGGESTIONS},${INDICES_NAMES.USER_SUGGESTIONS}`;
+    switch (suggestType) {
+      case SUGGESTION_TYPE.ARTICLE:
+        index = INDICES_NAMES.ARTICLE_SUGGESTIONS;
+        break;
+      case SUGGESTION_TYPE.CHAT_GROUP:
+        index = INDICES_NAMES.CHAT_GROUP_SUGGESTIONS;
+        break;
+      case SUGGESTION_TYPE.USER:
+        index = INDICES_NAMES.USER_SUGGESTIONS;
+        break;
+    }
+
+    this.SearchLogger.debug(`Suggesting on index ${index}`);
+    this.SearchLogger.debug(`Suggesting on term ${searchTerm}`);
+    this.SearchLogger.debug(`Suggesting on type ${suggestType}`);
+
+    try {
+      let queryResult = await this.ElasticClient.search<{
+        suggestion_value: string;
+      }>({
+        index,
+        suggest: {
+          suggestions: {
+            prefix: searchTerm,
+            completion: {
+              field: 'suggestion_value',
+              fuzzy: {
+                fuzziness: FUZZINESS,
+              },
+            },
+          },
+        },
+      });
+      let suggestions = queryResult?.suggest?.suggestions[0]
+        .options as SearchCompletionSuggestOption<{
+        suggestion_value: string;
+      }>[];
+      return suggestions.map(
+        (suggestion) => suggestion._source.suggestion_value,
+      );
+    } catch (error) {
+      this.SearchLogger.error(`Error in users suggest : ${error}`);
+      return [];
     }
   }
 }
