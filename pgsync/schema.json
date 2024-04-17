@@ -165,26 +165,11 @@
         "full_name"
       ],
       "transform": {
+        "rename": {
+          "full_name": "suggestion_value"
+        },
         "mapping": {
-          "full_name": {
-            "type": "completion"
-          }
-        }
-      }
-    }
-  },
-  {
-    "database": "intelli_gp",
-    "schema": "public",
-    "index": "mujedd_article_suggestions",
-    "nodes": {
-      "table": "article",
-      "columns": [
-        "title"
-      ],
-      "transform": {
-        "mapping": {
-          "title": {
+          "suggestion_value": {
             "type": "completion"
           }
         }
@@ -201,8 +186,32 @@
         "title"
       ],
       "transform": {
+        "rename": {
+          "title": "suggestion_value"
+        },
         "mapping": {
-          "title": {
+          "suggestion_value": {
+            "type": "completion"
+          }
+        }
+      }
+    }
+  },
+  {
+    "database": "intelli_gp",
+    "schema": "public",
+    "index": "mujedd_article_suggestions",
+    "nodes": {
+      "table": "article",
+      "columns": [
+        "title"
+      ],
+      "transform": {
+        "rename": {
+          "title": "suggestion_value"
+        },
+        "mapping": {
+          "suggestion_value": {
             "type": "completion"
           }
         }
