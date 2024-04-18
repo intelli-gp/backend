@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { SUGGESTION_TYPE, SearchService } from './search.service';
-import { Public } from '../auth/ParamDecorator';
+// import { Public } from '../auth/ParamDecorator';
 import { SearchDto } from './dto/search.dto';
 import { SerializedArticle } from '../articles/serialized-types/article.serialized';
 import { SerializedUser } from '../users/serialized-types/serialized-user';
@@ -15,13 +15,17 @@ import {
   groupsArray,
   usersArray,
 } from './swagger-examples/search-results';
+import { ChatGroupsService } from '../chat-groups/chat-groups.service';
 
 // TODO: remove @Public()
 
 @Controller('search')
 @ApiTags('Search')
 export class SearchController {
-  constructor(private searchService: SearchService) {}
+  constructor(
+    private searchService: SearchService,
+    private chatGroupsService: ChatGroupsService,
+  ) {}
 
   @Get('users')
   @ApiResponse({
@@ -75,8 +79,25 @@ export class SearchController {
       offset,
       limit,
     );
+
+    let fullGroupsData = await this.chatGroupsService.getChatGroupsByIds(
+      groupsSearchResult.map((group) => group.group_id),
+    );
+
+    /**
+     * Sorting the fullGroupsData array based on the order of groupsSearchResult array
+     * as the order of groupsSearchResult array is based on the search match ranking
+     * evaluated by elastic search.
+     */
+    let sortedFullDataGroups = fullGroupsData.sort((a, b) => {
+      return (
+        groupsSearchResult.findIndex((group) => group.group_id === a.group_id) -
+        groupsSearchResult.findIndex((group) => group.group_id === b.group_id)
+      );
+    });
+
     return sendSuccessResponse(
-      groupsSearchResult.map((group) => new SerializedChatGroup(group)),
+      sortedFullDataGroups.map((group) => new SerializedChatGroup(group)),
     );
   }
 
@@ -94,6 +115,28 @@ export class SearchController {
       offset,
       limit,
     );
+
+    // Fetch full data for groups
+    let fullGroupsData = await this.chatGroupsService.getChatGroupsByIds(
+      generalSearchResult?.groups.map((group) => group.group_id),
+    );
+
+    /**
+     * Sorting the fullGroupsData array based on the order of groupsSearchResult array
+     * as the order of groupsSearchResult array is based on the search match ranking
+     * evaluated by elastic search.
+     */
+    let sortedFullDataGroups = fullGroupsData.sort((a, b) => {
+      return (
+        generalSearchResult?.groups.findIndex(
+          (group) => group.group_id === a.group_id,
+        ) -
+        generalSearchResult?.groups.findIndex(
+          (group) => group.group_id === b.group_id,
+        )
+      );
+    });
+
     let serializedResult = {
       articles: [] as SerializedArticle[],
       users: [] as SerializedUser[],
@@ -102,7 +145,7 @@ export class SearchController {
     serializedResult.articles = generalSearchResult.articles.map(
       (article) => new SerializedArticle(article),
     );
-    serializedResult.groups = generalSearchResult.groups.map(
+    serializedResult.groups = sortedFullDataGroups?.map(
       (group) => new SerializedChatGroup(group),
     );
     serializedResult.users = generalSearchResult.users.map(

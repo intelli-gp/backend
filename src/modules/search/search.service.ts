@@ -138,7 +138,7 @@ export class SearchService {
         query: {
           multi_match: {
             query: searchTerm,
-            fields: ['title^3', 'group_tag.tag_name^2', 'description'],
+            fields: ['title^3', 'group_tag.tag_name', 'description'],
             fuzziness: FUZZINESS,
           },
         },
@@ -191,7 +191,7 @@ export class SearchService {
             query: {
               multi_match: {
                 query: searchTerm,
-                fields: ['title^3', 'group_tag.tag_name^2', 'description'],
+                fields: ['title^3', 'group_tag.tag_name', 'description'],
                 fuzziness: FUZZINESS,
               },
             },
