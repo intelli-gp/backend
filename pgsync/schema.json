@@ -5,12 +5,7 @@
     "index": "mujedd_articles",
     "nodes": {
       "table": "article",
-      "columns": [
-        "article_id",
-        "title",
-        "updated_at",
-        "cover_image_url"
-      ],
+      "columns": ["article_id", "title", "updated_at", "cover_image_url"],
       "transform": {
         "mapping": {
           "article_id": {
@@ -20,6 +15,10 @@
           "cover_image_url": {
             "type": "text",
             "index": false
+          },
+          "updated_at": {
+            "type": "date",
+            "index": false
           }
         }
       },
@@ -27,24 +26,17 @@
         {
           "table": "tag",
           "label": "article_tag",
-          "columns": [
-            "tag_name"
-          ],
+          "columns": ["tag_name"],
           "relationship": {
             "variant": "object",
             "type": "one_to_many",
-            "through_tables": [
-              "article_tag"
-            ]
+            "through_tables": ["article_tag"]
           }
         },
         {
           "table": "articles_content",
           "label": "articles_content",
-          "columns": [
-            "value",
-            "content_type"
-          ],
+          "columns": ["value", "content_type"],
           "relationship": {
             "variant": "object",
             "type": "one_to_many"
@@ -53,12 +45,7 @@
         {
           "table": "user",
           "label": "user",
-          "columns": [
-            "user_id",
-            "full_name",
-            "username",
-            "image"
-          ],
+          "columns": ["user_id", "full_name", "username", "image"],
           "relationship": {
             "variant": "object",
             "type": "one_to_one"
@@ -73,12 +60,7 @@
     "index": "mujedd_groups",
     "nodes": {
       "table": "group",
-      "columns": [
-        "group_id",
-        "title",
-        "description",
-        "cover_image_url"
-      ],
+      "columns": ["group_id", "title", "description", "cover_image_url"],
       "transform": {
         "mapping": {
           "group_id": {
@@ -95,15 +77,11 @@
         {
           "table": "tag",
           "label": "group_tag",
-          "columns": [
-            "tag_name"
-          ],
+          "columns": ["tag_name"],
           "relationship": {
             "variant": "object",
             "type": "one_to_many",
-            "through_tables": [
-              "group_tag"
-            ]
+            "through_tables": ["group_tag"]
           }
         }
       ]
@@ -141,15 +119,11 @@
         {
           "table": "tag",
           "label": "user_tag",
-          "columns": [
-            "tag_name"
-          ],
+          "columns": ["tag_name"],
           "relationship": {
             "variant": "object",
             "type": "one_to_many",
-            "through_tables": [
-              "user_tag"
-            ]
+            "through_tables": ["user_tag"]
           }
         }
       ]
@@ -161,9 +135,7 @@
     "index": "mujedd_user_suggestions",
     "nodes": {
       "table": "user",
-      "columns": [
-        "full_name"
-      ],
+      "columns": ["full_name"],
       "transform": {
         "rename": {
           "full_name": "suggestion_value"
@@ -182,9 +154,7 @@
     "index": "mujedd_group_suggestions",
     "nodes": {
       "table": "group",
-      "columns": [
-        "title"
-      ],
+      "columns": ["title"],
       "transform": {
         "rename": {
           "title": "suggestion_value"
@@ -203,9 +173,7 @@
     "index": "mujedd_article_suggestions",
     "nodes": {
       "table": "article",
-      "columns": [
-        "title"
-      ],
+      "columns": ["title"],
       "transform": {
         "rename": {
           "title": "suggestion_value"

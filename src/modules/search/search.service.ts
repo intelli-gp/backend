@@ -10,9 +10,9 @@ import {
   UserSearchResult,
 } from './types/search';
 import {
+  MsearchMultiSearchItem,
   SearchCompletionSuggestOption,
   SearchHit,
-  SearchPhraseSuggestOption,
 } from '@elastic/elasticsearch/lib/api/types';
 
 const config = new ConfigService();
@@ -71,7 +71,7 @@ export class SearchService {
               'email^3',
               'headline^2',
               'phone_number^2',
-              'tags',
+              'user_tag.tag_name',
               'bio',
             ],
             fuzziness: FUZZINESS,
@@ -152,11 +152,7 @@ export class SearchService {
     }
   }
 
-  async generalSearch(
-    searchTerm: string,
-    from: number,
-    size: number,
-  ): Promise<GeneralSearchResult> {
+  async generalSearch(searchTerm: string, from: number, size: number) {
     this.SearchLogger.log(
       `Initiate general search query about "${searchTerm}"`,
     );
@@ -168,47 +164,86 @@ export class SearchService {
     };
 
     try {
-      let queryResult = await this.ElasticClient.search<
+      let queryResult = await this.ElasticClient.msearch<
         ArticleSearchResult | GroupSearchResult | UserSearchResult
       >({
-        from,
-        size,
-        index: `${INDICES_NAMES.ARTICLES},${INDICES_NAMES.CHAT_GROUPS},${INDICES_NAMES.USERS}`,
-        query: {
-          multi_match: {
-            query: searchTerm,
-            fields: [
-              'title^3',
-              'full_name^3',
-              'username^3',
-              'email^3',
-              'headline^2',
-              'phone_number^2',
-              '*tag.tag_name^2',
-              'articles_content.value^2',
-              'description',
-              'bio',
-            ],
-            fuzziness: FUZZINESS,
+        searches: [
+          { index: INDICES_NAMES.ARTICLES },
+          {
+            from,
+            size,
+            query: {
+              multi_match: {
+                query: searchTerm,
+                fields: [
+                  'title^3',
+                  'article_tag.tag_name^2',
+                  'articles_content.value',
+                ],
+                fuzziness: FUZZINESS,
+              },
+            },
           },
-        },
+          { index: INDICES_NAMES.CHAT_GROUPS },
+          {
+            from,
+            size,
+            query: {
+              multi_match: {
+                query: searchTerm,
+                fields: ['title^3', 'group_tag.tag_name^2', 'description'],
+                fuzziness: FUZZINESS,
+              },
+            },
+          },
+          { index: INDICES_NAMES.USERS },
+          {
+            from,
+            size,
+            query: {
+              multi_match: {
+                query: searchTerm,
+                fields: [
+                  'full_name^3',
+                  'username^3',
+                  'email^3',
+                  'headline^2',
+                  'phone_number^2',
+                  'user_tag.tag_name',
+                  'bio',
+                ],
+                fuzziness: FUZZINESS,
+              },
+            },
+          },
+        ],
       });
 
-      let result = queryResult.hits.hits.reduce(
-        (acc: GeneralSearchResult, hit) => {
-          if (hit._source['user_id']) {
-            acc.users.push((hit as SearchHit<UserSearchResult>)._source);
-          } else if (hit._source['article_id']) {
-            acc.articles.push((hit as SearchHit<ArticleSearchResult>)._source);
-          } else if (hit._source['group_id']) {
-            acc.groups.push((hit as SearchHit<GroupSearchResult>)._source);
-          }
-          return acc;
-        },
-        emptySearchResult,
-      );
+      queryResult.responses.forEach((response) => {
+        (response as MsearchMultiSearchItem).hits.hits.forEach(
+          (hit: SearchHit) => {
+            switch (hit._index) {
+              case INDICES_NAMES.ARTICLES:
+                emptySearchResult.articles.push(
+                  (hit as SearchHit<ArticleSearchResult>)._source,
+                );
+                break;
+              case INDICES_NAMES.CHAT_GROUPS:
+                emptySearchResult.groups.push(
+                  (hit as SearchHit<GroupSearchResult>)._source,
+                );
+                break;
+              case INDICES_NAMES.USERS:
+                emptySearchResult.users.push(
+                  (hit as SearchHit<UserSearchResult>)._source,
+                );
+                break;
+            }
+          },
+        );
+      });
 
-      return result;
+      return emptySearchResult;
     } catch (error) {
       this.SearchLogger.error(`Error in general search : ${error}`);
       return emptySearchResult;
@@ -233,10 +268,6 @@ export class SearchService {
         index = INDICES_NAMES.USER_SUGGESTIONS;
         break;
     }
-
-    this.SearchLogger.debug(`Suggesting on index ${index}`);
-    this.SearchLogger.debug(`Suggesting on term ${searchTerm}`);
-    this.SearchLogger.debug(`Suggesting on type ${suggestType}`);
 
     try {
       let queryResult = await this.ElasticClient.search<{
