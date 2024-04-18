@@ -5,26 +5,37 @@ import { SearchDto } from './dto/search.dto';
 import { SerializedArticle } from '../articles/serialized-types/article.serialized';
 import { SerializedUser } from '../users/serialized-types/serialized-user';
 import { SerializedChatGroup } from '../chat-groups/serialized-types/chat-group/chat-group.serializer';
-import { PaginationDto } from 'src/common/dto';
 import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
+import {
+  articlesArray,
+  autoCompleteExample,
+  generalSearchExample,
+  groupsArray,
+  usersArray,
+} from './swagger-examples/search-results';
 
-// TODO: add swagger decorators
 // TODO: remove @Public()
 
 @Controller('search')
+@ApiTags('Search')
 export class SearchController {
   constructor(private searchService: SearchService) {}
 
   @Get('users')
-  @Public()
-  async searchUsers(
-    @Query() searchDto: SearchDto,
-    @Query() paginationData: PaginationDto,
-  ) {
+  @ApiResponse({
+    status: 200,
+    description: 'Returns users array',
+    schema: swaggerSuccessExample(null, usersArray),
+  })
+  // @Public()
+  async searchUsers(@Query() searchDto: SearchDto) {
+    let { offset, limit } = searchDto;
     let usersSearchResult = await this.searchService.searchUsers(
       searchDto.searchTerm,
-      paginationData.offset,
-      paginationData.limit,
+      offset,
+      limit,
     );
     return sendSuccessResponse(
       usersSearchResult.map((user) => new SerializedUser(user)),
@@ -32,15 +43,18 @@ export class SearchController {
   }
 
   @Get('articles')
-  @Public()
-  async searchArticles(
-    @Query() searchDto: SearchDto,
-    @Query() paginationData: PaginationDto,
-  ) {
+  @ApiResponse({
+    status: 200,
+    description: 'Returns articles array',
+    schema: swaggerSuccessExample(null, articlesArray),
+  })
+  // @Public()
+  async searchArticles(@Query() searchDto: SearchDto) {
+    let { offset, limit } = searchDto;
     let articleSearchResult = await this.searchService.searchArticles(
       searchDto.searchTerm,
-      paginationData.offset,
-      paginationData.limit,
+      offset,
+      limit,
     );
     return sendSuccessResponse(
       articleSearchResult.map((article) => new SerializedArticle(article)),
@@ -48,15 +62,18 @@ export class SearchController {
   }
 
   @Get('chat-groups')
-  @Public()
-  async searchGroups(
-    @Query() searchDto: SearchDto,
-    @Query() paginationData: PaginationDto,
-  ) {
+  @ApiResponse({
+    status: 200,
+    description: 'Returns groups array',
+    schema: swaggerSuccessExample(null, groupsArray),
+  })
+  // @Public()
+  async searchGroups(@Query() searchDto: SearchDto) {
+    let { offset, limit } = searchDto;
     let groupsSearchResult = await this.searchService.searchGroups(
       searchDto.searchTerm,
-      paginationData.offset,
-      paginationData.limit,
+      offset,
+      limit,
     );
     return sendSuccessResponse(
       groupsSearchResult.map((group) => new SerializedChatGroup(group)),
@@ -64,15 +81,18 @@ export class SearchController {
   }
 
   @Get()
-  @Public()
-  async generalSearch(
-    @Query() searchDto: SearchDto,
-    @Query() paginationData: PaginationDto,
-  ) {
+  @ApiResponse({
+    status: 200,
+    description: 'Returns general search result',
+    schema: swaggerSuccessExample(null, generalSearchExample),
+  })
+  // @Public()
+  async generalSearch(@Query() searchDto: SearchDto) {
+    let { offset, limit } = searchDto;
     let generalSearchResult = await this.searchService.generalSearch(
       searchDto.searchTerm,
-      paginationData.offset,
-      paginationData.limit,
+      offset,
+      limit,
     );
     let serializedResult = {
       articles: [] as SerializedArticle[],
@@ -92,7 +112,12 @@ export class SearchController {
   }
 
   @Get('autocomplete')
-  @Public()
+  @ApiResponse({
+    status: 200,
+    description: 'Returns suggestions array',
+    schema: swaggerSuccessExample(null, autoCompleteExample),
+  })
+  // @Public()
   async autocomplete(
     @Query('searchTerm') searchTerm: string,
     @Query('type') type: SUGGESTION_TYPE,
