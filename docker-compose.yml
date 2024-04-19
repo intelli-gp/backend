@@ -10,10 +10,11 @@ services:
     volumes:
       - .:/app
     depends_on:
-       redis:
+      redis:
         condition: service_started
-       postgres:
+      postgres:
         condition: service_started
+    command: ['chmod', '+x', './scripts/start.sh']
     entrypoint: './scripts/start.sh'
 
     networks:
