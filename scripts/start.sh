@@ -1,3 +1,3 @@
-npx prisma db push 
+npx prisma db push &
 npx prisma studio &
-npm run start:dev   
+npm run build && npm run start:prod
