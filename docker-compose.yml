@@ -11,8 +11,10 @@ services:
       - .:/app
       - certs:/app/es-certs
     depends_on:
-      - redis
-      - postgres
+       redis:
+        condition: service_started
+       postgres:
+        condition: service_started
     command: './scripts/start.sh'
 
     networks:
