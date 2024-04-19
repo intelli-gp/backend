@@ -1,3 +1,4 @@
+import { udemyCourseCategories } from '../constants/udemy-course-categories';
 /**
  * Represents a category on Udemy.
  */
@@ -22,3 +23,5 @@ export interface UdemySubcategory extends UdemyCategory {
    */
   Category: UdemyCategory;
 }
+
+export type UdemyCourseCategoryEnum = (typeof udemyCourseCategories)[number];
