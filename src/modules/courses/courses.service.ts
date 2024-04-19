@@ -1,29 +1,38 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { lastValueFrom, map } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto';
 import { UdemyApiResponse } from './types/udemy-response';
-import { TagsService } from '../tags/tags.service';
 import { udemyCourseCategories } from './constants';
 import { previewRequiredCourseFields } from './constants/udemy-course-fields';
-
-export type UdemyCourseCategory = (typeof udemyCourseCategories)[number];
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { UdemyCourseCategoryEnum } from './types';
 
 @Injectable()
 export class CoursesService {
   private coursesServiceLogger = new Logger(CoursesService.name);
 
   constructor(
-    private readonly tagsService: TagsService,
     private readonly udemyHttpService: HttpService,
     private readonly prismaService: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
+
   async getRecommendedCourses(paginationData: PaginationDto, userId: number) {
     this.coursesServiceLogger.log(
       `Getting recommended courses for user ${userId}`,
     );
 
+    this.coursesServiceLogger.debug({
+      paginationData,
+    });
+    // await this.cacheManager.reset();
+    const userCacheKey = `recommended-courses-${userId}-${paginationData.limit}-${paginationData.offset}`;
+    const cachedRecommendedCourses = await this.cacheManager.get(userCacheKey);
+    if (cachedRecommendedCourses) {
+      return cachedRecommendedCourses as UdemyApiResponse;
+    }
     /**
      * Naiive recommendation using Udemy API Search capabilities
      * Steps:
@@ -37,18 +46,20 @@ export class CoursesService {
       where: { user_id: userId },
     });
 
-    const tagsQuery = userTags.map((tag) => tag.tag_name).join(' ');
+    // TODO: this approach needs to change because once the tags increase udemy does not replyyes
+    // We set a max Size to at least get some results
+    const maxTags = 10;
+    const tagsQuery = userTags
+      .map((tag) => tag.tag_name)
+      .slice(0, maxTags)
+      .join(',');
 
-    const coursesObservable = this.udemyHttpService
-      .get(
-        `/courses/?search=${tagsQuery}&ordering=relevance&ratings=4&page_size=${+paginationData.limit}&page=${
-          +paginationData.offset || 1
-        }&fields[course]=${previewRequiredCourseFields.join(',')}`,
-      )
-      .pipe(map((response) => response?.data));
+    const recommendedCoursesResponse = await this.searchCourses(
+      tagsQuery,
+      paginationData,
+    );
 
-    const recommendedCoursesResponse: UdemyApiResponse =
-      await lastValueFrom(coursesObservable);
+    await this.cacheManager.set(userCacheKey, recommendedCoursesResponse, 3600);
 
     return recommendedCoursesResponse;
   }
@@ -58,17 +69,15 @@ export class CoursesService {
 
     const udemyCategoriesPreview = await Promise.all(
       udemyCourseCategories.map(async (category) => {
-        const categoryCoursesObservable = this.udemyHttpService
-          .get(
-            `/courses/?fields[course]=${previewRequiredCourseFields.join(
-              ',',
-            )}&category=${encodeURIComponent(category)}&page_size=10`,
-          )
-          .pipe(map((response) => response?.data));
-
-        const categoryCoursesResponse: UdemyApiResponse = await lastValueFrom(
-          categoryCoursesObservable,
-        );
+        const categoryCoursesResponse: UdemyApiResponse =
+          await this.searchCourses(
+            category,
+            {
+              limit: 10,
+              offset: 1,
+            },
+            category,
+          );
 
         this.coursesServiceLogger.debug({
           category,
@@ -87,67 +96,69 @@ export class CoursesService {
     return udemyCategoriesPreview;
   }
 
+  async nonBlockingWait(ms) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ success: true });
+      }, ms);
+    });
+  }
+
   async searchCourses(
     searchQuery: string,
     paginationData: PaginationDto,
+    category?: UdemyCourseCategoryEnum,
   ): Promise<UdemyApiResponse> {
-    /**
-     * We order by relevance because any other filter is manageable in frontend or after we get the data
-     * price , rating , etc
-     * but relevance can only be done from their side
-     */
     this.coursesServiceLogger.log(
       `Searching for courses with query ${searchQuery}`,
     );
-    this.coursesServiceLogger.debug({ test: +paginationData.offset || 1 });
-    const coursesObservable = this.udemyHttpService
-      .get(
-        `/courses/?search=${searchQuery}&ordering=relevance&ratings=4&page_size=${+paginationData.limit}&page=${
-          +paginationData.offset || 1
-        }&fields[course]=${previewRequiredCourseFields.join(',')}`,
-      )
-      .pipe(map((response) => response?.data));
-
-    const searchedCoursesResponse: UdemyApiResponse =
-      await lastValueFrom(coursesObservable);
 
     this.coursesServiceLogger.debug({
-      searchedCoursesResponseCount: searchedCoursesResponse?.count,
-      nextUrl: searchedCoursesResponse?.next,
+      searchQuery,
+      paginationData,
+      category,
     });
 
-    return searchedCoursesResponse;
-  }
+    const cleanUrl = `/courses/?search=${encodeURIComponent(
+      searchQuery,
+    )}&ordering=most-reviewed&ratings=4&page_size=${+paginationData.limit}&page=${
+      +paginationData.offset || 1
+    }${
+      category ? `&category=${encodeURIComponent(category)}` : ''
+    }&fields[course]=${previewRequiredCourseFields.join(',')}`;
 
-  /**
-   *
-   * @param category one of the udemy course categories defined in constants folder
-   */
-  async getCoursesByCategory(
-    category: (typeof udemyCourseCategories)[number],
-    paginationData: PaginationDto,
-  ): Promise<UdemyApiResponse> {
-    this.coursesServiceLogger.log(`Getting courses for category ${category}`);
+    // Custom retry mechanism
+    const retries = 5;
+    let failureCount = 0;
+    let resError = null;
 
-    // Failsafe to prevent invalid categories (in case dto validation fails)
-    if (!udemyCourseCategories.includes(category) || !category) {
-      throw new Error('Invalid category');
+    for (let i = 0; i < retries; i++) {
+      try {
+        const coursesObservable = this.udemyHttpService
+          .get(cleanUrl)
+          .pipe(map((response) => response?.data));
+
+        const searchedCoursesResponse: UdemyApiResponse =
+          await lastValueFrom(coursesObservable);
+
+        this.coursesServiceLogger.debug({
+          searchedCoursesResponseCount: searchedCoursesResponse?.count,
+          nextUrl: searchedCoursesResponse?.next,
+        });
+
+        return searchedCoursesResponse;
+      } catch (e) {
+        failureCount++;
+        resError = e;
+        this.coursesServiceLogger.error({
+          error: e,
+          retry: i,
+        });
+        await this.nonBlockingWait(1000);
+      }
     }
-
-    const categoryCoursesObservable = this.udemyHttpService
-      .get(
-        `/courses/?category=${encodeURIComponent(category)}&page_size=${
-          paginationData.limit
-        }&page=${
-          +paginationData.offset || 1
-        }&fields[course]=${previewRequiredCourseFields.join(',')}`,
-      )
-      .pipe(map((response) => response?.data));
-
-    const categoryCoursesResponse: UdemyApiResponse = await lastValueFrom(
-      categoryCoursesObservable,
-    );
-
-    return categoryCoursesResponse;
+    if (failureCount === retries) {
+      throw new Error(resError);
+    }
   }
 }

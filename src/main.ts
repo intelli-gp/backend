@@ -11,7 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: config.get('FRONT_URL'),
+    origin: [config.get('FRONT_URL'), 'http://localhost:4173'],
     credentials: true,
   });
   app.use(cookieParser());

@@ -25,9 +25,6 @@ export class CoursesController {
   private coursesControllerLogger = new Logger(CoursesController.name);
   constructor(private readonly coursesService: CoursesService) {}
   @Get()
-  @CacheKey('recommended-courses')
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(60 * 10)
   async getRecommendedCourses(
     @Query() paginationData: PaginationDto,
     @GetCurrentUser('user_id') userId: number,
@@ -44,18 +41,21 @@ export class CoursesController {
   @Get('/preview')
   @CacheKey('categories-preview')
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(60 * 60)
+  @CacheTTL(3600)
   async GetCategoriesPreview() {
-    return (await this.coursesService.getAllCourseCategories())?.map(
-      (categoryCourses) => {
-        return {
-          category: categoryCourses?.category,
-          courses: categoryCourses?.courses.map(
-            (course) => new SerializedUdemyCourse(course),
-          ),
-        };
-      },
-    );
+    this.coursesControllerLogger.error('Getting categories preview');
+    const coursesByCategories = (
+      await this.coursesService.getAllCourseCategories()
+    )?.map((categoryCourses) => {
+      return {
+        Category: categoryCourses?.category,
+        Courses: categoryCourses?.courses.map(
+          (course) => new SerializedUdemyCourse(course),
+        ),
+      };
+    });
+
+    return sendSuccessResponse(coursesByCategories);
   }
   @Get('/search')
   @UseInterceptors(CacheInterceptor)
@@ -70,23 +70,6 @@ export class CoursesController {
     );
     return sendSuccessResponse(
       new SerializedPaginatedUdemyCourses(searchResults),
-    );
-  }
-
-  @Get('/:category')
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(60 * 60)
-  async getCoursesByCategory(
-    @Query() paginationData: PaginationDto,
-    @Param() categoryData: GetCourseByCategoryDto,
-  ) {
-    this.coursesService.getAllCourseCategories();
-    const categoryCourses = await this.coursesService.getCoursesByCategory(
-      categoryData.category as (typeof udemyCourseCategories)[number],
-      paginationData,
-    );
-    return sendSuccessResponse(
-      new SerializedPaginatedUdemyCourses(categoryCourses),
     );
   }
 }

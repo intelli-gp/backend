@@ -178,3 +178,7 @@ export const udemyCourseCategoriesMap = {
     'Fashion Design',
   ],
 } as Record<(typeof udemyCourseCategories)[number], string[]>;
+
+export const FlattenedUdemyCourseCategories = Object.values(
+  udemyCourseCategoriesMap,
+).flat();
