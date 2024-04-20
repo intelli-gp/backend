@@ -14,7 +14,7 @@ services:
         condition: service_started
       postgres:
         condition: service_started
-    command: ['chmod', '+x', './scripts/start.sh']
+
     entrypoint: './scripts/start.sh'
 
     networks:
@@ -46,3 +46,7 @@ services:
 networks:
   intelligp-network:
     name: intelligp-network
+
+volumes:
+  shared-volume:
+    name: shared-volume

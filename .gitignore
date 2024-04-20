@@ -1,5 +1,6 @@
 # Environment Variables
 *.env
+frontend-dist
 
 # compiled output
 /dist

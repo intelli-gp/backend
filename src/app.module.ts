@@ -25,7 +25,7 @@ import { CoursesModule } from './modules/courses/courses.module';
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'frontend', 'dist'),
+      rootPath: join(__dirname, '..', 'frontend-dist'),
       exclude: ['/api*'],
     }),
     PrismaModule,
