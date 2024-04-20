@@ -2,6 +2,8 @@
 *.env
 frontend-dist
 
+scripts/.*
+
 # compiled output
 /dist
 /prisma/migrations/*
