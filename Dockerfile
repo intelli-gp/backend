@@ -9,3 +9,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+
+RUN chmod +x scripts/start.sh
+
+ENTRYPOINT ["/bin/ash", "scripts/start.sh"]

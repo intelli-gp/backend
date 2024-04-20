@@ -16,7 +16,6 @@ services:
       postgres:
         condition: service_started
 
-    entrypoint: './scripts/start.sh'
     networks:
       - intelligp-network
 
