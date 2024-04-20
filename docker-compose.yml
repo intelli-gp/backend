@@ -16,6 +16,7 @@ services:
       postgres:
         condition: service_started
 
+    entrypoint: './scripts/start.sh'
     networks:
       - intelligp-network
 
@@ -61,6 +62,8 @@ services:
         condition: service_started
       es01:
         condition: service_healthy
+      nestjs:
+        condition: service_started
     environment:
       - PG_USER=${DATABASE_USER_NAME}
       - PG_PASSWORD=${DATABASE_USER_PASSWORD}
