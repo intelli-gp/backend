@@ -16,8 +16,6 @@ services:
       postgres:
         condition: service_started
 
-    entrypoint: './scripts/start.sh'
-
     networks:
       - intelligp-network
 
@@ -36,6 +34,7 @@ services:
     image: postgres:16.1-alpine3.19
     volumes:
       - ./pgsync/0_init_postgres.sql:/docker-entrypoint-initdb.d/0_init.sql
+      - postgres-data:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment:
@@ -47,7 +46,7 @@ services:
       - intelligp-network
 
   pgsync:
-    build: 
+    build:
       context: ./pgsync
     container_name: pgsync
     networks:
@@ -73,7 +72,7 @@ services:
       - ELASTICSEARCH_SCHEME=https
       - ELASTICSEARCH_USER=elastic
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
-    
+
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     networks:
