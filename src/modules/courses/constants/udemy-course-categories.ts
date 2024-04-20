@@ -11,7 +11,6 @@ export const udemyCourseCategories = [
   'Finance & Accounting',
   'Health & Fitness',
   'IT & Software',
-  'Lifestyle',
   'Marketing',
   'Music',
   'Office Productivity',
