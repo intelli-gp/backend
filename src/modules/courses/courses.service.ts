@@ -8,6 +8,7 @@ import { udemyCourseCategories } from './constants';
 import { previewRequiredCourseFields } from './constants/udemy-course-fields';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { UdemyCourseCategoryEnum } from './types';
+import * as _ from 'lodash';
 
 @Injectable()
 export class CoursesService {
@@ -57,6 +58,8 @@ export class CoursesService {
     const recommendedCoursesResponse = await this.searchCourses(
       tagsQuery,
       paginationData,
+      null,
+      { isRecommendation: true },
     );
 
     await this.cacheManager.set(userCacheKey, recommendedCoursesResponse, 3600);
@@ -77,6 +80,9 @@ export class CoursesService {
               offset: 1,
             },
             category,
+            {
+              isPreview: true,
+            },
           );
 
         this.coursesServiceLogger.debug({
@@ -108,6 +114,13 @@ export class CoursesService {
     searchQuery: string,
     paginationData: PaginationDto,
     category?: UdemyCourseCategoryEnum,
+    {
+      isRecommendation,
+      isPreview,
+    }: { isRecommendation?: boolean; isPreview?: boolean } = {
+      isRecommendation: false,
+      isPreview: false,
+    },
   ): Promise<UdemyApiResponse> {
     this.coursesServiceLogger.log(
       `Searching for courses with query ${searchQuery}`,
@@ -118,6 +131,18 @@ export class CoursesService {
       paginationData,
       category,
     });
+
+    const cacheKey = `searched-courses-${_.kebabCase(searchQuery)}-${
+      paginationData.limit
+    }-${paginationData.offset}`;
+    // these flags help not to cache the recommendation and preview results
+    // as they will not be used and only take space
+    if (!isRecommendation || !isPreview) {
+      const cachedCaseInsensitiveSearch = await this.cacheManager.get(cacheKey);
+      if (cachedCaseInsensitiveSearch) {
+        return cachedCaseInsensitiveSearch as UdemyApiResponse;
+      }
+    }
 
     const cleanUrl = `/courses/?search=${encodeURIComponent(
       searchQuery,
@@ -146,6 +171,9 @@ export class CoursesService {
           nextUrl: searchedCoursesResponse?.next,
         });
 
+        if (!isRecommendation) {
+          await this.cacheManager.set(cacheKey, searchedCoursesResponse, 3600);
+        }
         return searchedCoursesResponse;
       } catch (e) {
         failureCount++;

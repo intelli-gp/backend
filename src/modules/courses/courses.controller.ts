@@ -58,7 +58,6 @@ export class CoursesController {
     return sendSuccessResponse(coursesByCategories);
   }
   @Get('/search')
-  @UseInterceptors(CacheInterceptor)
   async searchCourses(@Query() searchData: SearchDto) {
     this.coursesControllerLogger.debug({ searchData });
     const searchResults = await this.coursesService.searchCourses(
