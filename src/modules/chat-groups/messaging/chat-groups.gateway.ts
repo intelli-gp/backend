@@ -99,7 +99,7 @@ export class ChatGroupsGateway {
 
     // update online status of the user in db
     await this.usersService.updateUserConnectedStatus(
-      currentUser.user_id,
+      currentUser?.user_id,
       true,
     );
 

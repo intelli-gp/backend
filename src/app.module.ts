@@ -15,9 +15,11 @@ import { PrismaExceptionFilter } from './exception-filters/prisma.filter';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { ChatGroupsModule } from './modules/chat-groups/chat-groups.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { SearchModule } from './modules/search/search.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { CoursesModule } from './modules/courses/courses.module';
+import { DbInitializationService } from './db-initialization.service';
 
 @Module({
   imports: [
@@ -43,10 +45,12 @@ import { CoursesModule } from './modules/courses/courses.module';
     StudyPlannerModule,
     ChatGroupsModule,
     NotificationModule,
+    SearchModule,
     CoursesModule,
   ],
   controllers: [],
   providers: [
+    DbInitializationService,
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
@@ -69,4 +73,12 @@ import { CoursesModule } from './modules/courses/courses.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(
+    private readonly dbInitializationService: DbInitializationService,
+  ) {}
+  async onModuleInit() {
+    await this.dbInitializationService.init();
+    console.log('The module has been initialized.');
+  }
+}

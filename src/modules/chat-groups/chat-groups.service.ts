@@ -130,6 +130,26 @@ export class ChatGroupsService {
     return chatGroups;
   }
 
+  async getChatGroupsByIds(chatGroupIds: number[]): Promise<group[]> {
+    const chatGroups = await this.prismaService.group.findMany({
+      where: {
+        group_id: {
+          in: chatGroupIds,
+        },
+      },
+      include: {
+        group_tag: true,
+        group_user: {
+          include: {
+            user: true,
+          },
+        },
+        user: true,
+      },
+    });
+    return chatGroups;
+  }
+
   async getChatGroupsCreatedByUser(
     paginationData: PaginationDto,
     userId: number,

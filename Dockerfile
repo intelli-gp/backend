@@ -1,6 +1,4 @@
 FROM node:18-alpine3.18
-# RUN apt-get update
-# RUN apt-get install -y openssl
 WORKDIR /app
 
 
@@ -11,3 +9,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+
+RUN chmod +x scripts/start.sh
+
+ENTRYPOINT ["/bin/ash", "scripts/start.sh"]
