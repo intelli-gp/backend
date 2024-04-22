@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Logger,
-  Param,
   Query,
   UseInterceptors,
 } from '@nestjs/common';
@@ -15,9 +14,8 @@ import {
   SerializedUdemyCourse,
 } from './serialized-types';
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
-import { GetCourseByCategoryDto, SearchDto } from './dto';
+import { SearchDto } from './dto';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
-import { udemyCourseCategories } from './constants';
 
 @Controller('courses')
 @ApiTags('Courses')
@@ -41,7 +39,7 @@ export class CoursesController {
   @Get('/preview')
   @CacheKey('categories-preview')
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(3600)
+  @CacheTTL(60 * 60 * 24)
   async GetCategoriesPreview() {
     this.coursesControllerLogger.error('Getting categories preview');
     const coursesByCategories = (

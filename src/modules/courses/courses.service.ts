@@ -62,7 +62,11 @@ export class CoursesService {
       { isRecommendation: true },
     );
 
-    await this.cacheManager.set(userCacheKey, recommendedCoursesResponse, 3600);
+    await this.cacheManager.set(
+      userCacheKey,
+      recommendedCoursesResponse,
+      3600 * 1000,
+    );
 
     return recommendedCoursesResponse;
   }
@@ -172,7 +176,11 @@ export class CoursesService {
         });
 
         if (!isRecommendation) {
-          await this.cacheManager.set(cacheKey, searchedCoursesResponse, 3600);
+          await this.cacheManager.set(
+            cacheKey,
+            searchedCoursesResponse,
+            3600 * 1000,
+          );
         }
         return searchedCoursesResponse;
       } catch (e) {

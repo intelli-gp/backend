@@ -3,6 +3,7 @@
 frontend-dist
 
 scripts/.*
+src/initialization-data
 
 # compiled output
 /dist
