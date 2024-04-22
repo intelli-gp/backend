@@ -19,6 +19,7 @@ import { SearchModule } from './modules/search/search.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { CoursesModule } from './modules/courses/courses.module';
+import { DbInitializationService } from './db-initialization.service';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { CoursesModule } from './modules/courses/courses.module';
   ],
   controllers: [],
   providers: [
+    DbInitializationService,
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
@@ -71,4 +73,12 @@ import { CoursesModule } from './modules/courses/courses.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(
+    private readonly dbInitializationService: DbInitializationService,
+  ) {}
+  async onModuleInit() {
+    await this.dbInitializationService.init();
+    console.log('The module has been initialized.');
+  }
+}
