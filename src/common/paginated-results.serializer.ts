@@ -8,9 +8,9 @@ import { PaginationDto } from 'src/common/dto';
  */
 export class SerializedPaginated<Entity, SerializedEntity> {
   /**
-   * Total number of entities in this page
+   * Total number of entities
    */
-  Count: number;
+  TotalEntityCount: number;
   /**
    * Total number of pages
    */
@@ -49,7 +49,7 @@ export class SerializedPaginated<Entity, SerializedEntity> {
     paginationData: PaginationDto,
     entitySerializerConstructor: new (entity: Entity) => SerializedEntity,
   ) {
-    this.Count = data?.length || 0;
+    this.TotalEntityCount = totalEntityCount;
 
     this.NumPages = Math.ceil((totalEntityCount || 0) / +paginationData?.limit);
 
@@ -57,7 +57,7 @@ export class SerializedPaginated<Entity, SerializedEntity> {
     console.log('totalEntityCount', totalEntityCount);
     console.log('NumPages', this.NumPages);
 
-    this.CurrentPageNum = +paginationData?.offset || 1;
+    this.CurrentPageNum = +paginationData?.offset / +paginationData?.limit || 1;
 
     this.NextPageNum =
       this.CurrentPageNum + 1 > this.NumPages ? null : this.CurrentPageNum + 1;
