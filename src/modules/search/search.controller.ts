@@ -16,6 +16,8 @@ import {
   usersArray,
 } from './swagger-examples/search-results';
 import { ChatGroupsService } from '../chat-groups/chat-groups.service';
+import { SerializedPaginated } from 'src/common/paginated-results.serializer';
+import { ArticleSearchResult } from './types/search';
 
 // TODO: remove @Public()
 
@@ -60,8 +62,12 @@ export class SearchController {
       offset,
       limit,
     );
-    return sendSuccessResponse(
-      articleSearchResult.map((article) => new SerializedArticle(article)),
+
+    return new SerializedPaginated<ArticleSearchResult, SerializedArticle>(
+      articleSearchResult.data,
+      articleSearchResult.totalEntityCount,
+      { offset, limit },
+      SerializedArticle,
     );
   }
 

@@ -13,6 +13,7 @@ import {
   MsearchMultiSearchItem,
   SearchCompletionSuggestOption,
   SearchHit,
+  SearchTotalHits,
 } from '@elastic/elasticsearch/lib/api/types';
 
 const config = new ConfigService();
@@ -87,40 +88,37 @@ export class SearchService {
     }
   }
 
-  async searchArticles(
-    searchTerm: string,
-    from: number,
-    size: number,
-  ): Promise<ArticleSearchResult[]> {
+  async searchArticles(searchTerm: string, from: number, size: number) {
     this.SearchLogger.log(
       `Initiate articles search query about "${searchTerm}"`,
     );
 
-    try {
-      let queryResult = await this.ElasticClient.search<ArticleSearchResult>({
-        index: INDICES_NAMES.ARTICLES,
-        from,
-        size,
-        query: {
-          multi_match: {
-            query: searchTerm,
-            fields: [
-              'title^3',
-              'article_tag.tag_name^2',
-              'articles_content.value',
-            ],
-            fuzziness: FUZZINESS,
-          },
+    let queryResult = await this.ElasticClient.search<ArticleSearchResult>({
+      index: INDICES_NAMES.ARTICLES,
+      from,
+      size,
+      query: {
+        multi_match: {
+          query: searchTerm,
+          fields: [
+            'title^3',
+            'article_tag.tag_name^2',
+            'articles_content.value',
+          ],
+          fuzziness: FUZZINESS,
         },
-      });
+      },
+    });
 
-      return queryResult.hits.hits.map(
-        (hit) => (hit as SearchHit<ArticleSearchResult>)._source,
-      );
-    } catch (error) {
-      this.SearchLogger.error(`Error in articles search : ${error}`);
-      return [];
-    }
+    let data = queryResult.hits.hits.map(
+      (hit) => (hit as SearchHit<ArticleSearchResult>)._source,
+    );
+    let numOfMatches = (queryResult.hits.total as SearchTotalHits).value || 0;
+
+    return {
+      data,
+      totalEntityCount: numOfMatches,
+    };
   }
 
   async searchGroups(
