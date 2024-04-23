@@ -141,7 +141,7 @@ export class DbInitializationService {
     );
     const generatedUsers = JSON.parse(readFileSync(pathForUsers, 'utf-8'));
     const generatedUsersWithoutTags = generatedUsers.map((user) => {
-      const { tags, ...rest } = user;
+      const { tags, user_id, ...rest } = user;
       return rest;
     });
 
@@ -182,21 +182,9 @@ export class DbInitializationService {
       'articles.json',
     );
     const articles = JSON.parse(readFileSync(pathForArticles, 'utf-8'));
-    const articlesWithoutTagsAndContent = articles.map((article) => {
-      const {
-        article_tag,
-        articles_content,
-        article_id,
-        article_likes,
-        article_comments,
-        url,
-        ...rest
-      } = article;
-      return rest;
-    });
-
+    const generatedUsersInDb = await this.prisma.user.findMany({});
     this.DbInitializationLogger.log('Migrating articles');
-    this.DbInitializationLogger.log(articlesWithoutTagsAndContent.length);
+    this.DbInitializationLogger.log(articles.length);
 
     for (const article of articles) {
       const {
@@ -208,9 +196,30 @@ export class DbInitializationService {
         url,
         ...modifiedArticle
       } = article;
+      const currentUser = generatedUsersInDb[article.user_id - 1];
+
+      modifiedArticle.user_id = currentUser.user_id;
+
+      const modifiedArticleLikes = article_likes.map((like) => ({
+        ...like,
+        user_id: currentUser.user_id,
+      }));
+
+      const modifiedArticleComments = article_comments.map((comment) => {
+        const { article_comment_likes, ...modifiedComment } = comment;
+        return {
+          ...modifiedComment,
+          user_id: currentUser.user_id,
+          article_comment_likes: article_comment_likes.map((like) => ({
+            ...like,
+            user_id: currentUser.user_id,
+          })),
+        };
+      });
 
       const articleAdded = await this.prisma.article.create({
         data: {
+          user_id: currentUser.user_id,
           ...modifiedArticle,
           article_tag: {
             createMany: {
@@ -232,14 +241,14 @@ export class DbInitializationService {
           },
           article_likes: {
             createMany: {
-              data: article_likes as Prisma.article_likeCreateManyInput,
+              data: modifiedArticleLikes as Prisma.article_likeCreateManyInput,
               skipDuplicates: true,
             },
           },
-        },
+        } as Prisma.articleUncheckedCreateInput,
       });
 
-      for (const articleComment of article_comments) {
+      for (const articleComment of modifiedArticleComments) {
         const { article_comment_likes, ...modifiedArticleComment } =
           articleComment;
 
