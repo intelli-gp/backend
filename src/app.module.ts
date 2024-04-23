@@ -15,6 +15,7 @@ import { PrismaExceptionFilter } from './exception-filters/prisma.filter';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { ChatGroupsModule } from './modules/chat-groups/chat-groups.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { RecommenderSystemModule } from './modules/recommender-system/recommender-system.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { NotificationModule } from './modules/notification/notification.module';
     StudyPlannerModule,
     ChatGroupsModule,
     NotificationModule,
+    RecommenderSystemModule,
   ],
   controllers: [],
   providers: [
