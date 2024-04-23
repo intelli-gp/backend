@@ -9,13 +9,12 @@ import { CoursesService } from './courses.service';
 import { ApiTags } from '@nestjs/swagger';
 import { PaginationDto } from 'src/common/dto';
 import { GetCurrentUser } from '../auth/ParamDecorator';
-import {
-  SerializedPaginatedUdemyCourses,
-  SerializedUdemyCourse,
-} from './serialized-types';
+import { SerializedUdemyCourse } from './serialized-types';
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { SearchDto } from './dto';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
+import { SerializedPaginated } from 'src/common/paginated-results.serializer';
+import { UdemyCourse } from './types';
 
 @Controller('courses')
 @ApiTags('Courses')
@@ -31,8 +30,14 @@ export class CoursesController {
       paginationData,
       userId,
     );
+
     return sendSuccessResponse(
-      new SerializedPaginatedUdemyCourses(recommendations),
+      new SerializedPaginated<UdemyCourse, SerializedUdemyCourse>(
+        recommendations.results,
+        recommendations.count,
+        paginationData,
+        SerializedUdemyCourse,
+      ),
     );
   }
 
@@ -66,7 +71,12 @@ export class CoursesController {
       },
     );
     return sendSuccessResponse(
-      new SerializedPaginatedUdemyCourses(searchResults),
+      new SerializedPaginated<UdemyCourse, SerializedUdemyCourse>(
+        searchResults.results,
+        searchResults.count,
+        searchData,
+        SerializedUdemyCourse,
+      ),
     );
   }
 }
