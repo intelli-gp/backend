@@ -1,3 +1,5 @@
+import { articles_content, user } from '@prisma/client';
+
 export interface GroupSearchResult {
   tags: string[];
   title: string;
@@ -17,14 +19,17 @@ export interface UserSearchResult {
 }
 
 export interface ArticleSearchResult {
-  tags: string[];
+  user: Partial<user>; // Author
   title: string;
-  content: string[];
   article_id: number;
+  updated_at: Date;
+  cover_image_url: string;
+  article_tag: string;
+  articles_content: articles_content[];
 }
 
 export interface GeneralSearchResult {
-    articles: ArticleSearchResult[];
-    groups: GroupSearchResult[];
-    users: UserSearchResult[];
+  articles: ArticleSearchResult[];
+  groups: GroupSearchResult[];
+  users: UserSearchResult[];
 }
