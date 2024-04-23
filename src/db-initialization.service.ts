@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from './modules/prisma/prisma.service';
 import { resolve } from 'path';
-import { readFileSync } from 'fs';
-import { Prisma, user } from '@prisma/client';
+import { readFileSync, existsSync, rmSync } from 'fs';
+import { Prisma } from '@prisma/client';
+import { extractDirectory } from './utils/zip';
 
 @Injectable()
 export class DbInitializationService {
@@ -13,24 +14,64 @@ export class DbInitializationService {
 
   async resetData() {
     await this.prisma.user_tag.deleteMany({});
-    await this.prisma.tag.deleteMany({});
-    await this.prisma.article.deleteMany({});
-    await this.prisma.articles_content.deleteMany({});
-    await this.prisma.user.deleteMany({});
     await this.prisma.article_tag.deleteMany({});
+    await this.prisma.articles_content.deleteMany({});
+    await this.prisma.article.deleteMany({});
+    await this.prisma.user.deleteMany({});
     await this.prisma.level.deleteMany({});
     await this.prisma.plan.deleteMany({});
+    await this.prisma.tag.deleteMany({});
+  }
+  async extractInitializationData() {
+    this.DbInitializationLogger.log('Extracting data');
+    try {
+      if (!existsSync(resolve(__dirname, '..', 'src', 'initialization-data'))) {
+        throw new Error('Old Data not found');
+      }
+      rmSync(resolve(__dirname, '..', 'src', 'initialization-data'), {
+        recursive: true,
+      });
+      this.DbInitializationLogger.log('Data deleted');
+    } catch (_) {
+      this.DbInitializationLogger.error('Data to delete not found');
+    }
+
+    try {
+      if (
+        !existsSync(resolve(__dirname, '..', 'src', 'initialization-data.zip'))
+      ) {
+        throw new Error('zip file not found');
+      }
+      extractDirectory(
+        resolve(__dirname, '..', 'src', 'initialization-data.zip'),
+        resolve(__dirname, '..', 'src'),
+      );
+    } catch (error) {
+      this.DbInitializationLogger.error('Data to extract not found');
+      this.DbInitializationLogger.error(error);
+    }
+
+    this.DbInitializationLogger.log('Data extracted');
+  }
+
+  deleteInitialExtractedData() {
+    rmSync(resolve(__dirname, '..', 'src', 'initialization-data'), {
+      recursive: true,
+    });
+    this.DbInitializationLogger.log('Extracted Data Cleaned');
   }
   async init() {
+    this.DbInitializationLogger.log('Initializing data');
     const planCount = await this.prisma.plan.count();
-
     if (planCount === 0) {
-      this.DbInitializationLogger.log('Migrating data');
+      await this.extractInitializationData();
       await this.migrateData();
+      this.deleteInitialExtractedData();
     }
   }
 
   async migrateData() {
+    this.DbInitializationLogger.log('Migrating data');
     await this.migratePlans();
     await this.migrateLevels();
     await this.migrateTags();

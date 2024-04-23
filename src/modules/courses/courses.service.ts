@@ -9,6 +9,7 @@ import { previewRequiredCourseFields } from './constants/udemy-course-fields';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { UdemyCourseCategoryEnum } from './types';
 import * as _ from 'lodash';
+import { nonBlockingWait } from 'src/utils/wait';
 
 @Injectable()
 export class CoursesService {
@@ -106,14 +107,6 @@ export class CoursesService {
     return udemyCategoriesPreview;
   }
 
-  async nonBlockingWait(ms) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ success: true });
-      }, ms);
-    });
-  }
-
   async searchCourses(
     searchQuery: string,
     paginationData: PaginationDto,
@@ -190,7 +183,7 @@ export class CoursesService {
           error: e,
           retry: i,
         });
-        await this.nonBlockingWait(1000);
+        await nonBlockingWait(1000);
       }
     }
     if (failureCount === retries) {
