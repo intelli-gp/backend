@@ -31,7 +31,7 @@ model article_tag {
   article_id Int
   tag_name   String
   article    article @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
-  tag        tag     @relation(fields: [tag_name], references: [tag_name], onDelete: Cascade, onUpdate: Cascade)
+  tag        tag     @relation(fields: [tag_name], references: [tag_name], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([article_id, tag_name])
 }
@@ -136,7 +136,7 @@ model group_tag {
   group_id Int
   tag_name String
   group    group  @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
-  tag      tag    @relation(fields: [tag_name], references: [tag_name], onDelete: Cascade, onUpdate: Cascade)
+  tag      tag    @relation(fields: [tag_name], references: [tag_name], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([group_id, tag_name])
 }
@@ -152,7 +152,7 @@ model group_user {
   left_at             DateTime?         @db.Date
   joining_status      Boolean           @default(true)
   group               group             @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
-  user                user              @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  user                user              @relation(fields: [user_id], references: [user_id], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([group_id, user_id])
 }
@@ -220,7 +220,7 @@ model plan_benefit {
   hourly_ai_messages     Int
   groups_created         Int
   monthly_planner_helper Int
-  plan                   plan @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
+  plan                   plan @relation(fields: [plan_id], references: [plan_id], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([plan_id, plan_benefit_id])
 }
@@ -321,8 +321,8 @@ model user {
   task                 task[]
   user_badge           user_badge[]
   user_tag             user_tag[]
-  level                level                  @relation(fields: [level_id], references: [level_id], onDelete: Cascade, onUpdate: Cascade)
-  plan                 plan                   @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade, onUpdate: Cascade)
+  level                level                  @relation(fields: [level_id], references: [level_id], onDelete: Restrict, onUpdate: Cascade)
+  plan                 plan                   @relation(fields: [plan_id], references: [plan_id], onDelete: Restrict, onUpdate: Cascade)
   following            user_follower[]        @relation("following")
   followed_by          user_follower[]        @relation("followed_by")
   liked_articles       article_like[]
