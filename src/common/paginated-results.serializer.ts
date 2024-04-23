@@ -1,6 +1,9 @@
 import { PaginationDto } from 'src/common/dto';
-
-// Generic interface for entity results
+import { SerializedArticle } from 'src/modules/articles/serialized-types/article.serialized';
+import { SerializedChatGroup } from 'src/modules/chat-groups/serialized-types/chat-group/chat-group.serializer';
+import { SerializedUdemyCourse } from 'src/modules/courses/serialized-types';
+import { SerializedTask } from 'src/modules/study-planner/serialized-types/serialized-task';
+import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 
 /**
  * @template Entity The entity type e.g. UdemyCourse
@@ -49,13 +52,17 @@ export class SerializedPaginated<Entity, SerializedEntity> {
     paginationData: PaginationDto,
     entitySerializerConstructor: new (entity: Entity) => SerializedEntity,
   ) {
+    if (!entitySerializerConstructor) {
+      throw new Error('entitySerializerConstructor is required');
+    }
+
+    if (entitySerializerConstructor === SerializedUdemyCourse) {
+      paginationData.offset = +paginationData.offset * +paginationData.limit;
+    }
+
     this.TotalEntityCount = totalEntityCount;
 
     this.NumPages = Math.ceil((totalEntityCount || 0) / +paginationData?.limit);
-
-    console.log('limit', +paginationData?.limit);
-    console.log('totalEntityCount', totalEntityCount);
-    console.log('NumPages', this.NumPages);
 
     this.CurrentPageNum = +paginationData?.offset / +paginationData?.limit || 1;
 
@@ -64,11 +71,11 @@ export class SerializedPaginated<Entity, SerializedEntity> {
 
     this.PreviousPageNum =
       this.CurrentPageNum - 1 < 1 ? null : this.CurrentPageNum - 1;
+
     this.LimitPerPage = paginationData?.limit;
 
-    // Adapt this based on your specific entity serializer logic
     this.Results = data?.map(
       (entity) => new entitySerializerConstructor(entity),
-    ); // Example using UdemyCourse serializer
+    );
   }
 }
