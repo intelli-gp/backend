@@ -51,7 +51,11 @@ export class SerializedPaginated<Entity, SerializedEntity> {
   ) {
     this.Count = data?.length || 0;
 
-    this.NumPages = Math.ceil(totalEntityCount || 0 / +paginationData?.limit);
+    this.NumPages = Math.ceil((totalEntityCount || 0) / +paginationData?.limit);
+
+    console.log('limit', +paginationData?.limit);
+    console.log('totalEntityCount', totalEntityCount);
+    console.log('NumPages', this.NumPages);
 
     this.CurrentPageNum = +paginationData?.offset || 1;
 
