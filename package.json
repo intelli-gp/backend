@@ -43,6 +43,7 @@
     "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "csvtojson": "^2.0.10",
     "nest": "^0.1.6",
     "nodemailer": "^6.9.7",
     "nodemon": "^3.0.2",

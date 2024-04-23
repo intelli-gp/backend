@@ -10,6 +10,7 @@ import { TagsService } from '../tags/tags.service';
 import { UpdateArticleDto } from './dto';
 import { DeserializedArticle } from './serialized-types/article.deserializer';
 import { PaginationDto } from 'src/common/dto';
+import * as csvtojson from 'csvtojson';
 
 @Injectable()
 export class ArticlesService {
@@ -345,6 +346,7 @@ export class ArticlesService {
       });
     }
   }
+
   async updateArticle(
     articleData: UpdateArticleDto,
     articleId: number,
@@ -451,5 +453,25 @@ export class ArticlesService {
         return false;
       });
     return tagsAdded;
+  }
+
+  private async enterDatafromCsv() {
+    const filePath = 'test3.csv';
+    csvtojson()
+      .fromFile(filePath)
+      .then(async (json) => {
+        for (let i = 0; i < json.length; i++) {
+          console.log(i);
+
+          const article = json[i];
+          const x = {
+            title: article.title,
+            coverImageUrl: article.coverImageUrl,
+            tags: JSON.parse(article['tags'].replace(/'/g, '"')),
+            sections: [[article['sections'], 'text']],
+          };
+          await this.createArticle(x, 1);
+        }
+      });
   }
 }
