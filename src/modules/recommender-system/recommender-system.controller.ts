@@ -1,10 +1,13 @@
-import { Controller, Get, HttpCode } from '@nestjs/common';
+import { Controller, Get, HttpCode, Query } from '@nestjs/common';
 import { PaginationDto } from '../../common/dto';
 import { RecommenderSystemService } from './recommender-system.service';
 import { ApiBadRequestResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { MultipleArticlesExample } from '../articles/swagger-examples';
 import { swaggerSuccessExample } from '../../utils/swagger/example-generator';
 import { multipleGroupsExample } from '../chat-groups/swagger-examples';
+import { IdDto } from './dto/article.dto';
+import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
+import { SerializedArticle } from '../articles/serialized-types/article.serialized';
 
 // TODO: Implement the Methods
 @Controller('recommender-system')
@@ -23,8 +26,20 @@ export class RecommenderSystemController {
   @ApiBadRequestResponse({
     description: 'Invalid request',
   })
-  @Get('articles')
-  getArticleRecommendations(paginationData: PaginationDto) {}
+  @Get('articles/:articleId([0-9]+)')
+  async getArticleRecommendations(
+    @Query() paginationData: PaginationDto,
+    articleId: IdDto,
+  ) {
+    const articles =
+      await this.recommenderSystemService.getArticleRecommendations(
+        paginationData,
+        articleId,
+      );
+    return sendSuccessResponse(
+      articles.map((article) => new SerializedArticle(article)),
+    );
+  }
 
   @HttpCode(200)
   @HttpCode(400)
@@ -36,7 +51,13 @@ export class RecommenderSystemController {
     description: 'Invalid request',
   })
   @Get('groups')
-  getGroupRecommendations(paginationData: PaginationDto) {}
+  async getGroupRecommendations(paginationData: PaginationDto) {
+    const groups =
+      await this.recommenderSystemService.getGroupRecommendations(
+        paginationData,
+      );
+    return groups;
+  }
 
   // TODO: add swagger example for the return object in OK Response
   @HttpCode(200)
@@ -49,7 +70,11 @@ export class RecommenderSystemController {
     description: 'Invalid request',
   })
   @Get('users')
-  getUsersRecommendations(paginationData: PaginationDto) {}
+  async getUsersRecommendations(paginationData: PaginationDto) {
+    const users =
+      await this.recommenderSystemService.getUserRecommendation(paginationData);
+    return users;
+  }
 
   // TODO: add swagger example for the return object in OK Response
   @HttpCode(200)
@@ -58,5 +83,11 @@ export class RecommenderSystemController {
     description: 'Invalid request',
   })
   @Get('courses')
-  getCoursesRecommendations(paginationData: PaginationDto) {}
+  async getCoursesRecommendations(paginationData: PaginationDto) {
+    const courses =
+      await this.recommenderSystemService.getCourseRecommendation(
+        paginationData,
+      );
+    return courses;
+  }
 }

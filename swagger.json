@@ -3468,6 +3468,637 @@
           }
         }
       }
+    },
+    "/api/recommender-system/articles/{articleId}": {
+      "get": {
+        "operationId": "RecommenderSystemController_getArticleRecommendations",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns article recommendations with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 1,
+                          "Title": "My article title updated",
+                          "CreatedAt": "2024-02-21T19:52:10.423Z",
+                          "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                          "CoverImage": "www.google.com/url/to/image.jpg",
+                          "ArticleTags": [
+                            "tag2",
+                            "tag3",
+                            "tag4"
+                          ],
+                          "Author": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false,
+                            "FollowersCount": 0
+                          },
+                          "Sections": [
+                            {
+                              "Value": "valueOfSection3434343422",
+                              "ContentType": "text"
+                            },
+                            {
+                              "Value": "typeOfSection1",
+                              "ContentType": "text"
+                            }
+                          ],
+                          "LikedBy": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            }
+                          ],
+                          "Comments": [
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            },
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 1,
+                          "Title": "My article title updated",
+                          "CreatedAt": "2024-02-21T19:52:10.423Z",
+                          "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                          "CoverImage": "www.google.com/url/to/image.jpg",
+                          "ArticleTags": [
+                            "tag2",
+                            "tag3",
+                            "tag4"
+                          ],
+                          "Author": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false,
+                            "FollowersCount": 0
+                          },
+                          "Sections": [
+                            {
+                              "Value": "valueOfSection3434343422",
+                              "ContentType": "text"
+                            },
+                            {
+                              "Value": "typeOfSection1",
+                              "ContentType": "text"
+                            }
+                          ],
+                          "LikedBy": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            }
+                          ],
+                          "Comments": [
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            },
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 1,
+                          "Title": "My article title updated",
+                          "CreatedAt": "2024-02-21T19:52:10.423Z",
+                          "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                          "CoverImage": "www.google.com/url/to/image.jpg",
+                          "ArticleTags": [
+                            "tag2",
+                            "tag3",
+                            "tag4"
+                          ],
+                          "Author": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false,
+                            "FollowersCount": 0
+                          },
+                          "Sections": [
+                            {
+                              "Value": "valueOfSection3434343422",
+                              "ContentType": "text"
+                            },
+                            {
+                              "Value": "typeOfSection1",
+                              "ContentType": "text"
+                            }
+                          ],
+                          "LikedBy": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            }
+                          ],
+                          "Comments": [
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            },
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        },
+        "tags": [
+          "recommender-system"
+        ]
+      }
+    },
+    "/api/recommender-system/groups": {
+      "get": {
+        "operationId": "RecommenderSystemController_getGroupRecommendations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns article recommendations with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        },
+        "tags": [
+          "recommender-system"
+        ]
+      }
+    },
+    "/api/recommender-system/users": {
+      "get": {
+        "operationId": "RecommenderSystemController_getUsersRecommendations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns article recommendations with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        },
+        "tags": [
+          "recommender-system"
+        ]
+      }
+    },
+    "/api/recommender-system/courses": {
+      "get": {
+        "operationId": "RecommenderSystemController_getCoursesRecommendations",
+        "parameters": [],
+        "responses": {
+          "400": {
+            "description": "Invalid request"
+          }
+        },
+        "tags": [
+          "recommender-system"
+        ]
+      }
     }
   },
   "info": {
