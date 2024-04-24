@@ -6,15 +6,23 @@ import { ConfigService } from '@nestjs/config';
 export class HttpUdemyConfigService implements HttpModuleOptionsFactory {
   constructor(private readonly configService: ConfigService) {}
   createHttpOptions(): HttpModuleOptions {
-    console.log('Udemy Config Service');
-    console.log(this.configService.get('FRONT_URL'));
     return {
       baseURL: this.configService.get('UDEMY_API_BASE_URL'),
       timeout: 20000,
       maxRedirects: 5,
+      proxy: {
+        protocol: 'http',
+        host: this.configService.get('PROXY_HOST'),
+        port: this.configService.get('PROXY_PORT'),
+        auth: {
+          username: this.configService.get('PROXY_API_KEY'),
+          password: 'render_js=False&premium_proxy=True&forward_headers=True',
+        },
+      },
       headers: {
         'Content-Type': 'application/json',
         Authorization: this.configService.get('UDEMY_AUTH'),
+        'User-Agent': 'Mujedd/1.0 (https://www.mujedd.live)',
       },
     };
   }

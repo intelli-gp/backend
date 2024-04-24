@@ -1,9 +1,5 @@
 import { PaginationDto } from 'src/common/dto';
-import { SerializedArticle } from 'src/modules/articles/serialized-types/article.serialized';
-import { SerializedChatGroup } from 'src/modules/chat-groups/serialized-types/chat-group/chat-group.serializer';
 import { SerializedUdemyCourse } from 'src/modules/courses/serialized-types';
-import { SerializedTask } from 'src/modules/study-planner/serialized-types/serialized-task';
-import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 
 /**
  * @template Entity The entity type e.g. UdemyCourse

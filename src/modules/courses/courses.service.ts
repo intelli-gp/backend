@@ -10,6 +10,7 @@ import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { UdemyCourseCategoryEnum } from './types';
 import * as _ from 'lodash';
 import { nonBlockingWait } from 'src/utils/wait';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class CoursesService {
@@ -180,7 +181,7 @@ export class CoursesService {
         failureCount++;
         resError = e;
         this.coursesServiceLogger.error({
-          error: e,
+          error: (e as AxiosError).response,
           retry: i,
         });
         await nonBlockingWait(1000);
