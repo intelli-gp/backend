@@ -113,6 +113,7 @@ export class SearchService {
     let data = queryResult.hits.hits.map(
       (hit) => (hit as SearchHit<ArticleSearchResult>)._source,
     );
+
     let numOfMatches = (queryResult.hits.total as SearchTotalHits).value || 0;
 
     return {
@@ -121,33 +122,31 @@ export class SearchService {
     };
   }
 
-  async searchGroups(
-    searchTerm: string,
-    from: number,
-    size: number,
-  ): Promise<GroupSearchResult[]> {
+  async searchGroups(searchTerm: string, from: number, size: number) {
     this.SearchLogger.log(`Initiate groups search query about "${searchTerm}"`);
 
-    try {
-      let queryResult = await this.ElasticClient.search({
-        index: INDICES_NAMES.CHAT_GROUPS,
-        from,
-        size,
-        query: {
-          multi_match: {
-            query: searchTerm,
-            fields: ['title^3', 'group_tag.tag_name', 'description'],
-            fuzziness: FUZZINESS,
-          },
+    let queryResult = await this.ElasticClient.search({
+      index: INDICES_NAMES.CHAT_GROUPS,
+      from,
+      size,
+      query: {
+        multi_match: {
+          query: searchTerm,
+          fields: ['title^3', 'group_tag.tag_name', 'description'],
+          fuzziness: FUZZINESS,
         },
-      });
-      return queryResult.hits.hits.map(
-        (hit) => (hit as SearchHit<GroupSearchResult>)._source,
-      );
-    } catch (error) {
-      this.SearchLogger.error(`Error in groups search : ${error}`);
-      return [];
-    }
+      },
+    });
+
+    let data = queryResult.hits.hits.map(
+      (hit) => (hit as SearchHit<GroupSearchResult>)._source,
+    );
+    let numOfMatches = (queryResult.hits.total as SearchTotalHits).value || 0;
+
+    return {
+      data,
+      totalEntityCount: numOfMatches,
+    };
   }
 
   async generalSearch(searchTerm: string, from: number, size: number) {

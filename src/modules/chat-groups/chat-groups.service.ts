@@ -130,7 +130,7 @@ export class ChatGroupsService {
     return chatGroups;
   }
 
-  async getChatGroupsByIds(chatGroupIds: number[]): Promise<group[]> {
+  async getChatGroupsByIds(chatGroupIds: number[]) {
     const chatGroups = await this.prismaService.group.findMany({
       where: {
         group_id: {

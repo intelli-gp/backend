@@ -18,6 +18,7 @@ import {
 import { ChatGroupsService } from '../chat-groups/chat-groups.service';
 import { SerializedPaginated } from 'src/common/paginated-results.serializer';
 import { ArticleSearchResult } from './types/search';
+import { Prisma, group } from '@prisma/client';
 
 // TODO: remove @Public()
 
@@ -63,11 +64,13 @@ export class SearchController {
       limit,
     );
 
-    return new SerializedPaginated<ArticleSearchResult, SerializedArticle>(
-      articleSearchResult.data,
-      articleSearchResult.totalEntityCount,
-      { offset, limit },
-      SerializedArticle,
+    return sendSuccessResponse(
+      new SerializedPaginated<ArticleSearchResult, SerializedArticle>(
+        articleSearchResult.data,
+        articleSearchResult.totalEntityCount,
+        { offset, limit },
+        SerializedArticle,
+      ),
     );
   }
 
@@ -80,11 +83,12 @@ export class SearchController {
   // @Public()
   async searchGroups(@Query() searchDto: SearchDto) {
     let { offset, limit } = searchDto;
-    let groupsSearchResult = await this.searchService.searchGroups(
-      searchDto.searchTerm,
-      offset,
-      limit,
-    );
+    let { data: groupsSearchResult, totalEntityCount } =
+      await this.searchService.searchGroups(
+        searchDto.searchTerm,
+        offset,
+        limit,
+      );
 
     let fullGroupsData = await this.chatGroupsService.getChatGroupsByIds(
       groupsSearchResult.map((group) => group.group_id),
@@ -103,7 +107,12 @@ export class SearchController {
     });
 
     return sendSuccessResponse(
-      sortedFullDataGroups.map((group) => new SerializedChatGroup(group)),
+      new SerializedPaginated<group, SerializedChatGroup>(
+        sortedFullDataGroups,
+        totalEntityCount,
+        { limit, offset },
+        SerializedChatGroup,
+      ),
     );
   }
 
@@ -152,7 +161,7 @@ export class SearchController {
       (article) => new SerializedArticle(article),
     );
     serializedResult.groups = sortedFullDataGroups?.map(
-      (group) => new SerializedChatGroup(group),
+      (group) => new SerializedChatGroup(group as Prisma.groupWhereInput),
     );
     serializedResult.users = generalSearchResult.users.map(
       (user) => new SerializedUser(user),

@@ -1,10 +1,11 @@
-import { articles_content, user } from '@prisma/client';
+import { articles_content, user, group_tag } from '@prisma/client';
 
 export interface GroupSearchResult {
-  tags: string[];
-  title: string;
   group_id: number;
+  title: string;
   description: string;
+  cover_image_url: string;
+  group_tag: string[]
 }
 
 export interface UserSearchResult {
