@@ -1,6 +1,16 @@
 version: '3.7'
 
 services:
+  portrainer:
+    container_name: portrainer
+    image: portainer/portainer-ee:latest
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portrainer_data:/data
+    networks:
+      - intelligp-network
   nestjs:
     container_name: intelligp-backend-api
     build: .
@@ -294,6 +304,8 @@ volumes:
   certs:
     driver: local
   esdata01:
+    driver: local
+  portainer_data:
     driver: local
   # esdata02:
   #   driver: local
