@@ -55,9 +55,14 @@ export class NotificationService {
       if (!readTimeThreshold) {
         return;
       }
-      // Get all messages in the group that the user has not read yet
+      /**
+       * Get all messages in the group that the user has not read yet
+       * by checking the last read of the group user and comparing it to the message created At
+       * Note: These messages cannot be created by the user himself
+       */
       const unreadMessages = groupUser?.group?.message.filter(
-        (message) => message.created_at > readTimeThreshold,
+        (message) =>
+          message.created_at > readTimeThreshold && message.user_id !== userId,
       );
 
       this.NotificationServiceLogger.debug({
@@ -72,9 +77,9 @@ export class NotificationService {
       const unreadMessagesCount = unreadMessages.length;
 
       if (unreadMessagesCount > 0) {
-        this.NotificationServiceLogger.debug({
-          GroupMessages: groupUser?.group?.message,
-        });
+        // this.NotificationServiceLogger.debug({
+        //   GroupMessages: groupUser?.group?.message,
+        // });
         this.NotificationServiceLogger.debug({ unreadMessages });
       }
       // A precautionary measure to avoid circular JSON
@@ -92,31 +97,10 @@ export class NotificationService {
     return messagesNotifications;
   }
 
-  async markMessageNotificationAsViewed(userId: number, messageId: number) {
-    // Will no longer be needed with the new approach neither will the table
-    await this.prismaService.message_notification.update({
-      where: {
-        message_id_user_id: {
-          message_id: messageId,
-          user_id: userId,
-        },
-      },
-      data: {
-        isViewed: true,
-      },
-    });
-  }
-
   async emitChatNotification(
     eligibleUsersForNotification: group_user[],
     data: SerializedMessage,
   ) {
-    await this.prismaService.message_notification.createMany({
-      data: eligibleUsersForNotification.map((user) => ({
-        user_id: user.user_id,
-        message_id: data.MessageID,
-      })),
-    });
     await this.eventsService.emit(eligibleUsersForNotification, {
       eventName: 'chat-group-message',
       message: data,

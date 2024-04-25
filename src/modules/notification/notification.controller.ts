@@ -51,17 +51,4 @@ export class NotificationController {
       return new SerializedMessagesNotifications(messageNotification);
     });
   }
-
-  @Patch('/messages/view/:MessageID([0-9]+)')
-  async markMessagesAsViewed(
-    @GetCurrentUser('user_id') userId,
-    @Param() dto: DeleteMessageDto,
-  ) {
-    this.logger.log(`Marking message as viewed for user ${userId}`);
-    await this.notificationsService.markMessageNotificationAsViewed(
-      userId,
-      dto.MessageID,
-    );
-    return sendSuccessResponse('Message marked as viewed');
-  }
 }
