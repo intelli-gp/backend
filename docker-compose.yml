@@ -305,7 +305,7 @@ volumes:
     driver: local
   esdata01:
     driver: local
-  portainer_data:
+  portrainer_data:
     driver: local
   # esdata02:
   #   driver: local
