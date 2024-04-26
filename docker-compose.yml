@@ -1,17 +1,45 @@
-version: '3.7'
+
 
 services:
-  portrainer:
+ webserver:
+    image: nginx:mainline-alpine
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+    depends_on:
+      - nestjs
+    networks:
+      - intelligp-network
+
+ certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - webserver
+    command: certonly --webroot --webroot-path=/var/www/html --email ofahmy@mujedd.live --agree-tos --no-eff-email --force-renewal -d mujedd.live  -d www.mujedd.live
+ portrainer:
     container_name: portrainer
     image: portainer/portainer-ee:latest
     ports:
       - 9000:9000
+      - 9443:9443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portrainer_data:/data
     networks:
       - intelligp-network
-  nestjs:
+ nestjs:
     container_name: intelligp-backend-api
     build: .
     ports:
@@ -29,7 +57,7 @@ services:
     networks:
       - intelligp-network
 
-  redis:
+ redis:
     container_name: intelligp-redis
     image: redis
     ports:
@@ -39,7 +67,7 @@ services:
     networks:
       - intelligp-network
 
-  postgres:
+ postgres:
     container_name: intelligp-postgres
     image: postgres:16.1-alpine3.19
     volumes:
@@ -55,7 +83,7 @@ services:
     networks:
       - intelligp-network
 
-  pgsync:
+ pgsync:
     build:
       context: ./pgsync
     container_name: pgsync
@@ -84,8 +112,7 @@ services:
       - ELASTICSEARCH_SCHEME=https
       - ELASTICSEARCH_USER=elastic
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
-
-  setup:
+ setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     networks:
       - intelligp-network
@@ -134,7 +161,7 @@ services:
       timeout: 5s
       retries: 120
 
-  es01:
+ es01:
     depends_on:
       setup:
         condition: service_healthy
@@ -166,7 +193,8 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
-    mem_limit: ${MEM_LIMIT}
+#      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    mem_limit: 4g
     ulimits:
       memlock:
         soft: -1
@@ -306,6 +334,10 @@ volumes:
   esdata01:
     driver: local
   portrainer_data:
+    driver: local
+  certbot-etc:
+  certbot-var:
+  web-root:
     driver: local
   # esdata02:
   #   driver: local
