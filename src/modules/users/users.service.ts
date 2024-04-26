@@ -41,7 +41,7 @@ export class UsersService {
 
     userData.headline !== undefined &&
       (userDataInput.headline = userData.headline);
-
+    
     return userDataInput;
   }
 
@@ -119,6 +119,18 @@ export class UsersService {
             article_tag: true,
             user: true,
           },
+        },
+        payment_method:{
+          select:{
+            method_id:true,
+            card_id:true,
+            card_number: true,
+            created_at: true,
+            holder_name:true,
+            expiry_date:true,
+            user: true,
+
+          }
         },
       },
     });
@@ -230,6 +242,18 @@ export class UsersService {
                 article_tag: true,
               },
             },
+            payment_method:{
+              select:{
+                method_id:true,
+                card_id:true,
+                card_number: true,
+                created_at: true,
+                holder_name:true,
+                expiry_date:true,
+                user: true,
+    
+              }
+            }
           },
         });
       } else {
@@ -277,6 +301,18 @@ export class UsersService {
                 article_tag: true,
               },
             },
+            payment_method:{
+              select:{
+                method_id:true,
+                card_id:true,
+                card_number: true,
+                created_at: true,
+                holder_name:true,
+                expiry_date:true,
+                user: true,
+    
+              }
+            }
           },
         });
       }

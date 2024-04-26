@@ -54,7 +54,7 @@ describe('UsersServiceTest', () => {
       const userId = 1;
       const userToFollowId = 2;
 
-      const result = await usersService.followUser(userId, userToFollowId);
+      const result = await usersService.followUser();
 
       expect(prismaService.user_follower.create).toHaveBeenCalledWith({
         data: {
@@ -72,7 +72,7 @@ describe('UsersServiceTest', () => {
       const userId = 1;
       const userToUnfollowId = 2;
 
-      const result = await usersService.unfollowUser(userId, userToUnfollowId);
+      const result = await usersService.unfollowUser();
 
       expect(prismaService.user_follower.delete).toHaveBeenCalledWith({
         where: {
@@ -91,10 +91,7 @@ describe('UsersServiceTest', () => {
     it('should get user followers successfully', async () => {
       const userId = 1;
 
-      const result = await usersService.getUserFollowers(userId, {
-        limit: 10,
-        offset: 0,
-      });
+      const result = await usersService.getUserFollowers();
 
       expect(prismaService.user_follower.findMany).toHaveBeenCalledWith({
         where: { user_id: userId },
@@ -135,10 +132,7 @@ describe('UsersServiceTest', () => {
     it('should get user following successfully', async () => {
       const userId = 1;
 
-      const result = await usersService.getUserFollowing(userId, {
-        limit: 10,
-        offset: 0,
-      });
+      const result = await usersService.getUserFollowing();
 
       expect(prismaService.user_follower.findMany).toHaveBeenCalledWith({
         where: { follower_id: userId },

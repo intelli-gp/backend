@@ -3,12 +3,14 @@ import {
   article,
   group_user,
   level,
+  payment_method,
   plan,
   user_tag,
 } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 import { SerializedArticle } from 'src/modules/articles/serialized-types/article.serialized';
 import { SerializedChatGroup } from 'src/modules/chat-groups/serialized-types/chat-group/chat-group.serializer';
+import { SerializedPaymentMethod } from 'src/modules/payment-method/serialized-types/serialized-payment-method';
 
 export class SerializedUser {
   ID: number;
@@ -48,6 +50,8 @@ export class SerializedUser {
   GroupsCreated: SerializedChatGroup[];
 
   GroupsJoined: SerializedChatGroup[];
+
+  PaymentMethods: SerializedPaymentMethod[];
 
   @Exclude()
   renewal_date: Date;
@@ -98,6 +102,10 @@ export class SerializedUser {
       this.Articles = (partial?.article as article[]).map((article) => {
         return new SerializedArticle(article);
       });
+    if(partial?.payment_method)
+      this.PaymentMethods =(partial?.payment_method as payment_method[]).map(
+        (paymentMethod) =>{ return new SerializedPaymentMethod(paymentMethod);}
+      );
 
     if (partial?.group)
       this.GroupsCreated = (partial?.group as Prisma.groupWhereInput[]).map(
