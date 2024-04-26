@@ -85,6 +85,9 @@ export class SerializedArticle {
   })
   article_comments?: article_comment[];
 
+  @Exclude()
+  _meta?: any; // elasticsearch metadata
+
   constructor(partial: Partial<article>) {
     // assign values to object
     Object.assign(this, partial);

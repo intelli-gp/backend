@@ -1,3 +1,5 @@
-npx prisma db push 
+#!/bin/sh
+npx prisma db push &&
 npx prisma studio &
-npm run start:dev   
+npm install &&
+npm run build && npm run start:prod

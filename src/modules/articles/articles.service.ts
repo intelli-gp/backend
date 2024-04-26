@@ -144,21 +144,21 @@ export class ArticlesService {
         article_tag: true,
         user: true,
         articles_content: true,
-        article_likes: {
-          include: {
-            user: true,
-          },
-        },
-        article_comments: {
-          include: {
-            user: true,
-            article_comment_likes: {
-              include: {
-                user: true,
-              },
-            },
-          },
-        },
+        // article_likes: {
+        //   include: {
+        //     user: true,
+        //   },
+        // },
+        // article_comments: {
+        //   include: {
+        //     user: true,
+        //     article_comment_likes: {
+        //       include: {
+        //         user: true,
+        //       },
+        //     },
+        //   },
+        // },
       },
     });
     await this.tagsService.addTagsForEntities(

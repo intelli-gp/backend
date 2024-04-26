@@ -91,11 +91,15 @@ export class ChatGroupsGateway {
 
   async handleConnection(@ConnectedSocket() client: Socket) {
     this.gatewayLogger.log(`Client connected: ${client.id}`);
-    const currentUser = client['user'] as user;
+    const currentUser = client?.['user'] as user;
+
+    if (!currentUser) {
+      return;
+    }
 
     // update online status of the user in db
     await this.usersService.updateUserConnectedStatus(
-      currentUser.user_id,
+      currentUser?.user_id,
       true,
     );
 

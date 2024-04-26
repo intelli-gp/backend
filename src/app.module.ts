@@ -15,9 +15,12 @@ import { PrismaExceptionFilter } from './exception-filters/prisma.filter';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { ChatGroupsModule } from './modules/chat-groups/chat-groups.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { SearchModule } from './modules/search/search.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PaymentMethodModule } from './modules/payment-method/payment-method.module';
+import { CoursesModule } from './modules/courses/courses.module';
+import { DbInitializationService } from './db-initialization.service';
 
 @Module({
   imports: [
@@ -25,7 +28,7 @@ import { PaymentMethodModule } from './modules/payment-method/payment-method.mod
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'frontend', 'dist'),
+      rootPath: join(__dirname, '..', 'frontend-dist'),
       exclude: ['/api*'],
     }),
     PrismaModule,
@@ -36,6 +39,7 @@ import { PaymentMethodModule } from './modules/payment-method/payment-method.mod
       store: redisStore,
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
+      max: 100,
     }),
     TagsModule,
     ArticlesModule,
@@ -43,9 +47,12 @@ import { PaymentMethodModule } from './modules/payment-method/payment-method.mod
     ChatGroupsModule,
     NotificationModule,
     PaymentMethodModule,
+    SearchModule,
+    CoursesModule,
   ],
   controllers: [],
   providers: [
+    DbInitializationService,
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
@@ -68,4 +75,12 @@ import { PaymentMethodModule } from './modules/payment-method/payment-method.mod
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(
+    private readonly dbInitializationService: DbInitializationService,
+  ) {}
+  async onModuleInit() {
+    await this.dbInitializationService.init();
+    console.log('The module has been initialized.');
+  }
+}
