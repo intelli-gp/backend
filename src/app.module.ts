@@ -17,6 +17,7 @@ import { ChatGroupsModule } from './modules/chat-groups/chat-groups.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { PaymentMethodModule } from './modules/payment-method/payment-method.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { join } from 'path';
     StudyPlannerModule,
     ChatGroupsModule,
     NotificationModule,
+    PaymentMethodModule,
   ],
   controllers: [],
   providers: [
