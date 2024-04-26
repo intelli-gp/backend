@@ -10,15 +10,6 @@ export class HttpUdemyConfigService implements HttpModuleOptionsFactory {
       baseURL: this.configService.get('UDEMY_API_BASE_URL'),
       timeout: 20000,
       maxRedirects: 5,
-      proxy: {
-        protocol: 'http',
-        host: this.configService.get('PROXY_HOST'),
-        port: this.configService.get('PROXY_PORT'),
-        auth: {
-          username: this.configService.get('PROXY_API_KEY'),
-          password: 'render_js=False&premium_proxy=True&forward_headers=True',
-        },
-      },
       headers: {
         'Content-Type': 'application/json',
         Authorization: this.configService.get('UDEMY_AUTH'),
