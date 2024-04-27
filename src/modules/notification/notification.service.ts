@@ -2,8 +2,18 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EventsService } from './event.service';
 import { SerializedMessage } from '../chat-groups/serialized-types/messages/messages.serializer';
 import { PrismaService } from '../prisma/prisma.service';
-import { group_user } from '@prisma/client';
+import {
+  article_comment,
+  article_like,
+  group_user,
+  user,
+} from '@prisma/client';
 import { ChatGroupMessagesNotification } from './types/messages-notifications';
+import { SseEvents } from './types/events';
+import { ArticleNotificationArgs } from './types/article-notifications';
+import { ArticleNotificationTypesEnum } from './enums/article-notifications.enum';
+import { SerializedArticleComment } from '../articles/serialized-types/article-comment.serializer';
+import { SerializedArticleLike } from '../articles/serialized-types/article-like.serializer';
 
 @Injectable()
 export class NotificationService {
@@ -95,6 +105,40 @@ export class NotificationService {
     // this.NotificationServiceLogger.debug({ messagesNotifications });
 
     return messagesNotifications;
+  }
+
+  async emitArticleNotification(
+    articleAuthor: user,
+    args: ArticleNotificationArgs,
+  ) {
+    switch (args.type) {
+      case ArticleNotificationTypesEnum.LIKE:
+        const likeNotification: SseEvents = {
+          eventName: 'article-notification',
+          type: args.type,
+          message: new SerializedArticleLike(args.like),
+        };
+
+        await this.eventsService.emit(
+          [articleAuthor as user],
+          likeNotification,
+        );
+        break;
+      case ArticleNotificationTypesEnum.COMMENT:
+        const commentNotification: SseEvents = {
+          eventName: 'article-notification',
+          type: args.type,
+          message: new SerializedArticleComment(args.comment),
+        };
+        await this.eventsService.emit(
+          [articleAuthor as user],
+          commentNotification,
+        );
+        break;
+      default:
+        this.NotificationServiceLogger.error('Invalid notification type');
+        break;
+    }
   }
 
   async emitChatNotification(

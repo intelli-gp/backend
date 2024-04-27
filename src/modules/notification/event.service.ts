@@ -63,7 +63,7 @@ export class EventsService {
     this.eventsServiceLogger.log(
       `Emitting event ${data.eventName} to user sse-user-${userId}`,
     );
-    const clientEmitter = this.clients.get('sse-user-' + userId);
+    const clientEmitter = this.clients.get(`sse-user-${userId}`);
 
     // If the user is not subscribed to events, do nothing (temporary solution)
     if (!clientEmitter) {
