@@ -15,6 +15,7 @@ services:
       - certbot-var:/var/lib/letsencrypt
     depends_on:
       - nestjs
+    profiles: [prod]
     networks:
       - intelligp-network
 
@@ -27,7 +28,9 @@ services:
       - web-root:/var/www/html
     depends_on:
       - webserver
+    profiles: [prod]
     command: certonly --webroot --webroot-path=/var/www/html --email ofahmy@mujedd.live --agree-tos --no-eff-email --force-renewal -d mujedd.live  -d www.mujedd.live
+ 
  portrainer:
     container_name: portrainer
     image: portainer/portainer-ee:latest
@@ -37,6 +40,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portrainer_data:/data
+    profiles: [prod]
     networks:
       - intelligp-network
  nestjs:
@@ -293,38 +297,39 @@ services:
   #     timeout: 10s
   #     retries: 120
 
-  # kibana:
-  #   depends_on:
-  #     es01:
-  #       condition: service_healthy
-  #     es02:
-  #       condition: service_healthy
-  #     # es03:
-  #     #   condition: service_healthy
-  #   image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
-  #   networks:
-  #     - intelligp-network
-  #   volumes:
-  #     - certs:/usr/share/kibana/config/certs
-  #     - kibanadata:/usr/share/kibana/data
-  #   ports:
-  #     - ${KIBANA_PORT}:5601
-  #   environment:
-  #     - SERVERNAME=kibana
-  #     - ELASTICSEARCH_HOSTS=https://es01:9200
-  #     - ELASTICSEARCH_USERNAME=kibana_system
-  #     - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-  #     - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
-  #   mem_limit: ${MEM_LIMIT}
-  #   healthcheck:
-  #     test:
-  #       [
-  #         'CMD-SHELL',
-  #         "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
-  #       ]
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 120
+ kibana:
+    depends_on:
+      es01:
+        condition: service_healthy
+      # es02:
+      #   condition: service_healthy
+      # es03:
+      #   condition: service_healthy
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    networks:
+      - intelligp-network
+    volumes:
+      - certs:/usr/share/kibana/config/certs
+      - kibanadata:/usr/share/kibana/data
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=https://es01:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+    mem_limit: ${MEM_LIMIT}
+    profiles: [dev]
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
 
 volumes:
   postgres-data:
@@ -343,8 +348,8 @@ volumes:
   #   driver: local
   # esdata03:
   #   driver: local
-  # kibanadata:
-  #   driver: local
+  kibanadata:
+    driver: local
 
 networks:
   intelligp-network:
