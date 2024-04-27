@@ -13,6 +13,7 @@ import {
 } from './utils/prisma-errors';
 import { Response } from 'express';
 import { Socket } from 'socket.io';
+import { error } from 'console';
 
 // Got this from docs and logging output
 export type PrismaMeta = {
@@ -22,6 +23,9 @@ export type PrismaMeta = {
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaExceptionFilter implements ExceptionFilter {
+  private readonly prismaExceptionFilterLogger = new Logger(
+    PrismaExceptionFilter.name,
+  );
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -38,10 +42,18 @@ export class PrismaExceptionFilter implements ExceptionFilter {
     );
   }
 }
+
+@Catch(Prisma.PrismaClientKnownRequestError)
 export class WsPrismaExceptionFilter {
+  private readonly wsPrismaExceptionFilterLogger = new Logger(
+    WsPrismaExceptionFilter.name,
+  );
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
     const client = host.switchToWs().getClient() as Socket;
 
+    this.wsPrismaExceptionFilterLogger.error('Prisma Exception');
+    this.wsPrismaExceptionFilterLogger.error(exception);
+    this.wsPrismaExceptionFilterLogger.error(error);
     const details = {
       errorMessage: PrismaErrorMessage[exception.code] || exception.code,
       errorTarget:
@@ -49,7 +61,7 @@ export class WsPrismaExceptionFilter {
         (exception.meta as PrismaMeta)?.field_name,
     };
 
-    Logger.error(details);
+    this.wsPrismaExceptionFilterLogger.error(details);
     client.emit('error', details);
   }
 }

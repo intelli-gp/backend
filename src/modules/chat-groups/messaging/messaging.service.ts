@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Prisma, group_user } from '@prisma/client';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Prisma, group_user, message } from '@prisma/client';
 import { NotificationService } from 'src/modules/notification/notification.service';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { SerializedMessage } from '../serialized-types/messages/messages.serializer';
@@ -23,6 +23,41 @@ export class MessagingService {
       },
       include: {
         user: true,
+        replied_to_message: true,
+        message_reactions: {
+          include: {
+            user: {
+              select: {
+                user_id: true,
+                full_name: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getMessage(messageId: number) {
+    return await this.prismaService.message.findUnique({
+      where: {
+        message_id: messageId,
+      },
+      include: {
+        user: true,
+        replied_to_message: true,
+        message_reactions: {
+          include: {
+            user: {
+              select: {
+                user_id: true,
+                full_name: true,
+                image: true,
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -69,16 +104,23 @@ export class MessagingService {
     return readReceipts;
   }
 
-  async createMessage(groupId: number, userId: number, messageContent: string) {
+  async createMessage(
+    groupId: number,
+    userId: number,
+    messageContent: string,
+    repliedToMessageId?: number,
+  ) {
     const newMessage = await this.prismaService.message.create({
       data: {
         content: messageContent,
         group_id: groupId,
         user_id: userId,
+        reply_to: repliedToMessageId,
       },
 
       include: {
         user: true,
+        replied_to_message: true,
         group: {
           include: {
             group_user: true,
@@ -111,13 +153,72 @@ export class MessagingService {
 
     this.notificationsService.emitChatNotification(
       eligibleUsersForNotification,
-      new SerializedMessage(
-        newMessage as unknown as Prisma.messageWhereInput,
-        true,
-      ),
+      new SerializedMessage(newMessage as unknown as Prisma.messageWhereInput, {
+        isNotification: true,
+      }),
     );
 
     return newMessage;
+  }
+
+  /**
+   *
+   * @param messageId id of the message user wants to react to
+   * @param userId the user who wants to react to the message
+   * @param reaction reaction to the message (reaction is upserted, if it exists it is updated, if not it is created)
+   * @returns
+   */
+  async reactToMessage(messageId: number, userId: number, reaction: string) {
+    const messageExists = await this.prismaService.message.findUnique({
+      where: {
+        message_id: messageId,
+      },
+    });
+
+    if (!messageExists) {
+      throw new NotFoundException('Message not found');
+    }
+
+    const upsertedReaction = await this.prismaService.message_reaction.upsert({
+      where: {
+        message_id_user_id: {
+          message_id: messageId,
+          user_id: userId,
+        },
+      },
+      create: {
+        reaction,
+        message_id: messageId,
+        user_id: userId,
+      },
+      update: {
+        reaction,
+      },
+      include: {
+        message: {
+          include: {
+            user: true,
+            replied_to_message: true,
+            message_reactions: {
+              include: {
+                user: {
+                  select: {
+                    user_id: true,
+                    full_name: true,
+                    image: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return {
+      messageAfterReaction: upsertedReaction.message as message,
+      groupId: messageExists.group_id,
+    };
   }
 
   async deleteMessage(messageId: number, userId: number) {

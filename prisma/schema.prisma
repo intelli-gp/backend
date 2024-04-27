@@ -189,16 +189,30 @@ model message_ai {
 }
 
 model message {
-  message_id Int          @id @default(autoincrement())
+  message_id         Int                @id @default(autoincrement())
+  user_id            Int
+  group_id           Int
+  content            String
+  reply_to           Int?
+  deleted            Boolean            @default(false)
+  created_at         DateTime?          @default(now())
+  updated_at         DateTime?          @updatedAt
+  replied_to_message message?           @relation("replied_to_message", fields: [reply_to], references: [message_id], onDelete: SetNull, onUpdate: Cascade)
+  attachment         attachment[]
+  group              group              @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
+  user               user               @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  replies            message[]          @relation("replied_to_message")
+  message_reactions   message_reaction[]
+}
+
+model message_reaction {
+  message_id Int
   user_id    Int
-  group_id   Int
-  content    String
-  deleted    Boolean      @default(false)
-  created_at DateTime?    @default(now())
-  updated_at DateTime?    @updatedAt
-  attachment attachment[]
-  group      group        @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
-  user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  reaction   String  @db.VarChar(50)
+  message    message @relation(fields: [message_id], references: [message_id], onDelete: Cascade, onUpdate: Cascade)
+  user       user    @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([message_id, user_id])
 }
 
 model payment_method {
@@ -328,6 +342,7 @@ model user {
   liked_articles       article_like[]
   article_comment      article_comment[]
   article_comment_like article_comment_like[]
+  message_reactions     message_reaction[]
 }
 
 enum GroupUserTypeEnum {

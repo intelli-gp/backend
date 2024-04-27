@@ -19,7 +19,12 @@ import {
 import { Server, Socket } from 'socket.io';
 import { WsAuthMiddleware } from '../middleware/ws.auth.middleware';
 import { WsJwtGuard } from 'src/modules/auth/guards/ws.jwt.guard';
-import { CreateMessageDto, IsTypingDto, JoinChatGroupDto } from '../dto';
+import {
+  CreateMessageDto,
+  IsTypingDto,
+  JoinChatGroupDto,
+  ReactToMessageDto,
+} from '../dto';
 import { ServerToClientEvents, ClientToServerEvents } from './types';
 import { WebsocketExceptionsFilter } from 'src/exception-filters/ws.filter';
 import { GroupUsersService } from './group-users.service';
@@ -147,6 +152,7 @@ export class ChatGroupsGateway {
       data.GroupID,
       userId,
       data.Content,
+      data.RepliedToMessageID,
     );
 
     const groupTitle = this.createGroupTitle(data.GroupID);
@@ -190,7 +196,7 @@ export class ChatGroupsGateway {
     client.emit(
       'allMessages',
       messages.map((message) => {
-        return new SerializedMessage(message);
+        return new SerializedMessage(message as Prisma.messageWhereInput);
       }),
     );
 
@@ -281,9 +287,34 @@ export class ChatGroupsGateway {
     this.wss.to(groupTitle).emit(
       'allMessages',
       messagesAfterDeletion.map((message) => {
-        return new SerializedMessage(message);
+        return new SerializedMessage(message as Prisma.messageWhereInput);
       }),
     );
+  }
+
+  @SubscribeMessage('reactToMessage')
+  async reactToMessage(
+    @MessageBody() data: ReactToMessageDto,
+    @WsGetCurrentUser('user_id') userId: number,
+  ) {
+    this.gatewayLogger.debug({ reactionData: data });
+    const { messageAfterReaction, groupId } =
+      await this.messagingService.reactToMessage(
+        data.MessageID,
+        userId,
+        data.Reaction,
+      );
+
+    this.gatewayLogger.debug({ messageAfterReaction, groupId });
+
+    const groupTitle = this.createGroupTitle(groupId);
+
+    const serializedMessage = new SerializedMessage(messageAfterReaction);
+
+    this.gatewayLogger.debug({ serializedMessage });
+
+    // TODO: change this in edit message as well
+    this.wss.to(groupTitle).emit('editedMessage', serializedMessage);
   }
 
   @SubscribeMessage('editMessage')
@@ -306,7 +337,7 @@ export class ChatGroupsGateway {
     this.wss.to(groupTitle).emit(
       'allMessages',
       messagesAfterEdit.map((message) => {
-        return new SerializedMessage(message);
+        return new SerializedMessage(message as Prisma.messageWhereInput);
       }),
     );
   }
