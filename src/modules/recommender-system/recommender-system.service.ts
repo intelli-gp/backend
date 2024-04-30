@@ -1,80 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PaginationDto } from '../../common/dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { IdDto } from './dto/article.dto';
+import { HttpService } from '@nestjs/axios';
+import { AxiosResponse } from 'axios';
+import { DeleteArticleDto } from '../articles/dto';
 
 @Injectable()
 export class RecommenderSystemService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly httpService: HttpService,
+  ) {}
 
-  async getArticleRecommendations(paginationData: PaginationDto, idDto: IdDto) {
-    // TODO: Replace this with actual data from the recommender system (python)
-    const articlesWithScores = [
-      [2148, 1.0],
-      [2998, 1.0],
-      [1944, 1.0],
-      [2352, 1.0],
-      [2486, 1.0],
-      [2836, 1.0],
-      [2216, 1.0],
-      [2781, 0.9299],
-      [5083, 0.8598],
-      [6128, 0.8598],
-      [2769, 0.8566],
-      [2260, 0.8554],
-      [2615, 0.8554],
-      [2686, 0.8554],
-      [2252, 0.8554],
-      [2327, 0.8554],
-      [2364, 0.8554],
-      [5291, 0.8509],
-      [5134, 0.8509],
-      [3344, 0.8509],
-      [3880, 0.8509],
-      [5539, 0.8509],
-      [4000, 0.8509],
-      [6961, 0.8509],
-      [5754, 0.8509],
-      [5400, 0.8509],
-      [3744, 0.8509],
-      [6840, 0.8509],
-      [5457, 0.8495],
-      [4292, 0.8495],
-      [3342, 0.8495],
-      [3224, 0.8495],
-      [5252, 0.8495],
-      [2157, 0.8211],
-      [2083, 0.8201],
-      [223, 0.8178],
-      [2812, 0.817],
-      [1320, 0.8166],
-      [1157, 0.8166],
-      [2813, 0.8133],
-      [1004, 0.8101],
-      [1668, 0.8101],
-      [2879, 0.8101],
-      [2711, 0.8084],
-      [2959, 0.8084],
-      [2120, 0.8084],
-      [2418, 0.8084],
-      [4500, 0.8041],
-      [3706, 0.8041],
-      [6555, 0.8041],
-      [3204, 0.8041],
-      [3176, 0.8041],
-      [5471, 0.8041],
-      [6250, 0.7867],
-      [383, 0.7863],
-      [700, 0.7786],
-    ];
+  async getArticleRecommendations(
+    paginationData: PaginationDto,
+    idDto: DeleteArticleDto,
+  ) {
+    const article = await this.prismaService.article.findUnique({
+      where: { article_id: idDto.articleId },
+    });
 
-    const articleNeeded = articlesWithScores.slice(
+    if (!article) throw new BadRequestException('Article not found');
+
+    const { data } = await this.getData(idDto);
+    const articleNeeded = data.slice(
       paginationData.offset,
       paginationData.offset + paginationData.limit,
     );
 
     const articleNums = articleNeeded.map((article) => Number(article[0]));
-    console.log(articleNums);
 
     const articles = await this.prismaService.article.findMany({
       where: {
@@ -111,6 +65,11 @@ export class RecommenderSystemService {
     return articles;
   }
 
+  async getData(idDto: DeleteArticleDto): Promise<AxiosResponse<number[]>> {
+    const url = `http://recommender:5000/article-recommendations/${idDto.articleId}`;
+
+    return await this.httpService.axiosRef.get(url);
+  }
   async getGroupRecommendations(paginationData: PaginationDto) {}
 
   async getUserRecommendation(paginationData: PaginationDto) {}

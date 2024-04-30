@@ -1,13 +1,13 @@
-import { Controller, Get, HttpCode, Query } from '@nestjs/common';
+import { Controller, Get, HttpCode, Param, Query } from '@nestjs/common';
 import { PaginationDto } from '../../common/dto';
 import { RecommenderSystemService } from './recommender-system.service';
 import { ApiBadRequestResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { MultipleArticlesExample } from '../articles/swagger-examples';
 import { swaggerSuccessExample } from '../../utils/swagger/example-generator';
 import { multipleGroupsExample } from '../chat-groups/swagger-examples';
-import { IdDto } from './dto/article.dto';
 import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
 import { SerializedArticle } from '../articles/serialized-types/article.serialized';
+import { DeleteArticleDto } from '../articles/dto';
 
 // TODO: Implement the Methods
 @Controller('recommender-system')
@@ -29,13 +29,14 @@ export class RecommenderSystemController {
   @Get('articles/:articleId([0-9]+)')
   async getArticleRecommendations(
     @Query() paginationData: PaginationDto,
-    articleId: IdDto,
+    @Param() idDto: DeleteArticleDto,
   ) {
     const articles =
       await this.recommenderSystemService.getArticleRecommendations(
         paginationData,
-        articleId,
+        idDto,
       );
+
     return sendSuccessResponse(
       articles.map((article) => new SerializedArticle(article)),
     );
