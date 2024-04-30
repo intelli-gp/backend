@@ -19,6 +19,24 @@ services:
     networks:
       - intelligp-network
 
+  recommender:
+    container_name: intelligp-recommender
+    build:
+      context: ../recommender
+    ports:
+      - 5000:5000
+    environment:
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER_NAME=${DATABASE_USER_NAME}
+      - DATABASE_USER_PASSWORD=${DATABASE_USER_PASSWORD}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+    networks:
+      - intelligp-network
+    depends_on:
+      postgres:
+        condition: service_started
+
   redis:
     container_name: intelligp-redis
     image: redis
@@ -44,7 +62,6 @@ services:
       - POSTGRES_DB=${DATABASE_NAME}
     networks:
       - intelligp-network
-
   pgsync:
     build:
       context: ./pgsync
@@ -119,7 +136,7 @@ services:
         echo "All done!";
       '
     healthcheck:
-      test: ['CMD-SHELL', '[ -f config/certs/es01/es01.crt ]']
+      test: [ 'CMD-SHELL', '[ -f config/certs/es01/es01.crt ]' ]
       interval: 1s
       timeout: 5s
       retries: 120
@@ -165,12 +182,11 @@ services:
       test:
         [
           'CMD-SHELL',
-          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'"
         ]
       interval: 10s
       timeout: 10s
       retries: 120
-
   # es02:
   #   depends_on:
   #     - es01

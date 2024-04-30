@@ -39,17 +39,6 @@
                               "software",
                               "backend",
                               "web-development"
-                            "ID": 6,
-                            "FullName": "Omar Fahmy",
-                            "Username": "ofahmy143",
-                            "DOB": "2001-12-20T00:00:00.000Z",
-                            "Email": "ofahmy1234@gmail.com",
-                            "PhoneNumber": "+201060860770",
-                            "Connected": true,
-                            "UserTags": [
-                              "software",
-                              "backend",
-                              "web-development"
                             ],
                             "level": {
                               "level_id": 1,
@@ -3359,6 +3348,1462 @@
         },
         "tags": [
           "Chat Groups"
+        ]
+      }
+    },
+    "/api/notifications/events": {
+      "get": {
+        "operationId": "NotificationController_events",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/notifications/messages": {
+      "get": {
+        "operationId": "NotificationController_getMessagesNotifications",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Get all messages notifications for the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "Group": {
+                            "ID": 11,
+                            "GroupTitle": "404",
+                            "GroupDescription": "Nothing",
+                            "GroupCoverImage": "http://res.cloudinary.com/demxyvw8w/image/upload/v1710760762/MUJEDD/dia3jfrvpbzovobsavb5.jpg",
+                            "CreatedAt": "2024-03-18T11:19:23.236Z",
+                            "UpdatedAt": "2024-03-18T11:19:23.236Z",
+                            "GroupTags": [
+                              "tag1",
+                              "tag2"
+                            ]
+                          },
+                          "LastMessage": {
+                            "MessageID": 91,
+                            "Content": "unread message test",
+                            "User": {
+                              "ID": 8,
+                              "FullName": "Ahmed Fahmy",
+                              "Username": "ahmed132",
+                              "DOB": "2001-02-01T00:00:00.000Z",
+                              "Email": "ahmedfahmy123@gmail.com",
+                              "PhoneNumber": "+201060860770",
+                              "Connected": true
+                            },
+                            "IsDeleted": false,
+                            "CreatedAt": "2024-04-04T23:43:16.978Z"
+                          },
+                          "UnreadMessagesCount": 1
+                        },
+                        {
+                          "Group": {
+                            "ID": 11,
+                            "GroupTitle": "404",
+                            "GroupDescription": "Nothing",
+                            "GroupCoverImage": "http://res.cloudinary.com/demxyvw8w/image/upload/v1710760762/MUJEDD/dia3jfrvpbzovobsavb5.jpg",
+                            "CreatedAt": "2024-03-18T11:19:23.236Z",
+                            "UpdatedAt": "2024-03-18T11:19:23.236Z",
+                            "GroupTags": [
+                              "tag1",
+                              "tag2"
+                            ]
+                          },
+                          "LastMessage": {
+                            "MessageID": 91,
+                            "Content": "unread message test",
+                            "User": {
+                              "ID": 8,
+                              "FullName": "Ahmed Fahmy",
+                              "Username": "ahmed132",
+                              "DOB": "2001-02-01T00:00:00.000Z",
+                              "Email": "ahmedfahmy123@gmail.com",
+                              "PhoneNumber": "+201060860770",
+                              "Connected": true
+                            },
+                            "IsDeleted": false,
+                            "CreatedAt": "2024-04-04T23:43:16.978Z"
+                          },
+                          "UnreadMessagesCount": 1
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/search/users": {
+      "get": {
+        "operationId": "SearchController_searchUsers",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "searchTerm",
+            "required": true,
+            "in": "query",
+            "example": "pizza hu",
+            "description": "The search term",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns users array",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 6,
+                          "FullName": "Omar Fahmy",
+                          "Username": "ofahmy143",
+                          "DOB": "2001-12-20T00:00:00.000Z",
+                          "Email": "ofahmy1234@gmail.com",
+                          "PhoneNumber": "+201060860770",
+                          "Bio": "A software engineer",
+                          "Headline": "Backend Developer",
+                          "UserTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ]
+                        },
+                        {
+                          "ID": 6,
+                          "FullName": "Omar Fahmy",
+                          "Username": "ofahmy143",
+                          "DOB": "2001-12-20T00:00:00.000Z",
+                          "Email": "ofahmy1234@gmail.com",
+                          "PhoneNumber": "+201060860770",
+                          "Bio": "A software engineer",
+                          "Headline": "Backend Developer",
+                          "UserTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ]
+                        },
+                        {
+                          "ID": 6,
+                          "FullName": "Omar Fahmy",
+                          "Username": "ofahmy143",
+                          "DOB": "2001-12-20T00:00:00.000Z",
+                          "Email": "ofahmy1234@gmail.com",
+                          "PhoneNumber": "+201060860770",
+                          "Bio": "A software engineer",
+                          "Headline": "Backend Developer",
+                          "UserTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Search"
+        ]
+      }
+    },
+    "/api/search/articles": {
+      "get": {
+        "operationId": "SearchController_searchArticles",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "searchTerm",
+            "required": true,
+            "in": "query",
+            "example": "pizza hu",
+            "description": "The search term",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns articles array",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 1,
+                          "Title": "My article title updated",
+                          "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                          "CoverImage": "www.google.com/url/to/image.jpg",
+                          "ArticleTags": [
+                            "tag2",
+                            "tag3",
+                            "tag4"
+                          ],
+                          "Sections": [
+                            {
+                              "Value": "valueOfSection3434343422",
+                              "ContentType": "text"
+                            },
+                            {
+                              "Value": "typeOfSection1",
+                              "ContentType": "text"
+                            }
+                          ],
+                          "Author": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "ProfileImage": "www.google.com"
+                          }
+                        },
+                        {
+                          "ID": 1,
+                          "Title": "My article title updated",
+                          "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                          "CoverImage": "www.google.com/url/to/image.jpg",
+                          "ArticleTags": [
+                            "tag2",
+                            "tag3",
+                            "tag4"
+                          ],
+                          "Sections": [
+                            {
+                              "Value": "valueOfSection3434343422",
+                              "ContentType": "text"
+                            },
+                            {
+                              "Value": "typeOfSection1",
+                              "ContentType": "text"
+                            }
+                          ],
+                          "Author": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "ProfileImage": "www.google.com"
+                          }
+                        },
+                        {
+                          "ID": 1,
+                          "Title": "My article title updated",
+                          "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                          "CoverImage": "www.google.com/url/to/image.jpg",
+                          "ArticleTags": [
+                            "tag2",
+                            "tag3",
+                            "tag4"
+                          ],
+                          "Sections": [
+                            {
+                              "Value": "valueOfSection3434343422",
+                              "ContentType": "text"
+                            },
+                            {
+                              "Value": "typeOfSection1",
+                              "ContentType": "text"
+                            }
+                          ],
+                          "Author": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "ProfileImage": "www.google.com"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Search"
+        ]
+      }
+    },
+    "/api/search/chat-groups": {
+      "get": {
+        "operationId": "SearchController_searchGroups",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "searchTerm",
+            "required": true,
+            "in": "query",
+            "example": "pizza hu",
+            "description": "The search term",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns groups array",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ]
+                        },
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ]
+                        },
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Search"
+        ]
+      }
+    },
+    "/api/search": {
+      "get": {
+        "operationId": "SearchController_generalSearch",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "searchTerm",
+            "required": true,
+            "in": "query",
+            "example": "pizza hu",
+            "description": "The search term",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns general search result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {
+                        "users": [
+                          {
+                            "ID": 6,
+                            "FullName": "Omar Fahmy",
+                            "Username": "ofahmy143",
+                            "DOB": "2001-12-20T00:00:00.000Z",
+                            "Email": "ofahmy1234@gmail.com",
+                            "PhoneNumber": "+201060860770",
+                            "Bio": "A software engineer",
+                            "Headline": "Backend Developer",
+                            "UserTags": [
+                              "software",
+                              "backend",
+                              "web-development"
+                            ]
+                          },
+                          {
+                            "ID": 6,
+                            "FullName": "Omar Fahmy",
+                            "Username": "ofahmy143",
+                            "DOB": "2001-12-20T00:00:00.000Z",
+                            "Email": "ofahmy1234@gmail.com",
+                            "PhoneNumber": "+201060860770",
+                            "Bio": "A software engineer",
+                            "Headline": "Backend Developer",
+                            "UserTags": [
+                              "software",
+                              "backend",
+                              "web-development"
+                            ]
+                          },
+                          {
+                            "ID": 6,
+                            "FullName": "Omar Fahmy",
+                            "Username": "ofahmy143",
+                            "DOB": "2001-12-20T00:00:00.000Z",
+                            "Email": "ofahmy1234@gmail.com",
+                            "PhoneNumber": "+201060860770",
+                            "Bio": "A software engineer",
+                            "Headline": "Backend Developer",
+                            "UserTags": [
+                              "software",
+                              "backend",
+                              "web-development"
+                            ]
+                          }
+                        ],
+                        "groups": [
+                          {
+                            "ID": 7,
+                            "GroupTitle": "Dummy Title Updated",
+                            "GroupDescription": "Dummy Description",
+                            "GroupCoverImage": "www.google.com",
+                            "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                            "GroupTags": [
+                              "software",
+                              "backend",
+                              "web-development"
+                            ]
+                          },
+                          {
+                            "ID": 7,
+                            "GroupTitle": "Dummy Title Updated",
+                            "GroupDescription": "Dummy Description",
+                            "GroupCoverImage": "www.google.com",
+                            "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                            "GroupTags": [
+                              "software",
+                              "backend",
+                              "web-development"
+                            ]
+                          },
+                          {
+                            "ID": 7,
+                            "GroupTitle": "Dummy Title Updated",
+                            "GroupDescription": "Dummy Description",
+                            "GroupCoverImage": "www.google.com",
+                            "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                            "GroupTags": [
+                              "software",
+                              "backend",
+                              "web-development"
+                            ]
+                          }
+                        ],
+                        "articles": [
+                          {
+                            "ID": 1,
+                            "Title": "My article title updated",
+                            "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                            "CoverImage": "www.google.com/url/to/image.jpg",
+                            "ArticleTags": [
+                              "tag2",
+                              "tag3",
+                              "tag4"
+                            ],
+                            "Sections": [
+                              {
+                                "Value": "valueOfSection3434343422",
+                                "ContentType": "text"
+                              },
+                              {
+                                "Value": "typeOfSection1",
+                                "ContentType": "text"
+                              }
+                            ],
+                            "Author": {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "ProfileImage": "www.google.com"
+                            }
+                          },
+                          {
+                            "ID": 1,
+                            "Title": "My article title updated",
+                            "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                            "CoverImage": "www.google.com/url/to/image.jpg",
+                            "ArticleTags": [
+                              "tag2",
+                              "tag3",
+                              "tag4"
+                            ],
+                            "Sections": [
+                              {
+                                "Value": "valueOfSection3434343422",
+                                "ContentType": "text"
+                              },
+                              {
+                                "Value": "typeOfSection1",
+                                "ContentType": "text"
+                              }
+                            ],
+                            "Author": {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "ProfileImage": "www.google.com"
+                            }
+                          },
+                          {
+                            "ID": 1,
+                            "Title": "My article title updated",
+                            "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                            "CoverImage": "www.google.com/url/to/image.jpg",
+                            "ArticleTags": [
+                              "tag2",
+                              "tag3",
+                              "tag4"
+                            ],
+                            "Sections": [
+                              {
+                                "Value": "valueOfSection3434343422",
+                                "ContentType": "text"
+                              },
+                              {
+                                "Value": "typeOfSection1",
+                                "ContentType": "text"
+                              }
+                            ],
+                            "Author": {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "ProfileImage": "www.google.com"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Search"
+        ]
+      }
+    },
+    "/api/search/autocomplete": {
+      "get": {
+        "operationId": "SearchController_autocomplete",
+        "parameters": [
+          {
+            "name": "searchTerm",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns suggestions array",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        "software",
+                        "backend",
+                        "web-development",
+                        "frontend"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Search"
+        ]
+      }
+    },
+    "/api/courses": {
+      "get": {
+        "operationId": "CoursesController_getRecommendedCourses",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/api/courses/preview": {
+      "get": {
+        "operationId": "CoursesController_GetCategoriesPreview",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/api/courses/search": {
+      "get": {
+        "operationId": "CoursesController_searchCourses",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "query",
+            "required": true,
+            "in": "query",
+            "description": "Search query",
+            "example": "Javascript mastery",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Category of the course",
+            "example": "Development",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/api/recommender-system/articles/{articleId}": {
+      "get": {
+        "operationId": "RecommenderSystemController_getArticleRecommendations",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "articleId",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "description": "Article id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns article recommendations with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 1,
+                          "Title": "My article title updated",
+                          "CreatedAt": "2024-02-21T19:52:10.423Z",
+                          "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                          "CoverImage": "www.google.com/url/to/image.jpg",
+                          "ArticleTags": [
+                            "tag2",
+                            "tag3",
+                            "tag4"
+                          ],
+                          "Author": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false,
+                            "FollowersCount": 0
+                          },
+                          "Sections": [
+                            {
+                              "Value": "valueOfSection3434343422",
+                              "ContentType": "text"
+                            },
+                            {
+                              "Value": "typeOfSection1",
+                              "ContentType": "text"
+                            }
+                          ],
+                          "LikedBy": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            }
+                          ],
+                          "Comments": [
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            },
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 1,
+                          "Title": "My article title updated",
+                          "CreatedAt": "2024-02-21T19:52:10.423Z",
+                          "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                          "CoverImage": "www.google.com/url/to/image.jpg",
+                          "ArticleTags": [
+                            "tag2",
+                            "tag3",
+                            "tag4"
+                          ],
+                          "Author": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false,
+                            "FollowersCount": 0
+                          },
+                          "Sections": [
+                            {
+                              "Value": "valueOfSection3434343422",
+                              "ContentType": "text"
+                            },
+                            {
+                              "Value": "typeOfSection1",
+                              "ContentType": "text"
+                            }
+                          ],
+                          "LikedBy": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            }
+                          ],
+                          "Comments": [
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            },
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 1,
+                          "Title": "My article title updated",
+                          "CreatedAt": "2024-02-21T19:52:10.423Z",
+                          "UpdatedAt": "2024-02-21T20:33:01.069Z",
+                          "CoverImage": "www.google.com/url/to/image.jpg",
+                          "ArticleTags": [
+                            "tag2",
+                            "tag3",
+                            "tag4"
+                          ],
+                          "Author": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false,
+                            "FollowersCount": 0
+                          },
+                          "Sections": [
+                            {
+                              "Value": "valueOfSection3434343422",
+                              "ContentType": "text"
+                            },
+                            {
+                              "Value": "typeOfSection1",
+                              "ContentType": "text"
+                            }
+                          ],
+                          "LikedBy": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false
+                            }
+                          ],
+                          "Comments": [
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            },
+                            {
+                              "ID": 2,
+                              "Content": "Test comment",
+                              "CreatedAt": "2024-04-05T15:43:53.161Z",
+                              "ArticleID": 1,
+                              "Commenter": {
+                                "ID": 1,
+                                "FullName": "John",
+                                "Username": "John3142",
+                                "DOB": "2011-01-04T00:00:00.000Z",
+                                "Email": "johndoe.22@gmail.com",
+                                "PhoneNumber": "+201050790880",
+                                "Connected": false
+                              },
+                              "LikedBy": [
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                },
+                                {
+                                  "ID": 1,
+                                  "FullName": "John",
+                                  "Username": "John3142",
+                                  "DOB": "2011-01-04T00:00:00.000Z",
+                                  "Email": "johndoe.22@gmail.com",
+                                  "PhoneNumber": "+201050790880",
+                                  "Connected": false
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        },
+        "tags": [
+          "recommender-system"
+        ]
+      }
+    },
+    "/api/recommender-system/groups": {
+      "get": {
+        "operationId": "RecommenderSystemController_getGroupRecommendations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns article recommendations with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        },
+        "tags": [
+          "recommender-system"
+        ]
+      }
+    },
+    "/api/recommender-system/users": {
+      "get": {
+        "operationId": "RecommenderSystemController_getUsersRecommendations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns article recommendations with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        },
+        "tags": [
+          "recommender-system"
+        ]
+      }
+    },
+    "/api/recommender-system/courses": {
+      "get": {
+        "operationId": "RecommenderSystemController_getCoursesRecommendations",
+        "parameters": [],
+        "responses": {
+          "400": {
+            "description": "Invalid request"
+          }
+        },
+        "tags": [
+          "recommender-system"
         ]
       }
     }
