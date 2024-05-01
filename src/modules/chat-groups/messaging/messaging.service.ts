@@ -23,7 +23,16 @@ export class MessagingService {
       },
       include: {
         user: true,
-        replied_to_message: true,
+        replied_to_message: {
+          include: {
+            user: {
+              select: {
+                full_name: true,
+                username: true,
+              },
+            },
+          },
+        },
         message_reactions: {
           include: {
             user: {
@@ -31,6 +40,7 @@ export class MessagingService {
                 user_id: true,
                 full_name: true,
                 image: true,
+                username: true,
               },
             },
           },
@@ -54,6 +64,7 @@ export class MessagingService {
                 user_id: true,
                 full_name: true,
                 image: true,
+                username: true,
               },
             },
           },
@@ -120,7 +131,16 @@ export class MessagingService {
 
       include: {
         user: true,
-        replied_to_message: true,
+        replied_to_message: {
+          include: {
+            user: {
+              select: {
+                full_name: true,
+                username: true,
+              },
+            },
+          },
+        },
         group: {
           include: {
             group_user: true,
@@ -198,7 +218,16 @@ export class MessagingService {
         message: {
           include: {
             user: true,
-            replied_to_message: true,
+            replied_to_message: {
+              include: {
+                user: {
+                  select: {
+                    full_name: true,
+                    username: true,
+                  },
+                },
+              },
+            },
             message_reactions: {
               include: {
                 user: {
@@ -206,6 +235,7 @@ export class MessagingService {
                     user_id: true,
                     full_name: true,
                     image: true,
+                    username: true,
                   },
                 },
               },
