@@ -11,12 +11,10 @@ export class PaymentMethodService {
     const {  holderName, cardId,cardNumber,expiryDate } = data;
     const addedPaymentMethod = await this.prismaService.payment_method.create({
       data: {
-        
         holder_name:holderName,
-        card_id:cardId,
         user_id: userId,
         card_number:cardNumber,
-        expiry_date:expiryDate,
+        expiry_date: new Date(expiryDate),
       },
       include:{
         user: true,
@@ -31,7 +29,9 @@ export class PaymentMethodService {
       where: {
         user_id: userId,
       },
-    })
+    })  .catch((err) => {
+      throw new BadRequestException({ error: err });
+    });
     return paymentMethods;
   }
 

@@ -38,13 +38,10 @@ export class PaymentMethodController {
       (await this.paymentMethodService.getAllPaymentMethods(userId)).map(
         (paymentMethod) => new SerializedPaymentMethod(paymentMethod),
       ))
-    
+ 
   }
  
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.paymentMethodService.findOne(+id);
-  // }
+
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updatePaymentMethodDto: UpdatePaymentMethodDto) {
