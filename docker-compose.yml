@@ -31,6 +31,7 @@ services:
       - DATABASE_USER_PASSWORD=${DATABASE_USER_PASSWORD}
       - DATABASE_HOST=${DATABASE_HOST}
       - DATABASE_PORT=${DATABASE_PORT}
+      - API_KEY=${RECOMMENDER_API_KEY}
     networks:
       - intelligp-network
     depends_on:

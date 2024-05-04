@@ -4763,21 +4763,50 @@
         ]
       }
     },
-    "/api/recommender-system/users": {
+    "/api/recommender-system/users/{Username}": {
       "get": {
-        "operationId": "RecommenderSystemController_getUsersRecommendations",
-        "parameters": [],
+        "operationId": "RecommenderSystemController_getUserRecommendations",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "Username",
+            "required": true,
+            "in": "path",
+            "example": "John32",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Returns article recommendations with pagination",
+            "description": "Returns User recommendations with pagination",
             "content": {
               "application/json": {
                 "schema": {
                   "properties": {
                     "data": {
                       "type": "object",
-                      "properties": null,
-                      "example": {}
+                      "properties": null
                     }
                   }
                 }
