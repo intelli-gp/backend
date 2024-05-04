@@ -8,6 +8,8 @@ import { multipleGroupsExample } from '../chat-groups/swagger-examples';
 import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
 import { SerializedArticle } from '../articles/serialized-types/article.serialized';
 import { DeleteArticleDto } from '../articles/dto';
+import { SerializedUser } from '../users/serialized-types/serialized-user';
+import { GetSingleUserDto } from '../users/dto/get-user.dto';
 
 // TODO: Implement the Methods
 @Controller('recommender-system')
@@ -60,21 +62,26 @@ export class RecommenderSystemController {
     return groups;
   }
 
-  // TODO: add swagger example for the return object in OK Response
   @HttpCode(200)
   @HttpCode(400)
   @ApiOkResponse({
-    description: 'Returns article recommendations with pagination',
-    schema: swaggerSuccessExample(null, {}),
+    description: 'Returns User recommendations with pagination',
+    schema: swaggerSuccessExample(null),
   })
   @ApiBadRequestResponse({
     description: 'Invalid request',
   })
-  @Get('users')
-  async getUsersRecommendations(paginationData: PaginationDto) {
-    const users =
-      await this.recommenderSystemService.getUserRecommendation(paginationData);
-    return users;
+  @Get('users/:Username')
+  async getUserRecommendations(
+    @Query() paginationData: PaginationDto,
+    @Param() usernameDto: GetSingleUserDto,
+  ) {
+    const users = await this.recommenderSystemService.getUserRecommendations(
+      paginationData,
+      usernameDto,
+    );
+
+    return sendSuccessResponse(users.map((user) => new SerializedUser(user)));
   }
 
   // TODO: add swagger example for the return object in OK Response
@@ -86,7 +93,7 @@ export class RecommenderSystemController {
   @Get('courses')
   async getCoursesRecommendations(paginationData: PaginationDto) {
     const courses =
-      await this.recommenderSystemService.getCourseRecommendation(
+      await this.recommenderSystemService.getCourseRecommendations(
         paginationData,
       );
     return courses;

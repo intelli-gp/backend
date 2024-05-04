@@ -4,12 +4,13 @@ import { PrismaService } from '../prisma/prisma.service';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { DeleteArticleDto } from '../articles/dto';
+import { GetSingleUserDto } from '../users/dto/get-user.dto';
 
 @Injectable()
 export class RecommenderSystemService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly httpService: HttpService,
+    private readonly recommenderHttpService: HttpService,
   ) {}
 
   async getArticleRecommendations(
@@ -22,7 +23,7 @@ export class RecommenderSystemService {
 
     if (!article) throw new BadRequestException('Article not found');
 
-    const { data } = await this.getData(idDto);
+    const { data } = await this.getData(idDto.articleId, 'article');
     const articleNeeded = data.slice(
       paginationData.offset,
       paginationData.offset + paginationData.limit,
@@ -65,14 +66,43 @@ export class RecommenderSystemService {
     return articles;
   }
 
-  async getData(idDto: DeleteArticleDto): Promise<AxiosResponse<number[]>> {
-    const url = `http://recommender:5000/article-recommendations/${idDto.articleId}`;
-
-    return await this.httpService.axiosRef.get(url);
-  }
   async getGroupRecommendations(paginationData: PaginationDto) {}
 
-  async getUserRecommendation(paginationData: PaginationDto) {}
+  async getUserRecommendations(
+    paginationData: PaginationDto,
+    usernameDto: GetSingleUserDto,
+  ) {
+    const user = await this.prismaService.user.findUnique({
+      where: { username: usernameDto.Username },
+    });
 
-  async getCourseRecommendation(paginationData: PaginationDto) {}
+    if (!user) throw new BadRequestException('Article not found');
+
+    const { data } = await this.getData(user.user_id, 'user');
+    const userNeeded = data.slice(
+      paginationData.offset,
+      paginationData.offset + paginationData.limit,
+    );
+
+    const userNums = userNeeded.map((user) => Number(user[0]));
+
+    const users = await this.prismaService.user.findMany({
+      where: {
+        user_id: {
+          in: userNums,
+        },
+      },
+    });
+    return users;
+  }
+  async getCourseRecommendations(paginationData: PaginationDto) {}
+
+  private async getData(
+    id: number,
+    type: 'user' | 'article' | 'group',
+  ): Promise<AxiosResponse<number[]>> {
+    const urlPath = `/${type}-recommendations/${id}`;
+
+    return await this.recommenderHttpService.axiosRef.get(urlPath);
+  }
 }
