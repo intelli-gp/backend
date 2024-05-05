@@ -11,7 +11,11 @@ import { UpdateArticleDto } from './dto';
 import { DeserializedArticle } from './serialized-types/article.deserializer';
 import { PaginationDto } from 'src/common/dto';
 import { NotificationService } from '../notification/notification.service';
-import { ArticleNotificationTypesEnum } from '../notification/enums/article-notifications.enum';
+import {
+  NOTIFICATION_SUB_TYPES,
+  NOTIFICATION_TYPES,
+} from '../notification/enums/notification-primary-types.enum';
+import { ARTICLE_NOTIFICATION_TYPES } from '../notification/enums/article-notifications.enum';
 
 @Injectable()
 export class ArticlesService {
@@ -224,7 +228,7 @@ export class ArticlesService {
     await this.notificationsService.emitArticleNotification(
       articleComment.article.user,
       {
-        type: ArticleNotificationTypesEnum.COMMENT,
+        type: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].COMMENT,
         comment: notificationComment,
       },
     );
@@ -332,7 +336,7 @@ export class ArticlesService {
       await this.notificationsService.emitArticleNotification(
         articleLike.article.user,
         {
-          type: ArticleNotificationTypesEnum.LIKE,
+          type: ARTICLE_NOTIFICATION_TYPES.LIKE,
           like: articleLike,
         },
       );
@@ -369,6 +373,43 @@ export class ArticlesService {
       return await this.prismaService.article_comment_like.create({
         data: {
           comment_id: commentId,
+          user_id: userId,
+        },
+        include: {
+          user: true,
+        },
+      });
+    }
+  }
+
+  async toggleBookmarkArticle(articleId: number, userId: number) {
+    const bookmarkExists = await this.prismaService.article_bookmark.findUnique(
+      {
+        where: {
+          article_id_user_id: {
+            article_id: articleId,
+            user_id: userId,
+          },
+        },
+      },
+    );
+
+    if (bookmarkExists) {
+      return await this.prismaService.article_bookmark.delete({
+        where: {
+          article_id_user_id: {
+            article_id: articleId,
+            user_id: userId,
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+    } else {
+      return await this.prismaService.article_bookmark.create({
+        data: {
+          article_id: articleId,
           user_id: userId,
         },
         include: {
