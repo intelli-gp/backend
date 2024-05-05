@@ -133,7 +133,7 @@ export class ArticlesController {
     return sendSuccessResponse(new SerializedUser(articleLike.user));
   }
 
-  @Post('/:articleId([0-9]+)/comment/:commentId([0-9]+)/like')
+  @Post('/:articleId([0-9]+)/comment/:commentId([0-9]+)/toggle-like')
   async toggleLikeOnArticleComment(
     @GetCurrentUser('user_id') userId: number,
     @Param() filterData: GetCommentDto,
