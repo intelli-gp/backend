@@ -1,38 +1,32 @@
-import { Prisma, article_comment_like } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { SerializedArticleComment } from 'src/modules/articles/serialized-types/article-comment.serializer';
 import { SerializedArticleLike } from 'src/modules/articles/serialized-types/article-like.serializer';
-import { ArticleNotificationTypesEnum } from '../enums/article-notifications.enum';
+import { NotificationType } from '../enums/notification-primary-types.enum';
+import { ArticleNotificationType } from '../enums/article-notifications.enum';
 export type ArticleNotificationArgs =
   | {
-      type: ArticleNotificationTypesEnum.LIKE;
+      type: ArticleNotificationType<'LIKE'>;
       like: Prisma.article_likeWhereInput;
     }
   | {
-      type: ArticleNotificationTypesEnum.COMMENT;
+      type: ArticleNotificationType<'COMMENT'>;
       comment: Prisma.article_commentWhereInput;
     };
 
 export type ArticleLikeNotification = {
-  eventName: 'article-notification';
-  type: ArticleNotificationTypesEnum.LIKE;
+  eventName: NotificationType<'ARTICLE'>;
+  type: ArticleNotificationType<'LIKE'>;
   message: SerializedArticleLike;
 };
 
 export type ArticleCommentNotification = {
-  eventName: 'article-notification';
-  type: ArticleNotificationTypesEnum.COMMENT;
+  eventName: NotificationType<'ARTICLE'>;
+  type: ArticleNotificationType<'COMMENT'>;
   message: SerializedArticleComment;
-};
-
-export type ArticleCommentReplyNotification = {
-  eventName: 'article-notification';
-  type: ArticleNotificationTypesEnum.COMMENT_REPLY;
-  message: article_comment_like;
 };
 
 export type ArticleNotification =
   | ArticleLikeNotification
-  | ArticleCommentNotification
-  | ArticleCommentReplyNotification;
+  | ArticleCommentNotification;
 
 export default ArticleNotification;

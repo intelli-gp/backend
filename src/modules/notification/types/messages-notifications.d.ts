@@ -1,5 +1,7 @@
 import { group, message } from '@prisma/client';
 import { SerializedMessage } from 'src/modules/chat-groups/serialized-types/messages/messages.serializer';
+import { NotificationType } from '../enums/notification-primary-types.enum';
+
 export type ChatGroupMessagesNotification = {
   group: group;
   lastMessage: message;
@@ -7,6 +9,6 @@ export type ChatGroupMessagesNotification = {
 };
 
 export type chatNotification = {
-  eventName: 'chat-group-message';
+  eventName: NotificationType<'MESSAGE'>;
   message: SerializedMessage;
 };
