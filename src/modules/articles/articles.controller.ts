@@ -32,6 +32,7 @@ import { MultipleArticlesExample } from './swagger-examples/multiple-articles.ex
 import { SerializedUser } from '../users/serialized-types/serialized-user';
 import { SerializedArticleComment } from './serialized-types/article-comment.serializer';
 import { Prisma } from '@prisma/client';
+import { SerializedPaginated } from 'src/common/paginated-results.serializer';
 
 @Controller('articles')
 @ApiTags('Articles')
@@ -101,6 +102,26 @@ export class ArticlesController {
       articleData.articleId,
     );
     return sendSuccessResponse(new SerializedArticle(article));
+  }
+
+  @Get('/bookmarked')
+  async getBookmarkedArticles(
+    @GetCurrentUser('user_id') userId: number,
+    @Query() paginationData: PaginationDto,
+  ) {
+    const { articles, totalCount } =
+      await this.articlesService.getBookmarkedArticles(paginationData, userId);
+    return sendSuccessResponse(
+      new SerializedPaginated(
+        articles,
+        totalCount,
+        {
+          offset: paginationData.offset,
+          limit: paginationData.limit,
+        },
+        SerializedArticle,
+      ),
+    );
   }
 
   @Post('/:articleId([0-9]+)/bookmark')

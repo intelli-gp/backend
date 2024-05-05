@@ -128,6 +128,36 @@ export class ArticlesService {
     return articles;
   }
 
+  async getBookmarkedArticles(paginationData: PaginationDto, userId: number) {
+    const bookmarkedArticleCount =
+      await this.prismaService.article_bookmark.count();
+    const articles = await this.prismaService.article_bookmark.findMany({
+      take: paginationData.limit,
+      skip: paginationData.offset,
+      where: {
+        user_id: userId,
+      },
+      include: {
+        article: {
+          include: {
+            article_tag: true,
+            user: true,
+            article_likes: {
+              include: {
+                user: true,
+              },
+            },
+            article_comments: true,
+          },
+        },
+      },
+    });
+    return {
+      articles: articles.map((article) => article.article),
+      totalCount: bookmarkedArticleCount,
+    };
+  }
+
   async createArticle(data: CreateArticleDto, userId: number) {
     const { title, coverImageUrl, tags, sections } = data;
     const sectionsPayload = sections.map(([value, content_type]) => ({
