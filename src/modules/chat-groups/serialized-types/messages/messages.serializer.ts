@@ -2,6 +2,8 @@ import { Prisma, attachment } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 import { SerializedChatGroup } from '../chat-group/chat-group.serializer';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
+import { Logger } from '@nestjs/common';
+import { SerializedAttachment } from './attachment.serializer';
 
 export class SerializedMessage {
   MessageID: number;
@@ -10,7 +12,7 @@ export class SerializedMessage {
 
   Content: string;
 
-  Attachment: attachment;
+  Attachment?: SerializedAttachment[];
 
   CreatedAt: string;
 
@@ -28,6 +30,7 @@ export class SerializedMessage {
     partial: Partial<Omit<Prisma.messageWhereInput, 'AND' | 'OR' | 'NOT'>>,
     isNotification = false,
   ) {
+    partial
     this.MessageID = Number(partial?.message_id);
     this.Content = partial?.deleted
       ? 'This message has been deleted'
@@ -35,11 +38,17 @@ export class SerializedMessage {
 
     this.User = new SerializedUser(partial?.user);
     this.IsDeleted = partial?.deleted as boolean;
-    // this.Attachment = {
-    //   ID: partial?.attachment?.attachment_id,
-    //   URL: partial?.attachment?.url,
-    //   Type: partial?.attachment?.type,
-    // };
+    Logger.debug("partial?.attachment");
+
+    Logger.debug(partial?.attachment);
+
+    if (partial?.attachment) {
+      this.Attachment = (partial.attachment as Prisma.attachmentWhereInput []).map( att => (
+        new SerializedAttachment(att)
+      ));
+    } else {
+      this.Attachment = [];
+    }
 
     this.CreatedAt = partial?.created_at as string;
     if (isNotification) {

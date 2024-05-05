@@ -8,7 +8,7 @@ export class PaymentMethodService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createPaymentMethod(data: CreatePaymentMethodDto, userId: number) {
-    const {  holderName, cardId,cardNumber,expiryDate } = data;
+    const {  holderName, cardNumber,expiryDate } = data;
     const addedPaymentMethod = await this.prismaService.payment_method.create({
       data: {
         holder_name:holderName,

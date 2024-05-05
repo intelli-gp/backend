@@ -98,9 +98,8 @@ model articles_content {
 model attachment {
   attachment_id Int     @id @default(autoincrement())
   message_id    Int
-  photo_url     String? @db.VarChar(255)
-  video_url     String? @db.VarChar(255)
-  location      String? @db.VarChar(255)
+  type          String? @db.VarChar(255)
+  content       String? @db.VarChar(255)
   message       message @relation(fields: [message_id], references: [message_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
@@ -196,14 +195,14 @@ model message {
   deleted    Boolean      @default(false)
   created_at DateTime?    @default(now())
   updated_at DateTime?    @updatedAt
-  attachment attachment[]
+  attachment attachment[]?
   group      group        @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
   user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model payment_method {
   method_id   Int       @id @default(autoincrement())
-  card_id     String    @db.VarChar(50)
+  card_id     String?   @db.VarChar(50)
   card_number String    @db.VarChar(255)
   holder_name String    @db.VarChar(100)
   expiry_date DateTime  @db.Date
