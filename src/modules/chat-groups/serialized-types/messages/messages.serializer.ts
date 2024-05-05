@@ -1,9 +1,7 @@
-import { Prisma, attachment } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 import { SerializedChatGroup } from '../chat-group/chat-group.serializer';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
-import { Logger } from '@nestjs/common';
-import { SerializedAttachment } from './attachment.serializer';
 
 export class SerializedMessage {
   MessageID: number;
@@ -12,7 +10,7 @@ export class SerializedMessage {
 
   Content: string;
 
-  Attachment?: SerializedAttachment[];
+  Type: string;
 
   CreatedAt: string;
 
@@ -38,18 +36,8 @@ export class SerializedMessage {
 
     this.User = new SerializedUser(partial?.user);
     this.IsDeleted = partial?.deleted as boolean;
-    Logger.debug("partial?.attachment");
-
-    Logger.debug(partial?.attachment);
-
-    if (partial?.attachment) {
-      this.Attachment = (partial.attachment as Prisma.attachmentWhereInput []).map( att => (
-        new SerializedAttachment(att)
-      ));
-    } else {
-      this.Attachment = [];
-    }
-
+ 
+    this.Type =partial?.type as string;
     this.CreatedAt = partial?.created_at as string;
     if (isNotification) {
       this.Group = new SerializedChatGroup(partial?.group);

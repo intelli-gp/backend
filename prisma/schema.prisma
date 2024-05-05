@@ -100,7 +100,6 @@ model attachment {
   message_id    Int
   type          String? @db.VarChar(255)
   content       String? @db.VarChar(255)
-  message       message @relation(fields: [message_id], references: [message_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model badges {
@@ -191,11 +190,11 @@ model message {
   message_id Int          @id @default(autoincrement())
   user_id    Int
   group_id   Int
-  content    String
+  content    String       @db.VarChar(50)
+  type    String
   deleted    Boolean      @default(false)
   created_at DateTime?    @default(now())
   updated_at DateTime?    @updatedAt
-  attachment attachment[]?
   group      group        @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
   user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
@@ -332,4 +331,9 @@ model user {
 enum GroupUserTypeEnum {
   ADMIN
   MEMBER
+}
+
+enum MessageTypeEnum {
+  MESSAGE
+  IMAGE
 }

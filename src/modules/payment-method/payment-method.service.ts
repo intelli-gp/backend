@@ -1,22 +1,22 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { CreatePaymentMethodDto } from './dto/create-payment-method.dto';
-import { UpdatePaymentMethodDto } from './dto/update-payment-method.dto';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class PaymentMethodService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async createPaymentMethod(data: CreatePaymentMethodDto, userId: number) {
-    const {  holderName, cardNumber,expiryDate } = data;
+    const { holderName, cardNumber, expiryDate,cardId } = data;
     const addedPaymentMethod = await this.prismaService.payment_method.create({
       data: {
-        holder_name:holderName,
+        holder_name: holderName,
         user_id: userId,
-        card_number:cardNumber,
+        card_id: cardId, 
+        card_number: cardNumber,
         expiry_date: new Date(expiryDate),
       },
-      include:{
+      include: {
         user: true,
       }
     })
@@ -24,12 +24,12 @@ export class PaymentMethodService {
   }
 
 
-  async getAllPaymentMethods( userId: number) {
+  async getAllPaymentMethods(userId: number) {
     const paymentMethods = await this.prismaService.payment_method.findMany({
       where: {
         user_id: userId,
       },
-    })  .catch((err) => {
+    }).catch((err) => {
       throw new BadRequestException({ error: err });
     });
     return paymentMethods;

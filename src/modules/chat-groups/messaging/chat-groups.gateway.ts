@@ -147,7 +147,7 @@ export class ChatGroupsGateway {
       data.GroupID,
       userId,
       data.Content,
-      data.Attachment
+      data.Type
     );
 
     const groupTitle = this.createGroupTitle(data.GroupID);

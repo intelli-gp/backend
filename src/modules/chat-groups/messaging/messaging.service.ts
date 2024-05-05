@@ -4,7 +4,6 @@ import { NotificationService } from 'src/modules/notification/notification.servi
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { SerializedMessage } from '../serialized-types/messages/messages.serializer';
 import { MessageReadReceipt } from './types/message-read';
-import { SerializedAttachment } from '../serialized-types/messages/attachment.serializer';
 
 @Injectable()
 export class MessagingService {
@@ -70,20 +69,13 @@ export class MessagingService {
     return readReceipts;
   }
 
-  async createMessage(groupId: number, userId: number, messageContent: string, attachments: SerializedAttachment[]) {
+  async createMessage(groupId: number, userId: number, messageContent: string, messageType:string) {
     const newMessage = await this.prismaService.message.create({
       data: {
         content: messageContent,
         group_id: groupId,
         user_id: userId,
-        attachment:{
-          createMany:{
-          data: attachments.map( (attachment: SerializedAttachment)=>({ 
-            message_id: attachment.MessageID,
-            type: String(attachment.Type),
-            content: String(attachment.Content)
-          }))
-        }}
+        type:messageType,
       },
 
       include: {
