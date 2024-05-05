@@ -103,6 +103,18 @@ export class ArticlesController {
     return sendSuccessResponse(new SerializedArticle(article));
   }
 
+  @Post('/:articleId([0-9]+)/bookmark')
+  async toggleBookmarkArticle(
+    @GetCurrentUser('user_id') userId: number,
+    @Param() articleData: DeleteArticleDto,
+  ) {
+    await this.articlesService.toggleBookmarkArticle(
+      articleData.articleId,
+      userId,
+    );
+    return sendSuccessResponse('Article bookmarked successfully');
+  }
+
   @ApiResponse({
     status: 200,
     description: 'Toggle like on article',
