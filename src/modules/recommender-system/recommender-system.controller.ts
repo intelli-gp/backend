@@ -10,6 +10,7 @@ import { SerializedArticle } from '../articles/serialized-types/article.serializ
 import { DeleteArticleDto } from '../articles/dto';
 import { SerializedUser } from '../users/serialized-types/serialized-user';
 import { GetSingleUserDto } from '../users/dto/get-user.dto';
+import { GetCurrentUser } from '../auth/ParamDecorator';
 
 // TODO: Implement the Methods
 @Controller('recommender-system')
@@ -22,7 +23,8 @@ export class RecommenderSystemController {
   @HttpCode(200)
   @HttpCode(400)
   @ApiOkResponse({
-    description: 'Returns article recommendations with pagination',
+    description:
+      'Returns article recommendations with pagination based on the article id',
     schema: swaggerSuccessExample(null, MultipleArticlesExample),
   })
   @ApiBadRequestResponse({
@@ -34,7 +36,7 @@ export class RecommenderSystemController {
     @Param() idDto: DeleteArticleDto,
   ) {
     const articles =
-      await this.recommenderSystemService.getArticleRecommendations(
+      await this.recommenderSystemService.getSpecificArticleRecommendations(
         paginationData,
         idDto,
       );
@@ -47,25 +49,8 @@ export class RecommenderSystemController {
   @HttpCode(200)
   @HttpCode(400)
   @ApiOkResponse({
-    description: 'Returns article recommendations with pagination',
-    schema: swaggerSuccessExample(null, multipleGroupsExample),
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid request',
-  })
-  @Get('groups')
-  async getGroupRecommendations(paginationData: PaginationDto) {
-    const groups =
-      await this.recommenderSystemService.getGroupRecommendations(
-        paginationData,
-      );
-    return groups;
-  }
-
-  @HttpCode(200)
-  @HttpCode(400)
-  @ApiOkResponse({
-    description: 'Returns User recommendations with pagination',
+    description:
+      'Returns User recommendations with pagination based on the user id',
     schema: swaggerSuccessExample(null),
   })
   @ApiBadRequestResponse({
@@ -76,26 +61,62 @@ export class RecommenderSystemController {
     @Query() paginationData: PaginationDto,
     @Param() usernameDto: GetSingleUserDto,
   ) {
-    const users = await this.recommenderSystemService.getUserRecommendations(
-      paginationData,
-      usernameDto,
-    );
+    const users =
+      await this.recommenderSystemService.getSpecificUserRecommendations(
+        paginationData,
+        usernameDto,
+      );
 
     return sendSuccessResponse(users.map((user) => new SerializedUser(user)));
   }
 
-  // TODO: add swagger example for the return object in OK Response
   @HttpCode(200)
   @HttpCode(400)
+  @ApiOkResponse({
+    description:
+      'Returns article recommendations with pagination based on the interests of the user',
+    schema: swaggerSuccessExample(null, MultipleArticlesExample),
+  })
   @ApiBadRequestResponse({
     description: 'Invalid request',
   })
-  @Get('courses')
-  async getCoursesRecommendations(paginationData: PaginationDto) {
-    const courses =
-      await this.recommenderSystemService.getCourseRecommendations(
+  @Get('articles')
+  async getGeneralArticleRecommendations(
+    @Query() paginationData: PaginationDto,
+    @GetCurrentUser('user_id') userId,
+  ) {
+    const articles =
+      await this.recommenderSystemService.getGeneralArticleRecommendations(
         paginationData,
+        userId,
       );
-    return courses;
+
+    return sendSuccessResponse(
+      articles.map((article) => new SerializedArticle(article)),
+    );
+  }
+
+  @HttpCode(200)
+  @HttpCode(400)
+  @ApiOkResponse({
+    description:
+      'Returns User recommendations with pagination based on the interests of the user',
+    schema: swaggerSuccessExample(null),
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid request',
+  })
+  @Get('users')
+  async getGeneralUserRecommendations(
+    @Query() paginationData: PaginationDto,
+    @GetCurrentUser('user_id') userId,
+  ) {
+    const users =
+      await this.recommenderSystemService.getGeneralUserRecommendations(
+        paginationData,
+        userId,
+      );
+
+    return sendSuccessResponse(users.map((user) => new SerializedUser(user)));
   }
 }
