@@ -8,6 +8,9 @@ import {
   NotificationSubtype,
   NotificationType,
 } from '../enums/notification-primary-types.enum';
+import { Logger } from '@nestjs/common';
+
+const notificationsSerializerLogger = new Logger('NotificationsSerializer');
 
 export interface NotificationSendType<
   T extends NotificationType<void>,
@@ -52,6 +55,7 @@ export class SerializedUserNotifications {
       const serializedArticleComments = (
         article.article_comments as article_comment[]
       )?.map((comment) => {
+        notificationsSerializerLogger.debug(comment);
         return new SerializedUserNotification<
           article_comment,
           SerializedArticleComment,
@@ -70,6 +74,7 @@ export class SerializedUserNotifications {
       const serializedArticleLikes = (
         article.article_likes as article_like[]
       )?.map((like) => {
+        notificationsSerializerLogger.debug(like);
         return new SerializedUserNotification<
           article_like,
           SerializedArticleLike,
@@ -91,10 +96,10 @@ export class SerializedUserNotifications {
 
     const combinedSortedNotifications = articlesNotifications
       ?.flat()
-      .slice(paginationData.offset, paginationData.limit)
       .sort((a, b) => {
         return b.createdAt.getTime() - a.createdAt.getTime();
-      });
+      })
+      .slice(paginationData.offset, paginationData.limit);
 
     return combinedSortedNotifications;
   }

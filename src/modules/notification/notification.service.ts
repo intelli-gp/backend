@@ -129,13 +129,13 @@ export class NotificationService {
       `Getting notifications for user ${userId}`,
     );
 
-    const cachedUser = await this.cacheService.get(
-      `user-${userId}-notifications`,
-    );
+    // const cachedUser = await this.cacheService.get(
+    //   `user-${userId}-notifications`,
+    // );
 
-    if (cachedUser) {
-      return cachedUser;
-    }
+    // if (cachedUser) {
+    //   return cachedUser;
+    // }
 
     const userWithNotifications = await this.prismaService.user.findUnique({
       where: {
@@ -150,6 +150,7 @@ export class NotificationService {
                 article_id: true,
                 created_at: true,
                 comment_id: true,
+                isNotificationViewed: true,
                 user: {
                   select: {
                     image: true,
@@ -164,6 +165,7 @@ export class NotificationService {
               select: {
                 article_id: true,
                 liked_at: true,
+                isNotificationViewed: true,
                 user: {
                   select: {
                     image: true,
@@ -179,11 +181,11 @@ export class NotificationService {
       },
     });
 
-    await this.cacheService.set(
-      `user-${userId}-notifications`,
-      userWithNotifications,
-      3600,
-    );
+    // await this.cacheService.set(
+    //   `user-${userId}-notifications`,
+    //   userWithNotifications,
+    //   3600,
+    // );
 
     return userWithNotifications;
   }
