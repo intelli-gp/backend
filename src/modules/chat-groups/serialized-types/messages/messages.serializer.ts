@@ -1,7 +1,13 @@
-import { Prisma } from '@prisma/client';
+import { Prisma,  message, message_reaction } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 import { SerializedChatGroup } from '../chat-group/chat-group.serializer';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
+import { SerializedMessageReaction } from './message-reaction.serializer';
+
+interface SerializedMessageOptions {
+  isNotification?: boolean;
+  isReply?: boolean;
+}
 
 export class SerializedMessage {
   MessageID: number;
@@ -16,17 +22,23 @@ export class SerializedMessage {
 
   IsDeleted: boolean;
 
-  // TODO: link all serializer types
-  Group: any;
+  Group: SerializedChatGroup;
 
-  MessageReadBy: any[];
+  UpdatedAt: string;
+
+  RepliedToMessage: SerializedMessage;
+
+  Reactions: SerializedMessageReaction[];
 
   @Exclude()
-  updated_at: Date;
+  reply_to: number;
+
+  @Exclude()
+  replies: message[];
 
   constructor(
     partial: Partial<Omit<Prisma.messageWhereInput, 'AND' | 'OR' | 'NOT'>>,
-    isNotification = false,
+    options?: SerializedMessageOptions,
   ) {
     partial
     this.MessageID = Number(partial?.message_id);
@@ -39,7 +51,23 @@ export class SerializedMessage {
  
     this.Type =partial?.type as string;
     this.CreatedAt = partial?.created_at as string;
-    if (isNotification) {
+
+    this.UpdatedAt = partial?.updated_at as string;
+
+    this.Reactions = (partial?.message_reactions as message_reaction[])?.map(
+      (reaction) => new SerializedMessageReaction(reaction),
+    );
+
+    if (!options?.isReply && partial?.replied_to_message) {
+      this.RepliedToMessage = new SerializedMessage(
+        partial?.replied_to_message,
+        {
+          isReply: true,
+        },
+      );
+    }
+
+    if (options?.isNotification) {
       this.Group = new SerializedChatGroup(partial?.group);
     }
   }

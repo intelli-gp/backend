@@ -10,12 +10,19 @@ import { TagsService } from '../tags/tags.service';
 import { UpdateArticleDto } from './dto';
 import { DeserializedArticle } from './serialized-types/article.deserializer';
 import { PaginationDto } from 'src/common/dto';
+import { NotificationService } from '../notification/notification.service';
+import {
+  NOTIFICATION_SUB_TYPES,
+  NOTIFICATION_TYPES,
+} from '../notification/enums/notification-primary-types.enum';
+import { ARTICLE_NOTIFICATION_TYPES } from '../notification/enums/article-notifications.enum';
 
 @Injectable()
 export class ArticlesService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly tagsService: TagsService,
+    private readonly notificationsService: NotificationService,
   ) {}
 
   // TODO: Temporary
@@ -121,6 +128,36 @@ export class ArticlesService {
     return articles;
   }
 
+  async getBookmarkedArticles(paginationData: PaginationDto, userId: number) {
+    const bookmarkedArticleCount =
+      await this.prismaService.article_bookmark.count();
+    const articles = await this.prismaService.article_bookmark.findMany({
+      take: paginationData.limit,
+      skip: paginationData.offset,
+      where: {
+        user_id: userId,
+      },
+      include: {
+        article: {
+          include: {
+            article_tag: true,
+            user: true,
+            article_likes: {
+              include: {
+                user: true,
+              },
+            },
+            article_comments: true,
+          },
+        },
+      },
+    });
+    return {
+      articles: articles.map((article) => article.article),
+      totalCount: bookmarkedArticleCount,
+    };
+  }
+
   async createArticle(data: CreateArticleDto, userId: number) {
     const { title, coverImageUrl, tags, sections } = data;
     const sectionsPayload = sections.map(([value, content_type]) => ({
@@ -195,7 +232,7 @@ export class ArticlesService {
     userId: number,
     commentContent: string,
   ) {
-    const comment = await this.prismaService.article_comment.create({
+    const articleComment = await this.prismaService.article_comment.create({
       data: {
         article_id: articleId,
         user_id: userId,
@@ -203,6 +240,11 @@ export class ArticlesService {
       },
       include: {
         user: true,
+        article: {
+          include: {
+            user: true,
+          },
+        },
         article_comment_likes: {
           include: {
             user: true,
@@ -210,7 +252,17 @@ export class ArticlesService {
         },
       },
     });
-    return comment;
+
+    const { article_comment_likes, ...notificationComment } = articleComment;
+
+    await this.notificationsService.emitArticleNotification(
+      articleComment.article.user,
+      {
+        type: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].COMMENT,
+        comment: notificationComment,
+      },
+    );
+    return articleComment;
   }
 
   async updateCommentOnArticle(
@@ -283,6 +335,7 @@ export class ArticlesService {
 
     if (likeExists) {
       // TODO: decide whether to delete the like or just add an invisible flag
+      // If invisible flag added then just use prisma upsert
       return await this.prismaService.article_like.delete({
         where: {
           article_id_user_id: {
@@ -295,15 +348,30 @@ export class ArticlesService {
         },
       });
     } else {
-      return await this.prismaService.article_like.create({
+      const articleLike = await this.prismaService.article_like.create({
         data: {
           article_id: articleId,
           user_id: userId,
         },
         include: {
+          article: {
+            include: {
+              user: true,
+            },
+          },
           user: true,
         },
       });
+
+      await this.notificationsService.emitArticleNotification(
+        articleLike.article.user,
+        {
+          type: ARTICLE_NOTIFICATION_TYPES.LIKE,
+          like: articleLike,
+        },
+      );
+
+      return articleLike;
     }
   }
   async toggleLikeArticleComment(commentId: number, userId: number) {
@@ -335,6 +403,43 @@ export class ArticlesService {
       return await this.prismaService.article_comment_like.create({
         data: {
           comment_id: commentId,
+          user_id: userId,
+        },
+        include: {
+          user: true,
+        },
+      });
+    }
+  }
+
+  async toggleBookmarkArticle(articleId: number, userId: number) {
+    const bookmarkExists = await this.prismaService.article_bookmark.findUnique(
+      {
+        where: {
+          article_id_user_id: {
+            article_id: articleId,
+            user_id: userId,
+          },
+        },
+      },
+    );
+
+    if (bookmarkExists) {
+      return await this.prismaService.article_bookmark.delete({
+        where: {
+          article_id_user_id: {
+            article_id: articleId,
+            user_id: userId,
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+    } else {
+      return await this.prismaService.article_bookmark.create({
+        data: {
+          article_id: articleId,
           user_id: userId,
         },
         include: {

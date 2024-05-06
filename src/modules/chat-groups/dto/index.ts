@@ -6,3 +6,5 @@ export * from './join-chat-group.dto';
 export * from './update-permission.dto';
 export * from './create-message.dto';
 export * from './is-typing.dto';
+export * from './edit-message.dto';
+export * from './react-to-message.dto';

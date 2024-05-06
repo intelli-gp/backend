@@ -1,6 +1,8 @@
-# Intelligp Backend Api
+# Mujedd Backend Api
 
 ## Getting Started
 
-- To run this project using docker  `docker-compose up`
-- To run it locally without docker  `npm run start:dev`  but make sure dependancies are installed and credentials are in your env file
+To run this project using docker Compose: 
+
+- Development : `docker compose --profile dev up -d`
+- Production: `docker compose --profile prod up -d  `

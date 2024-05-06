@@ -18,4 +18,5 @@ export interface ServerToClientEvents {
   error: (data: { message: string }) => void;
   messageInfo: (data: SerializedReadMessageInfo[]) => void;
   newMessageReadInfo: (data: SerializedReadMessageInfo) => void;
+  editedMessage: (data: SerializedMessage) => void;
 }
