@@ -10,7 +10,7 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly tagsService: TagsService,
-  ) {}
+  ) { }
 
   convertUserDtoToDatabaseKeys(userData: Partial<UpdateUserDto>) {
     const userDataInput: Partial<user> = {};
@@ -120,6 +120,16 @@ export class UsersService {
             user: true,
           },
         },
+        payment_method: {
+          select: {
+            method_id: true,
+            card_number: true,
+            created_at: true,
+            holder_name: true,
+            expiry_date: true,
+            user: true,
+          }
+        },
       },
     });
 
@@ -156,13 +166,13 @@ export class UsersService {
         ...(connected
           ? {}
           : {
-              group_user: {
-                updateMany: {
-                  where: { user_id: userId },
-                  data: { inRoom: false },
-                },
+            group_user: {
+              updateMany: {
+                where: { user_id: userId },
+                data: { inRoom: false },
               },
-            }),
+            },
+          }),
       },
     });
   }
@@ -230,6 +240,16 @@ export class UsersService {
                 article_tag: true,
               },
             },
+            payment_method: {
+              select: {
+                method_id: true,
+                card_number: true,
+                created_at: true,
+                holder_name: true,
+                expiry_date: true,
+                user: true,
+              }
+            }
           },
         });
       } else {
@@ -277,6 +297,16 @@ export class UsersService {
                 article_tag: true,
               },
             },
+            payment_method: {
+              select: {
+                method_id: true,
+                card_number: true,
+                created_at: true,
+                holder_name: true,
+                expiry_date: true,
+                user: true,
+              }
+            }
           },
         });
       }

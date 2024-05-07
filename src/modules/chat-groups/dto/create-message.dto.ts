@@ -5,6 +5,11 @@ import { IsGteZero } from 'src/utils/class-validator-decorators';
 
 export class CreateMessageDto {
   // TODOL add more validation here for safety or escape the content
+
+  @IsNotEmpty()
+  @IsString()
+  Type: string;
+  
   @ApiProperty({
     example: 'Hello World!',
     description: 'The content of the message',

@@ -119,6 +119,7 @@ export class MessagingService {
     groupId: number,
     userId: number,
     messageContent: string,
+    messageType:string,
     repliedToMessageId?: number,
   ) {
     const newMessage = await this.prismaService.message.create({
@@ -126,9 +127,9 @@ export class MessagingService {
         content: messageContent,
         group_id: groupId,
         user_id: userId,
+        type:messageType,
         reply_to: repliedToMessageId,
       },
-
       include: {
         user: true,
         replied_to_message: {

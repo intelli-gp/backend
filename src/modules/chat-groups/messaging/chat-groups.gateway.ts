@@ -69,7 +69,7 @@ export class ChatGroupsGateway {
     private readonly groupUsersService: GroupUsersService,
     private readonly messagingService: MessagingService,
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
   createGroupTitle(groupId: number) {
     return `Chat-Group-${groupId}`;
   }
@@ -152,6 +152,7 @@ export class ChatGroupsGateway {
       data.GroupID,
       userId,
       data.Content,
+      data.Type,
       data.RepliedToMessageID,
     );
 

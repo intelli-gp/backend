@@ -18,6 +18,7 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { SearchModule } from './modules/search/search.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { PaymentMethodModule } from './modules/payment-method/payment-method.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { DbInitializationService } from './db-initialization.service';
 
@@ -45,6 +46,7 @@ import { DbInitializationService } from './db-initialization.service';
     StudyPlannerModule,
     ChatGroupsModule,
     NotificationModule,
+    PaymentMethodModule,
     SearchModule,
     CoursesModule,
   ],
