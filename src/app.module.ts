@@ -21,6 +21,7 @@ import { join } from 'path';
 import { PaymentMethodModule } from './modules/payment-method/payment-method.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { DbInitializationService } from './db-initialization.service';
+import { RecommenderSystemModule } from './modules/recommender-system/recommender-system.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { DbInitializationService } from './db-initialization.service';
     PaymentMethodModule,
     SearchModule,
     CoursesModule,
+    RecommenderSystemModule,
   ],
   controllers: [],
   providers: [

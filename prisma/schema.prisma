@@ -34,6 +34,7 @@ model article_tag {
   tag        tag     @relation(fields: [tag_name], references: [tag_name], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([article_id, tag_name])
+  @@index([article_id])
 }
 
 model article_like {
@@ -264,12 +265,13 @@ model plan {
 }
 
 model tag {
-  tag_name      String          @id @unique @default("") @db.VarChar(255)
-  ai_output_tag ai_output_tag[]
-  article_tag   article_tag[]
-  course_tag    course_tag[]
-  group_tag     group_tag[]
-  user_tag      user_tag[]
+  tag_name        String            @id @unique @default("") @db.VarChar(255)
+  ai_output_tag   ai_output_tag[]
+  article_tag     article_tag[]
+  course_tag      course_tag[]
+  group_tag       group_tag[]
+  user_tag        user_tag[]
+  user_system_tag user_system_tag[]
 }
 
 model task {
@@ -302,6 +304,17 @@ model user_tag {
   user     user   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([user_id, tag_name])
+}
+
+model user_system_tag {
+  user_id        Int
+  tag_name       String
+  tag_importance Int    @default(1)
+  tag            tag    @relation(fields: [tag_name], references: [tag_name], onDelete: Cascade, onUpdate: Cascade)
+  user           user   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([user_id, tag_name])
+  @@index([user_id])
 }
 
 model user_follower {
@@ -355,6 +368,7 @@ model user {
   article_comment_like article_comment_like[]
   message_reactions    message_reaction[]
   bookmarked_articles  article_bookmark[]
+  user_system_tag       user_system_tag[]
 }
 
 enum GroupUserTypeEnum {

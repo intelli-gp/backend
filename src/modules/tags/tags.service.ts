@@ -51,6 +51,46 @@ export class TagsService {
     return true;
   }
 
+  async addTagsToUserSystem(tags: string[], userId: number, prisma: any) {
+    const customizedTags = new Map();
+    for (const tag of tags)
+      customizedTags.set(tag.trim().toLowerCase(), {
+        tag_name: tag.trim().toLowerCase(),
+        user_id: userId,
+      });
+
+    const userTags = await prisma.user_system_tag.findMany({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    await prisma.user_system_tag.updateMany({
+      where: {
+        user_id: userId,
+        tag_name: { in: tags },
+      },
+      data: {
+        tag_importance: {
+          increment: 1,
+        },
+      },
+    });
+
+    for (let i = 0; i < userTags.length; i++) {
+      if (customizedTags.has(userTags[i].tag_name))
+        customizedTags.delete(userTags[i].tag_name);
+    }
+
+    const otherTags = Array.from(customizedTags.values());
+
+    await prisma.user_system_tag.createMany({
+      data: otherTags,
+    });
+
+    return true;
+  }
+
   async getAllTags(paginationData?: PaginationDto) {
     const { limit, offset } = paginationData;
     const tags = await this.prismaService.tag.findMany({
