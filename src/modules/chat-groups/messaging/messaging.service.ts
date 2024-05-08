@@ -4,6 +4,7 @@ import { NotificationService } from 'src/modules/notification/notification.servi
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { SerializedMessage } from '../serialized-types/messages/messages.serializer';
 import { MessageReadReceipt } from './types/message-read';
+import { MessageType } from 'src/utils/enums';
 
 @Injectable()
 export class MessagingService {
@@ -119,7 +120,7 @@ export class MessagingService {
     groupId: number,
     userId: number,
     messageContent: string,
-    messageType:string,
+    messageType:MessageType,
     repliedToMessageId?: number,
   ) {
     const newMessage = await this.prismaService.message.create({

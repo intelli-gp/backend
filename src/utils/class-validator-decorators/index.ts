@@ -3,3 +3,4 @@ export * from './password.decorator';
 export * from './username.decorator';
 export * from './gte-zero.decorator';
 export * from './article-section.decorator';
+export * from './message-type.decorator';

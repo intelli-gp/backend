@@ -1,14 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { ToInteger } from 'src/utils/class-transformer-decorators/int-transformer.decorator';
-import { IsGteZero } from 'src/utils/class-validator-decorators';
+import { IsGteZero, IsValidMessageType } from 'src/utils/class-validator-decorators';
+import { MessageType } from 'src/utils/enums';
 
 export class CreateMessageDto {
   // TODOL add more validation here for safety or escape the content
-
+  @ApiProperty({
+    example: 'TEXT',
+    description: 'The type of the message',
+  })
   @IsNotEmpty()
   @IsString()
-  Type: string;
+  @IsValidMessageType()
+  Type: MessageType;
   
   @ApiProperty({
     example: 'Hello World!',
