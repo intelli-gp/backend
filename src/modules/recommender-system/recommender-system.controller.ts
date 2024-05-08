@@ -4,13 +4,14 @@ import { RecommenderSystemService } from './recommender-system.service';
 import { ApiBadRequestResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { MultipleArticlesExample } from '../articles/swagger-examples';
 import { swaggerSuccessExample } from '../../utils/swagger/example-generator';
-import { multipleGroupsExample } from '../chat-groups/swagger-examples';
 import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
 import { SerializedArticle } from '../articles/serialized-types/article.serialized';
 import { DeleteArticleDto } from '../articles/dto';
 import { SerializedUser } from '../users/serialized-types/serialized-user';
 import { GetSingleUserDto } from '../users/dto/get-user.dto';
 import { GetCurrentUser } from '../auth/ParamDecorator';
+import { SerializedPaginated } from 'src/common/paginated-results.serializer';
+import { article, user } from '.prisma/client';
 
 // TODO: Implement the Methods
 @Controller('recommender-system')
@@ -35,14 +36,19 @@ export class RecommenderSystemController {
     @Query() paginationData: PaginationDto,
     @Param() idDto: DeleteArticleDto,
   ) {
-    const articles =
+    const { articles, totalEntityCount } =
       await this.recommenderSystemService.getSpecificArticleRecommendations(
         paginationData,
         idDto,
       );
 
     return sendSuccessResponse(
-      articles.map((article) => new SerializedArticle(article)),
+      new SerializedPaginated<article, SerializedArticle>(
+        articles,
+        totalEntityCount,
+        paginationData,
+        SerializedArticle,
+      ),
     );
   }
 
@@ -61,13 +67,20 @@ export class RecommenderSystemController {
     @Query() paginationData: PaginationDto,
     @Param() usernameDto: GetSingleUserDto,
   ) {
-    const users =
+    const { users, totalEntityCount } =
       await this.recommenderSystemService.getSpecificUserRecommendations(
         paginationData,
         usernameDto,
       );
 
-    return sendSuccessResponse(users.map((user) => new SerializedUser(user)));
+    return sendSuccessResponse(
+      new SerializedPaginated<user, SerializedUser>(
+        users,
+        totalEntityCount,
+        paginationData,
+        SerializedUser,
+      ),
+    );
   }
 
   @HttpCode(200)
@@ -85,14 +98,19 @@ export class RecommenderSystemController {
     @Query() paginationData: PaginationDto,
     @GetCurrentUser('user_id') userId,
   ) {
-    const articles =
+    const { articles, totalEntityCount } =
       await this.recommenderSystemService.getGeneralArticleRecommendations(
         paginationData,
         userId,
       );
 
     return sendSuccessResponse(
-      articles.map((article) => new SerializedArticle(article)),
+      new SerializedPaginated<article, SerializedArticle>(
+        articles,
+        totalEntityCount,
+        paginationData,
+        SerializedArticle,
+      ),
     );
   }
 
@@ -111,12 +129,19 @@ export class RecommenderSystemController {
     @Query() paginationData: PaginationDto,
     @GetCurrentUser('user_id') userId,
   ) {
-    const users =
+    const { users, totalEntityCount } =
       await this.recommenderSystemService.getGeneralUserRecommendations(
         paginationData,
         userId,
       );
 
-    return sendSuccessResponse(users.map((user) => new SerializedUser(user)));
+    return sendSuccessResponse(
+      new SerializedPaginated<user, SerializedUser>(
+        users,
+        totalEntityCount,
+        paginationData,
+        SerializedUser,
+      ),
+    );
   }
 }

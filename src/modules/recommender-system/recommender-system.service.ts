@@ -5,6 +5,7 @@ import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { DeleteArticleDto } from '../articles/dto';
 import { GetSingleUserDto } from '../users/dto/get-user.dto';
+import { article, group, user } from '.prisma/client';
 
 @Injectable()
 export class RecommenderSystemService {
@@ -24,6 +25,8 @@ export class RecommenderSystemService {
     if (!article) throw new BadRequestException('Article not found');
 
     const { data } = await this.getData(idDto.articleId, 'article');
+    const totalEntityCount = data.length;
+
     const articleNeeded = data.slice(
       paginationData.offset,
       paginationData.offset + paginationData.limit,
@@ -63,7 +66,10 @@ export class RecommenderSystemService {
       },
     });
 
-    return articles;
+    return {
+      articles: this.orderArticles(articles, articleNums),
+      totalEntityCount,
+    };
   }
 
   async getSpecificGroupRecommendations(paginationData: PaginationDto) {}
@@ -79,6 +85,8 @@ export class RecommenderSystemService {
     if (!user) throw new BadRequestException('User not found');
 
     const { data } = await this.getData(user.user_id, 'user');
+    const totalEntityCount = data.length;
+
     const userNeeded = data.slice(
       paginationData.offset,
       paginationData.offset + paginationData.limit,
@@ -93,7 +101,10 @@ export class RecommenderSystemService {
         },
       },
     });
-    return users;
+    return {
+      users: this.orderUsers(users, userNums),
+      totalEntityCount,
+    };
   }
 
   async getGeneralArticleRecommendations(
@@ -101,6 +112,8 @@ export class RecommenderSystemService {
     userId: number,
   ) {
     const { data } = await this.getData(userId, 'general-article');
+    const totalEntityCount = data.length;
+
     const articleNeeded = data.slice(
       paginationData.offset,
       paginationData.offset + paginationData.limit,
@@ -140,7 +153,10 @@ export class RecommenderSystemService {
       },
     });
 
-    return articles;
+    return {
+      articles: this.orderArticles(articles, articleNums),
+      totalEntityCount,
+    };
   }
 
   async getGeneralGroupRecommendations(paginationData: PaginationDto) {}
@@ -150,6 +166,8 @@ export class RecommenderSystemService {
     userId: number,
   ) {
     const { data } = await this.getData(userId, 'general-user');
+    const totalEntityCount = data.length;
+
     const userNeeded = data.slice(
       paginationData.offset,
       paginationData.offset + paginationData.limit,
@@ -164,7 +182,11 @@ export class RecommenderSystemService {
         },
       },
     });
-    return users;
+
+    return {
+      users: this.orderUsers(users, userNums),
+      totalEntityCount,
+    };
   }
 
   private async getData(
@@ -180,5 +202,22 @@ export class RecommenderSystemService {
     const urlPath = `/${type}-recommendations/${id}`;
 
     return await this.recommenderHttpService.axiosRef.get(urlPath);
+  }
+  private orderArticles(articles: article[], indexes: number[]) {
+    return indexes.map((articleNum) => {
+      return articles.find((article) => article.article_id === articleNum);
+    });
+  }
+
+  private orderUsers(users: user[], indexes: number[]) {
+    return indexes.map((userNum) => {
+      return users.find((user) => user.user_id === userNum);
+    });
+  }
+
+  private orderGroups(groups: group[], indexes: number[]) {
+    return indexes.map((groupNum) => {
+      return groups.find((group) => group.group_id === groupNum);
+    });
   }
 }
