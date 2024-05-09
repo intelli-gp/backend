@@ -318,8 +318,10 @@ model user_system_tag {
 }
 
 model follows {
-  follower_id Int
-  followed_id Int
+  follower_id          Int
+  followed_id          Int
+  isNotificationViewed Boolean @default(false)
+  created_at           DateTime @default(now())
 
   followed user @relation(name: "followed_by", fields: [followed_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   follower user @relation(name: "follows", fields: [follower_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
@@ -348,7 +350,7 @@ model user {
   connected            Boolean   @default(false)
   active               Boolean   @default(false)
   followers_count      Int       @default(0)
-  following_count    Int       @default(0)
+  following_count      Int       @default(0)
   hashed_refresh_token String?   @db.VarChar(100)
 
   ai_output            ai_output[]
@@ -369,7 +371,7 @@ model user {
   message_reactions    message_reaction[]
   bookmarked_articles  article_bookmark[]
   user_system_tag      user_system_tag[]
-  follows            follows[]              @relation(name: "follows")
+  follows              follows[]              @relation(name: "follows")
   followed_by          follows[]              @relation(name: "followed_by")
 }
 

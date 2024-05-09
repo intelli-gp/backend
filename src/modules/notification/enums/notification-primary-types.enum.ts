@@ -3,6 +3,7 @@ import { ARTICLE_NOTIFICATION_TYPES } from './article-notifications.enum';
 export const NOTIFICATION_TYPES = {
   MESSAGE: 'chat-group-message',
   ARTICLE: 'article',
+  FOLLOW: 'follow',
 } as const;
 
 export type NotificationType<T extends keyof typeof NOTIFICATION_TYPES | void> =
@@ -16,6 +17,10 @@ export const NOTIFICATION_SUB_TYPES = {
     MESSAGE: 'message',
     EVENT: 'event',
     WARNING: 'warning',
+  },
+  [NOTIFICATION_TYPES.FOLLOW]: {
+    FOLLOW: 'follow',
+    UNFOLLOW: 'unfollow',
   },
 } as const;
 

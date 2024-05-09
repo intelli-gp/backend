@@ -1,4 +1,10 @@
-import { Prisma, article_comment, article_like } from '@prisma/client';
+import {
+  Prisma,
+  article_comment,
+  article_like,
+  follows,
+  user,
+} from '@prisma/client';
 import { SerializedArticleComment } from 'src/modules/articles/serialized-types/article-comment.serializer';
 import { SerializedArticleLike } from 'src/modules/articles/serialized-types/article-like.serializer';
 import { PaginationDto } from 'src/common/dto';
@@ -9,6 +15,7 @@ import {
   NotificationType,
 } from '../enums/notification-primary-types.enum';
 import { Logger } from '@nestjs/common';
+import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 
 const notificationsSerializerLogger = new Logger('NotificationsSerializer');
 
@@ -89,17 +96,39 @@ export class SerializedUserNotifications {
           SerializedArticleLike,
         );
       });
-
       // merge them into an array
       return [...serializedArticleComments, ...serializedArticleLikes];
     });
 
-    const combinedSortedNotifications = articlesNotifications
+    const followsNotifications = (
+      partial?.follows as Prisma.followsWhereInput[]
+    )?.map((follow) => {
+      return new SerializedUserNotification<
+        user,
+        SerializedUser,
+        NotificationType<'FOLLOW'>
+      >(
+        {
+          CreatedAt: new Date(follow?.created_at as Date),
+          PrimaryType: NOTIFICATION_TYPES.FOLLOW,
+          SubType: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.FOLLOW].FOLLOW,
+          Content: follow?.follower as user,
+        },
+        SerializedUser,
+      );
+    });
+
+    const combinedNotfications = [
+      ...articlesNotifications,
+      ...followsNotifications,
+    ];
+
+    const combinedSortedNotifications = combinedNotfications
       ?.flat()
-      .sort((a, b) => {
+      ?.sort((a, b) => {
         return b.createdAt.getTime() - a.createdAt.getTime();
       })
-      .slice(paginationData.offset, paginationData.limit);
+      ?.slice(paginationData.offset, paginationData.limit);
 
     return combinedSortedNotifications;
   }

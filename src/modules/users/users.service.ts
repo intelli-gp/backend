@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { TagsService } from '../tags/tags.service';
 import { hashS10 } from '../../utils/bcrypt';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class UsersService {
@@ -11,6 +12,7 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly tagsService: TagsService,
+    private readonly notificationsService: NotificationService,
   ) {}
 
   convertUserDtoToDatabaseKeys(userData: Partial<UpdateUserDto>) {
@@ -365,7 +367,12 @@ export class UsersService {
     // update the user followers_count and create a new follows record
     const user = await this.prismaService.user.update({
       where: { user_id: followerId },
-      select: { following_count: true },
+      select: {
+        following_count: true,
+        user_id: true,
+        username: true,
+        image: true,
+      },
       data: {
         following_count: {
           increment: 1,
@@ -387,6 +394,8 @@ export class UsersService {
       },
     });
     this.logger.debug(`Followers count: ${user.following_count}`);
+
+    this.notificationsService.emitFollowNotification(user as user, followedId);
 
     return user.following_count;
   }

@@ -25,6 +25,7 @@ import {
 } from './enums/article-notifications.enum';
 
 import { ViewNotificationDto } from './dto/view-notification.dto';
+import { SerializedUser } from '../users/serialized-types/serialized-user';
 
 @Injectable()
 export class NotificationService {
@@ -178,6 +179,19 @@ export class NotificationService {
             },
           },
         },
+        followed_by: {
+          select: {
+            follower_id: true,
+            follower: {
+              select: {
+                user_id: true,
+                username: true,
+                full_name: true,
+                image: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -212,6 +226,13 @@ export class NotificationService {
           notificationData.ID,
           notificationData.SubType as ArticleNotificationType<void>,
           notificationData.NotificationSenderID,
+        );
+        break;
+      }
+      case NOTIFICATION_TYPES.FOLLOW: {
+        await this.#viewSingleFollowNotification(
+          notificationData.NotificationSenderID,
+          notificationData.ID,
         );
         break;
       }
@@ -266,6 +287,37 @@ export class NotificationService {
         );
         throw new BadRequestException('Invalid article notification sub-type');
     }
+  }
+
+  async #viewSingleFollowNotification(followerId: number, followedId: number) {
+    this.NotificationServiceLogger.log(
+      `Viewing follow notification for user ${followedId} from ${followerId}`,
+    );
+
+    await this.prismaService.follows.update({
+      where: {
+        followed_id_follower_id: {
+          follower_id: followerId,
+          followed_id: followedId,
+        },
+      },
+      data: {
+        isNotificationViewed: true,
+      },
+    });
+  }
+
+  emitFollowNotification(follower: user, followedId: number) {
+    const followNotification: SseEvents = {
+      eventName: NOTIFICATION_TYPES.FOLLOW,
+      message: new SerializedUser(follower),
+    };
+
+    // TODO: fix this by changing what emit takes to just id
+    this.eventsService.emit(
+      [{ user_id: followedId } as user],
+      followNotification,
+    );
   }
 
   async emitArticleNotification(
