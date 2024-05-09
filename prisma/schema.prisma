@@ -348,7 +348,7 @@ model user {
   connected            Boolean   @default(false)
   active               Boolean   @default(false)
   followers_count      Int       @default(0)
-  followed_by_count    Int       @default(0)
+  following_count    Int       @default(0)
   hashed_refresh_token String?   @db.VarChar(100)
 
   ai_output            ai_output[]

@@ -7,6 +7,7 @@ import { hashS10 } from '../../utils/bcrypt';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
   constructor(
     private readonly prismaService: PrismaService,
     private readonly tagsService: TagsService,
@@ -364,8 +365,9 @@ export class UsersService {
     // update the user followers_count and create a new follows record
     const user = await this.prismaService.user.update({
       where: { user_id: followerId },
+      select: { followers_count: true },
       data: {
-        followers_count: {
+        following_count: {
           increment: 1,
         },
         follows: {
@@ -376,15 +378,16 @@ export class UsersService {
       },
     });
 
-    // update the followed by count asynchronusly
+    // update the followers count of followed user asynchronously
     this.prismaService.user.update({
       where: { user_id: followedId },
       data: {
-        followed_by_count: {
+        followers_count: {
           increment: 1,
         },
       },
     });
+    this.logger.debug(`Followers count: ${user.followers_count}`);
 
     return user.followers_count;
   }
@@ -399,8 +402,9 @@ export class UsersService {
     // update the user followers_count and delete the follows record
     const user = await this.prismaService.user.update({
       where: { user_id: unFollowerId },
+      select: { followers_count: true },
       data: {
-        followers_count: {
+        following_count: {
           decrement: 1,
         },
         follows: {
@@ -414,15 +418,16 @@ export class UsersService {
       },
     });
 
-    // update the followed by count asynchronusly
+    // update the followers count of followed user asynchronously
     this.prismaService.user.update({
       where: { user_id: unFollowedId },
       data: {
-        followed_by_count: {
+        followers_count: {
           decrement: 1,
         },
       },
     });
+    this.logger.debug(`Followers count: ${user.followers_count}`);
 
     return user.followers_count;
   }
