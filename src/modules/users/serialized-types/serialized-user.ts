@@ -53,6 +53,10 @@ export class SerializedUser {
 
   PaymentMethods: SerializedPaymentMethod[];
 
+  FollowersCount: number;
+
+  FollowingCount: number;
+
   @Exclude()
   renewal_date: Date;
 
@@ -88,6 +92,12 @@ export class SerializedUser {
 
     partial?.cover_image && (this.CoverImage = partial?.cover_image as string);
 
+    partial?.followers_count &&
+      (this.FollowersCount = +partial?.followers_count);
+
+    partial?.following_count &&
+      (this.FollowingCount = +partial?.following_count);
+
     if (partial?.connected !== null && partial?.connected !== undefined)
       this.Connected = partial?.connected as boolean;
 
@@ -102,9 +112,11 @@ export class SerializedUser {
       this.Articles = (partial?.article as article[]).map((article) => {
         return new SerializedArticle(article);
       });
-    if(partial?.payment_method)
-      this.PaymentMethods =(partial?.payment_method as payment_method[]).map(
-        (paymentMethod) =>{ return new SerializedPaymentMethod(paymentMethod);}
+    if (partial?.payment_method)
+      this.PaymentMethods = (partial?.payment_method as payment_method[]).map(
+        (paymentMethod) => {
+          return new SerializedPaymentMethod(paymentMethod);
+        },
       );
 
     if (partial?.group)

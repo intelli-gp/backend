@@ -64,7 +64,7 @@ export class UsersController {
     @GetCurrentUser('user_id') followerId: number,
     @Param() FollowedUserData: GetSingleUserByIdDto,
   ) {
-    const FollowersCount = await this.usersService.toggleFollowUser(
+    const FollowingCount = await this.usersService.toggleFollowUser(
       followerId,
       FollowedUserData.userId,
     );
@@ -74,7 +74,7 @@ export class UsersController {
     );
 
     return sendSuccessResponse({
-      FollowersCount,
+      FollowingCount,
     });
   }
 }

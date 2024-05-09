@@ -359,13 +359,13 @@ export class UsersService {
    *
    * @param followerId the current user id
    * @param followedId the target user id
-   * @returns current user followers count
+   * @returns current user following count
    */
   async followUser(followerId: number, followedId: number) {
     // update the user followers_count and create a new follows record
     const user = await this.prismaService.user.update({
       where: { user_id: followerId },
-      select: { followers_count: true },
+      select: { following_count: true },
       data: {
         following_count: {
           increment: 1,
@@ -378,8 +378,7 @@ export class UsersService {
       },
     });
 
-    // update the followers count of followed user asynchronously
-    this.prismaService.user.update({
+    await this.prismaService.user.update({
       where: { user_id: followedId },
       data: {
         followers_count: {
@@ -387,22 +386,22 @@ export class UsersService {
         },
       },
     });
-    this.logger.debug(`Followers count: ${user.followers_count}`);
+    this.logger.debug(`Followers count: ${user.following_count}`);
 
-    return user.followers_count;
+    return user.following_count;
   }
 
   /**
    *
    * @param unFollowerId the current user id
    * @param unFollowedId the target user id
-   * @returns current user followers count
+   * @returns current user following count
    */
   async unFollowUser(unFollowerId: number, unFollowedId: number) {
     // update the user followers_count and delete the follows record
     const user = await this.prismaService.user.update({
       where: { user_id: unFollowerId },
-      select: { followers_count: true },
+      select: { following_count: true },
       data: {
         following_count: {
           decrement: 1,
@@ -418,8 +417,7 @@ export class UsersService {
       },
     });
 
-    // update the followers count of followed user asynchronously
-    this.prismaService.user.update({
+    await this.prismaService.user.update({
       where: { user_id: unFollowedId },
       data: {
         followers_count: {
@@ -427,8 +425,8 @@ export class UsersService {
         },
       },
     });
-    this.logger.debug(`Followers count: ${user.followers_count}`);
+    this.logger.debug(`Followers count: ${user.following_count}`);
 
-    return user.followers_count;
+    return user.following_count;
   }
 }
