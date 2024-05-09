@@ -10,7 +10,7 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly tagsService: TagsService,
-  ) { }
+  ) {}
 
   convertUserDtoToDatabaseKeys(userData: Partial<UpdateUserDto>) {
     const userDataInput: Partial<user> = {};
@@ -128,7 +128,7 @@ export class UsersService {
             holder_name: true,
             expiry_date: true,
             user: true,
-          }
+          },
         },
       },
     });
@@ -166,13 +166,13 @@ export class UsersService {
         ...(connected
           ? {}
           : {
-            group_user: {
-              updateMany: {
-                where: { user_id: userId },
-                data: { inRoom: false },
+              group_user: {
+                updateMany: {
+                  where: { user_id: userId },
+                  data: { inRoom: false },
+                },
               },
-            },
-          }),
+            }),
       },
     });
   }
@@ -248,8 +248,8 @@ export class UsersService {
                 holder_name: true,
                 expiry_date: true,
                 user: true,
-              }
-            }
+              },
+            },
           },
         });
       } else {
@@ -305,8 +305,8 @@ export class UsersService {
                 holder_name: true,
                 expiry_date: true,
                 user: true,
-              }
-            }
+              },
+            },
           },
         });
       }
@@ -315,7 +315,7 @@ export class UsersService {
     return user ? user : null;
   }
 
-  async updatePassword(id, password) {
+  async updatePassword(id: number, password: string) {
     const hashedPassword = await hashS10(password);
     await this.prismaService.user.update({
       where: { user_id: id },
@@ -335,11 +335,95 @@ export class UsersService {
     return true;
   }
 
-  async followUser() {
-    return;
+  async toggleFollowUser(followerId: number, followedId: number) {
+    //TODO: when deleting a user reduce followers count for each user he is following and each user following him
+    // check if the user is already following the target
+    const isFollowing = await this.prismaService.follows.findFirst({
+      where: {
+        follower_id: followerId,
+        followed_id: followedId,
+      },
+    });
+
+    if (isFollowing) {
+      // if the user is already following the target, unfollow the target
+      return await this.unFollowUser(followerId, followedId);
+    } else {
+      // if the user is not following the target, follow the target
+      return await this.followUser(followerId, followedId);
+    }
   }
 
-  async unfollowUser() {
-    return;
+  /**
+   *
+   * @param followerId the current user id
+   * @param followedId the target user id
+   * @returns current user followers count
+   */
+  async followUser(followerId: number, followedId: number) {
+    // update the user followers_count and create a new follows record
+    const user = await this.prismaService.user.update({
+      where: { user_id: followerId },
+      data: {
+        followers_count: {
+          increment: 1,
+        },
+        follows: {
+          create: {
+            followed_id: followedId,
+          },
+        },
+      },
+    });
+
+    // update the followed by count asynchronusly
+    this.prismaService.user.update({
+      where: { user_id: followedId },
+      data: {
+        followed_by_count: {
+          increment: 1,
+        },
+      },
+    });
+
+    return user.followers_count;
+  }
+
+  /**
+   *
+   * @param unFollowerId the current user id
+   * @param unFollowedId the target user id
+   * @returns current user followers count
+   */
+  async unFollowUser(unFollowerId: number, unFollowedId: number) {
+    // update the user followers_count and delete the follows record
+    const user = await this.prismaService.user.update({
+      where: { user_id: unFollowerId },
+      data: {
+        followers_count: {
+          decrement: 1,
+        },
+        follows: {
+          delete: {
+            followed_id_follower_id: {
+              followed_id: unFollowedId,
+              follower_id: unFollowerId,
+            },
+          },
+        },
+      },
+    });
+
+    // update the followed by count asynchronusly
+    this.prismaService.user.update({
+      where: { user_id: unFollowedId },
+      data: {
+        followed_by_count: {
+          decrement: 1,
+        },
+      },
+    });
+
+    return user.followers_count;
   }
 }

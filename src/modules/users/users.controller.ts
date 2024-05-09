@@ -1,14 +1,11 @@
 import {
   Body,
-  ClassSerializerInterceptor,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   Param,
   Patch,
-  UseFilters,
-  UseInterceptors,
   Logger,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -20,7 +17,7 @@ import { Prisma, user } from '@prisma/client';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { SwaggerLoginExample } from '../auth/swagger-examples';
-import { GetSingleUserDto } from './dto/get-user.dto';
+import { GetSingleUserByIdDto, GetSingleUserDto } from './dto/get-user.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -59,6 +56,21 @@ export class UsersController {
 
     return sendSuccessResponse({
       user: new SerializedUser(foundUser as Prisma.userWhereInput),
+    });
+  }
+
+  @Get('/toggle-follow/:userId([0-9]+)')
+  async followUser(
+    @GetCurrentUser('user_id') followerId: number,
+    @Param() FollowedUserData: GetSingleUserByIdDto,
+  ) {
+    const FollowersCount = this.usersService.toggleFollowUser(
+      followerId,
+      FollowedUserData.userId,
+    );
+
+    return sendSuccessResponse({
+      FollowersCount,
     });
   }
 }

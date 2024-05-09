@@ -205,7 +205,7 @@ model message {
   user_id            Int
   group_id           Int
   content            String
-  type               String             @db.VarChar(50)   
+  type               String             @db.VarChar(50)
   reply_to           Int?
   deleted            Boolean            @default(false)
   created_at         DateTime?          @default(now())
@@ -317,14 +317,14 @@ model user_system_tag {
   @@index([user_id])
 }
 
-model user_follower {
-  user_id     Int
+model follows {
   follower_id Int
+  followed_id Int
 
-  user     user @relation(name: "followed_by", fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
-  follower user @relation(name: "following", fields: [follower_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  followed user @relation(name: "followed_by", fields: [followed_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  follower user @relation(name: "follows", fields: [follower_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@id([user_id, follower_id])
+  @@id([followed_id, follower_id])
 }
 
 model user {
@@ -347,6 +347,8 @@ model user {
   isNotificationMuted  Boolean   @default(false)
   connected            Boolean   @default(false)
   active               Boolean   @default(false)
+  followers_count      Int       @default(0)
+  followed_by_count    Int       @default(0)
   hashed_refresh_token String?   @db.VarChar(100)
 
   ai_output            ai_output[]
@@ -361,14 +363,14 @@ model user {
   user_tag             user_tag[]
   level                level                  @relation(fields: [level_id], references: [level_id], onDelete: Restrict, onUpdate: Cascade)
   plan                 plan                   @relation(fields: [plan_id], references: [plan_id], onDelete: Restrict, onUpdate: Cascade)
-  following            user_follower[]        @relation("following")
-  followed_by          user_follower[]        @relation("followed_by")
   liked_articles       article_like[]
   article_comment      article_comment[]
   article_comment_like article_comment_like[]
   message_reactions    message_reaction[]
   bookmarked_articles  article_bookmark[]
-  user_system_tag       user_system_tag[]
+  user_system_tag      user_system_tag[]
+  follows            follows[]              @relation(name: "follows")
+  followed_by          follows[]              @relation(name: "followed_by")
 }
 
 enum GroupUserTypeEnum {
