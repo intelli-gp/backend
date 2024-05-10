@@ -102,9 +102,11 @@ export class SerializedUser {
       this.Articles = (partial?.article as article[]).map((article) => {
         return new SerializedArticle(article);
       });
-    if(partial?.payment_method)
-      this.PaymentMethods =(partial?.payment_method as payment_method[]).map(
-        (paymentMethod) =>{ return new SerializedPaymentMethod(paymentMethod);}
+    if (partial?.payment_method)
+      this.PaymentMethods = (partial?.payment_method as payment_method[]).map(
+        (paymentMethod) => {
+          return new SerializedPaymentMethod(paymentMethod);
+        },
       );
 
     if (partial?.group)
