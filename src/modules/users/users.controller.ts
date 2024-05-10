@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Logger,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
@@ -18,6 +19,8 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { SwaggerLoginExample } from '../auth/swagger-examples';
 import { GetSingleUserByIdDto, GetSingleUserDto } from './dto/get-user.dto';
+import { PaginationDto } from 'src/common/dto';
+import { SerializedPaginated } from 'src/common/paginated-results.serializer';
 
 @Controller('users')
 @ApiTags('Users')
@@ -76,5 +79,89 @@ export class UsersController {
     return sendSuccessResponse({
       FollowingCount,
     });
+  }
+
+  @Get('/followers/me')
+  async getFollowersForLoggedInUser(
+    @GetCurrentUser('user_id') userId: number,
+    @Query() paginationData: PaginationDto,
+  ) {
+    this.usersControllerLogger.log(
+      `Getting followers for user with id: ${userId}`,
+    );
+    const { followers, followersCount } =
+      await this.usersService.getUserFollowers(userId, paginationData);
+
+    return sendSuccessResponse(
+      new SerializedPaginated<user, SerializedUser>(
+        followers,
+        followersCount,
+        paginationData,
+        SerializedUser,
+      ),
+    );
+  }
+
+  @Get('/followers/:userId([0-9]+)')
+  async getFollowers(
+    @Param() dto: GetSingleUserByIdDto,
+    @Query() paginationData: PaginationDto,
+  ) {
+    this.usersControllerLogger.log(
+      `Getting followers for user with id: ${dto.userId}`,
+    );
+    const { followers, followersCount } =
+      await this.usersService.getUserFollowers(dto.userId, paginationData);
+
+    return sendSuccessResponse(
+      new SerializedPaginated<user, SerializedUser>(
+        followers,
+        followersCount,
+        paginationData,
+        SerializedUser,
+      ),
+    );
+  }
+
+  @Get('/following/me')
+  async getFollowingForLoggedInUser(
+    @GetCurrentUser('user_id') userId: number,
+    @Query() paginationData: PaginationDto,
+  ) {
+    this.usersControllerLogger.log(
+      `Getting following for user with id: ${userId}`,
+    );
+    const { following, followingCount } =
+      await this.usersService.getUserFollowing(userId, paginationData);
+
+    return sendSuccessResponse(
+      new SerializedPaginated<user, SerializedUser>(
+        following,
+        followingCount,
+        paginationData,
+        SerializedUser,
+      ),
+    );
+  }
+
+  @Get('/following/:userId([0-9]+)')
+  async getFollowing(
+    @Param() dto: GetSingleUserByIdDto,
+    @Query() paginationData: PaginationDto,
+  ) {
+    this.usersControllerLogger.log(
+      `Getting following for user with id: ${dto.userId}`,
+    );
+    const { following, followingCount } =
+      await this.usersService.getUserFollowing(dto.userId, paginationData);
+
+    return sendSuccessResponse(
+      new SerializedPaginated<user, SerializedUser>(
+        following,
+        followingCount,
+        paginationData,
+        SerializedUser,
+      ),
+    );
   }
 }

@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { TagsService } from '../tags/tags.service';
 import { hashS10 } from '../../utils/bcrypt';
 import { NotificationService } from '../notification/notification.service';
+import { PaginationDto } from 'src/common/dto';
 
 @Injectable()
 export class UsersService {
@@ -327,15 +328,85 @@ export class UsersService {
     return;
   }
 
-  async getRecommendedUsers() {
-    return true;
-  }
-  async getUserFollowers() {
-    return true;
+  async toggleTwoFactorAuthentication(
+    userId: number,
+    status: 'enable' | 'disable',
+  ) {
+    await this.prismaService.user.update({
+      where: { user_id: userId },
+      data: { two_factor_auth_enabled: status === 'enable' },
+    });
+    return;
   }
 
-  async getUserFollowing() {
-    return true;
+  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+    await this.prismaService.user.update({
+      where: { user_id: userId },
+      data: { two_factor_auth_secret: secret },
+    });
+    return;
+  }
+
+  async toggleTwoFactorAuthenticationStatus(
+    userId: number,
+    status: 'enabled' | 'disabled',
+  ) {
+    await this.prismaService.user.update({
+      where: { user_id: userId },
+      data: { two_factor_auth_enabled: status === 'enabled' },
+    });
+    return;
+  }
+
+  async getUserFollowers(userId: number, paginationData: PaginationDto) {
+    const user = await this.prismaService.user.findUnique({
+      where: { user_id: userId },
+      select: {
+        followers_count: true,
+        followed_by: {
+          take: paginationData.limit,
+          skip: paginationData.offset,
+          select: {
+            follower: {
+              select: {
+                user_id: true,
+                username: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const followers = user.followed_by.map(
+      (follow) => follow.follower,
+    ) as user[];
+    return { followers, followersCount: user.followers_count };
+  }
+
+  async getUserFollowing(userId: number, paginationData: PaginationDto) {
+    const user = await this.prismaService.user.findUnique({
+      where: { user_id: userId },
+      select: {
+        following_count: true,
+        follows: {
+          take: paginationData.limit,
+          skip: paginationData.offset,
+          select: {
+            followed: {
+              select: {
+                user_id: true,
+                username: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    const following = user.follows.map((follow) => follow.followed) as user[];
+    return { following, followingCount: user.following_count };
   }
 
   async toggleFollowUser(followerId: number, followedId: number) {
