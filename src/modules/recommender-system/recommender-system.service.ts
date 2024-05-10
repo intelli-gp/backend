@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PaginationDto } from '../../common/dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
 import { DeleteArticleDto } from '../articles/dto';
 import { GetSingleUserDto } from '../users/dto/get-user.dto';
 import { GetSingleChatGroupDto } from '../chat-groups/dto';
@@ -25,13 +24,11 @@ export class RecommenderSystemService {
 
     if (!article) throw new BadRequestException('Article not found');
 
-    const { data } = await this.getData(idDto.articleId, 'article');
-    const articleNeeded = data.slice(
-      paginationData.offset,
-      paginationData.offset + paginationData.limit,
+    const articleNums = await this.getData(
+      idDto.articleId,
+      'article',
+      paginationData,
     );
-
-    const articleNums = articleNeeded.map((article) => Number(article[0]));
 
     const articles = await this.prismaService.article.findMany({
       where: {
@@ -78,13 +75,11 @@ export class RecommenderSystemService {
 
     if (!group) throw new BadRequestException('Group not found');
 
-    const { data } = await this.getData(group.group_id, 'group');
-    const groupNeeded = data.slice(
-      paginationData.offset,
-      paginationData.offset + paginationData.limit,
+    const groupNums = await this.getData(
+      group.group_id,
+      'group',
+      paginationData,
     );
-
-    const groupNums = groupNeeded.map((group) => Number(group[0]));
 
     const groups = await this.prismaService.group.findMany({
       where: {
@@ -115,13 +110,7 @@ export class RecommenderSystemService {
 
     if (!user) throw new BadRequestException('User not found');
 
-    const { data } = await this.getData(user.user_id, 'user');
-    const userNeeded = data.slice(
-      paginationData.offset,
-      paginationData.offset + paginationData.limit,
-    );
-
-    const userNums = userNeeded.map((user) => Number(user[0]));
+    const userNums = await this.getData(user.user_id, 'user', paginationData);
 
     const users = await this.prismaService.user.findMany({
       where: {
@@ -137,13 +126,11 @@ export class RecommenderSystemService {
     paginationData: PaginationDto,
     userId: number,
   ) {
-    const { data } = await this.getData(userId, 'general-article');
-    const articleNeeded = data.slice(
-      paginationData.offset,
-      paginationData.offset + paginationData.limit,
+    const articleNums = await this.getData(
+      userId,
+      'general-article',
+      paginationData,
     );
-
-    const articleNums = articleNeeded.map((article) => Number(article[0]));
 
     const articles = await this.prismaService.article.findMany({
       where: {
@@ -184,13 +171,11 @@ export class RecommenderSystemService {
     paginationData: PaginationDto,
     userId: number,
   ): Promise<group[]> {
-    const { data } = await this.getData(userId, 'general-group');
-    const groupNeeded = data.slice(
-      paginationData.offset,
-      paginationData.offset + paginationData.limit,
+    const groupNums = await this.getData(
+      userId,
+      'general-group',
+      paginationData,
     );
-
-    const groupNums = groupNeeded.map((group) => Number(group[0]));
 
     const groups = await this.prismaService.group.findMany({
       where: {
@@ -215,13 +200,7 @@ export class RecommenderSystemService {
     paginationData: PaginationDto,
     userId: number,
   ) {
-    const { data } = await this.getData(userId, 'general-user');
-    const userNeeded = data.slice(
-      paginationData.offset,
-      paginationData.offset + paginationData.limit,
-    );
-
-    const userNums = userNeeded.map((user) => Number(user[0]));
+    const userNums = await this.getData(userId, 'general-user', paginationData);
 
     const users = await this.prismaService.user.findMany({
       where: {
@@ -242,9 +221,18 @@ export class RecommenderSystemService {
       | 'general-article'
       | 'general-user'
       | 'general-group',
-  ): Promise<AxiosResponse<number[]>> {
+    paginationData?: PaginationDto,
+  ): Promise<number[]> {
     const urlPath = `/${type}-recommendations/${id}`;
 
-    return await this.recommenderHttpService.axiosRef.get(urlPath);
+    const { data } = await this.recommenderHttpService.axiosRef.get(urlPath);
+
+    const dataNeeded = data.slice(
+      paginationData.offset,
+      paginationData.offset + paginationData.limit,
+    );
+
+    const dataNums = dataNeeded.map((data) => Number(data[0]));
+    return dataNums;
   }
 }
