@@ -11,6 +11,9 @@ import { DeleteArticleDto } from '../articles/dto';
 import { SerializedUser } from '../users/serialized-types/serialized-user';
 import { GetSingleUserDto } from '../users/dto/get-user.dto';
 import { GetCurrentUser } from '../auth/ParamDecorator';
+import { GetSingleChatGroupDto } from '../chat-groups/dto';
+import { SerializedChatGroup } from '../chat-groups/serialized-types/chat-group/chat-group.serializer';
+import { MultipleUsersExample } from '../users/swagger-examples';
 
 // TODO: Implement the Methods
 @Controller('recommender-system')
@@ -50,8 +53,34 @@ export class RecommenderSystemController {
   @HttpCode(400)
   @ApiOkResponse({
     description:
+      'Returns group recommendations with pagination based on the group id',
+    schema: swaggerSuccessExample(null, multipleGroupsExample),
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid request',
+  })
+  @Get('groups/:ID([0-9]+)')
+  async getGroupRecommendations(
+    @Query() paginationData: PaginationDto,
+    @Param() idDto: GetSingleChatGroupDto,
+  ) {
+    const groups =
+      await this.recommenderSystemService.getSpecificGroupRecommendations(
+        paginationData,
+        idDto,
+      );
+
+    return sendSuccessResponse(
+      groups.map((group) => new SerializedChatGroup(group)),
+    );
+  }
+
+  @HttpCode(200)
+  @HttpCode(400)
+  @ApiOkResponse({
+    description:
       'Returns User recommendations with pagination based on the user id',
-    schema: swaggerSuccessExample(null),
+    schema: swaggerSuccessExample(null, MultipleUsersExample),
   })
   @ApiBadRequestResponse({
     description: 'Invalid request',
@@ -101,7 +130,7 @@ export class RecommenderSystemController {
   @ApiOkResponse({
     description:
       'Returns User recommendations with pagination based on the interests of the user',
-    schema: swaggerSuccessExample(null),
+    schema: swaggerSuccessExample(null, MultipleUsersExample),
   })
   @ApiBadRequestResponse({
     description: 'Invalid request',
@@ -118,5 +147,31 @@ export class RecommenderSystemController {
       );
 
     return sendSuccessResponse(users.map((user) => new SerializedUser(user)));
+  }
+
+  @HttpCode(200)
+  @HttpCode(400)
+  @ApiOkResponse({
+    description:
+      'Returns Group recommendations with pagination based on the interests of the user',
+    schema: swaggerSuccessExample(null, multipleGroupsExample),
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid request',
+  })
+  @Get('groups')
+  async getGeneralGroupRecommendations(
+    @Query() paginationData: PaginationDto,
+    @GetCurrentUser('user_id') userId,
+  ) {
+    const groups =
+      await this.recommenderSystemService.getGeneralGroupRecommendations(
+        paginationData,
+        userId,
+      );
+
+    return sendSuccessResponse(
+      groups.map((group) => new SerializedChatGroup(group)),
+    );
   }
 }

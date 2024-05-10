@@ -5,6 +5,8 @@ import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { DeleteArticleDto } from '../articles/dto';
 import { GetSingleUserDto } from '../users/dto/get-user.dto';
+import { GetSingleChatGroupDto } from '../chat-groups/dto';
+import { group } from '@prisma/client';
 
 @Injectable()
 export class RecommenderSystemService {
@@ -66,7 +68,42 @@ export class RecommenderSystemService {
     return articles;
   }
 
-  async getSpecificGroupRecommendations(paginationData: PaginationDto) {}
+  async getSpecificGroupRecommendations(
+    paginationData: PaginationDto,
+    chatGroupDto: GetSingleChatGroupDto,
+  ): Promise<group[]> {
+    const group = await this.prismaService.group.findUnique({
+      where: { group_id: chatGroupDto.ID },
+    });
+
+    if (!group) throw new BadRequestException('Group not found');
+
+    const { data } = await this.getData(group.group_id, 'group');
+    const groupNeeded = data.slice(
+      paginationData.offset,
+      paginationData.offset + paginationData.limit,
+    );
+
+    const groupNums = groupNeeded.map((group) => Number(group[0]));
+
+    const groups = await this.prismaService.group.findMany({
+      where: {
+        group_id: {
+          in: groupNums,
+        },
+      },
+      include: {
+        group_tag: true,
+        group_user: {
+          include: {
+            user: true,
+          },
+        },
+        user: true,
+      },
+    });
+    return groups;
+  }
 
   async getSpecificUserRecommendations(
     paginationData: PaginationDto,
@@ -143,7 +180,36 @@ export class RecommenderSystemService {
     return articles;
   }
 
-  async getGeneralGroupRecommendations(paginationData: PaginationDto) {}
+  async getGeneralGroupRecommendations(
+    paginationData: PaginationDto,
+    userId: number,
+  ): Promise<group[]> {
+    const { data } = await this.getData(userId, 'general-group');
+    const groupNeeded = data.slice(
+      paginationData.offset,
+      paginationData.offset + paginationData.limit,
+    );
+
+    const groupNums = groupNeeded.map((group) => Number(group[0]));
+
+    const groups = await this.prismaService.group.findMany({
+      where: {
+        group_id: {
+          in: groupNums,
+        },
+      },
+      include: {
+        group_tag: true,
+        group_user: {
+          include: {
+            user: true,
+          },
+        },
+        user: true,
+      },
+    });
+    return groups;
+  }
 
   async getGeneralUserRecommendations(
     paginationData: PaginationDto,

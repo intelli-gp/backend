@@ -2007,6 +2007,66 @@
         ]
       }
     },
+    "/api/articles/bookmarked": {
+      "get": {
+        "operationId": "ArticlesController_getBookmarkedArticles",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
+    "/api/articles/{articleId}/bookmark": {
+      "post": {
+        "operationId": "ArticlesController_toggleBookmarkArticle",
+        "parameters": [
+          {
+            "name": "articleId",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "description": "Article id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
     "/api/articles/{articleId}/toggle-like": {
       "post": {
         "operationId": "ArticlesController_toggleLikeArticle",
@@ -2055,7 +2115,7 @@
         ]
       }
     },
-    "/api/articles/{articleId}/comment/{commentId}/like": {
+    "/api/articles/{articleId}/comment/{commentId}/toggle-like": {
       "post": {
         "operationId": "ArticlesController_toggleLikeOnArticleComment",
         "parameters": [
@@ -3447,6 +3507,100 @@
         }
       }
     },
+    "/api/notifications": {
+      "get": {
+        "operationId": "NotificationController_getUserNotifications",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/notifications/read": {
+      "patch": {
+        "operationId": "NotificationController_markNotificationAsViewed",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ViewNotificationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/payment-method": {
+      "post": {
+        "operationId": "PaymentMethodController_createPaymentMethod",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentMethodDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Returns created payment method"
+          }
+        }
+      },
+      "get": {
+        "operationId": "PaymentMethodController_getPaymentMethods",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns all payment methods"
+          }
+        }
+      }
+    },
+    "/api/payment-method/{ID}": {
+      "delete": {
+        "operationId": "PaymentMethodController_deletePaymentMethod",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/search/users": {
       "get": {
         "operationId": "SearchController_searchUsers",
@@ -4203,7 +4357,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Returns article recommendations with pagination",
+            "description": "Returns article recommendations with pagination based on the article id",
             "content": {
               "application/json": {
                 "schema": {
@@ -4600,6 +4754,200 @@
         ]
       }
     },
+    "/api/recommender-system/groups/{ID}": {
+      "get": {
+        "operationId": "RecommenderSystemController_getGroupRecommendations",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "ID",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "description": "The Id of the chatgroup",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns group recommendations with pagination based on the group id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        },
+        "tags": [
+          "recommender-system"
+        ]
+      }
+    },
     "/api/recommender-system/users/{Username}": {
       "get": {
         "operationId": "RecommenderSystemController_getUserRecommendations",
@@ -4636,14 +4984,43 @@
         ],
         "responses": {
           "200": {
-            "description": "Returns User recommendations with pagination",
+            "description": "Returns User recommendations with pagination based on the user id",
             "content": {
               "application/json": {
                 "schema": {
                   "properties": {
                     "data": {
                       "type": "object",
-                      "properties": null
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 1,
+                          "FullName": "John",
+                          "Username": "John3142",
+                          "DOB": "2011-01-04T00:00:00.000Z",
+                          "Email": "johndoe.22@gmail.com",
+                          "PhoneNumber": "+201050790880",
+                          "Connected": false
+                        },
+                        {
+                          "ID": 1,
+                          "FullName": "John",
+                          "Username": "John3142",
+                          "DOB": "2011-01-04T00:00:00.000Z",
+                          "Email": "johndoe.22@gmail.com",
+                          "PhoneNumber": "+201050790880",
+                          "Connected": false
+                        },
+                        {
+                          "ID": 1,
+                          "FullName": "John",
+                          "Username": "John3142",
+                          "DOB": "2011-01-04T00:00:00.000Z",
+                          "Email": "johndoe.22@gmail.com",
+                          "PhoneNumber": "+201050790880",
+                          "Connected": false
+                        }
+                      ]
                     }
                   }
                 }
@@ -4686,7 +5063,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Returns article recommendations with pagination",
+            "description": "Returns article recommendations with pagination based on the interests of the user",
             "content": {
               "application/json": {
                 "schema": {
@@ -5110,7 +5487,86 @@
         ],
         "responses": {
           "200": {
-            "description": "Returns User recommendations with pagination",
+            "description": "Returns User recommendations with pagination based on the interests of the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 1,
+                          "FullName": "John",
+                          "Username": "John3142",
+                          "DOB": "2011-01-04T00:00:00.000Z",
+                          "Email": "johndoe.22@gmail.com",
+                          "PhoneNumber": "+201050790880",
+                          "Connected": false
+                        },
+                        {
+                          "ID": 1,
+                          "FullName": "John",
+                          "Username": "John3142",
+                          "DOB": "2011-01-04T00:00:00.000Z",
+                          "Email": "johndoe.22@gmail.com",
+                          "PhoneNumber": "+201050790880",
+                          "Connected": false
+                        },
+                        {
+                          "ID": 1,
+                          "FullName": "John",
+                          "Username": "John3142",
+                          "DOB": "2011-01-04T00:00:00.000Z",
+                          "Email": "johndoe.22@gmail.com",
+                          "PhoneNumber": "+201050790880",
+                          "Connected": false
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        },
+        "tags": [
+          "recommender-system"
+        ]
+      }
+    },
+    "/api/recommender-system/groups": {
+      "get": {
+        "operationId": "RecommenderSystemController_getGeneralGroupRecommendations",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Group recommendations with pagination based on the interests of the user",
             "content": {
               "application/json": {
                 "schema": {
@@ -5530,6 +5986,69 @@
         "required": [
           "TargetID",
           "permissionLevel"
+        ]
+      },
+      "ViewNotificationDto": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "number",
+            "example": 1,
+            "description": "The ID of the notification in case of notifications with composite IDs its the one directly related to the notification entity e.g. article_id, comment_id, etc. for article its article_id"
+          },
+          "PrimaryType": {
+            "type": "string",
+            "example": "article-notification",
+            "description": "The primary type of the notification e.g. article-notification"
+          },
+          "SubType": {
+            "type": "string",
+            "example": "comment",
+            "description": "The sub-type of the notification e.g. comment, like, etc. for article notifications"
+          },
+          "NotificationSenderID": {
+            "type": "number",
+            "example": 1,
+            "description": "The ID of the notification sender which serves as the second key of the composite key e.g. user_id for article notifications"
+          }
+        },
+        "required": [
+          "ID",
+          "PrimaryType",
+          "SubType",
+          "NotificationSenderID"
+        ]
+      },
+      "CreatePaymentMethodDto": {
+        "type": "object",
+        "properties": {
+          "holderName": {
+            "type": "string",
+            "description": "The holder name",
+            "example": "Hamed Hassan"
+          },
+          "cardId": {
+            "type": "string",
+            "description": "The CVV",
+            "example": "123"
+          },
+          "cardNumber": {
+            "type": "string",
+            "description": "The credit number",
+            "example": "4242 4242 4242 4242"
+          },
+          "expiryDate": {
+            "type": "string",
+            "description": "The expiry date of the credit card in the format yyyy-mm-ddThh:mm",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$",
+            "example": "2021-01-01T00:00"
+          }
+        },
+        "required": [
+          "holderName",
+          "cardId",
+          "cardNumber",
+          "expiryDate"
         ]
       }
     }
