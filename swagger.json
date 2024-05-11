@@ -4997,27 +4997,33 @@
                           "ID": 1,
                           "FullName": "John",
                           "Username": "John3142",
+                          "Bio": "I'm a software engineer",
                           "DOB": "2011-01-04T00:00:00.000Z",
                           "Email": "johndoe.22@gmail.com",
                           "PhoneNumber": "+201050790880",
+                          "ProfileImage": "https://example.com/image.jpg",
                           "Connected": false
                         },
                         {
                           "ID": 1,
                           "FullName": "John",
                           "Username": "John3142",
+                          "Bio": "I'm a software engineer",
                           "DOB": "2011-01-04T00:00:00.000Z",
                           "Email": "johndoe.22@gmail.com",
                           "PhoneNumber": "+201050790880",
+                          "ProfileImage": "https://example.com/image.jpg",
                           "Connected": false
                         },
                         {
                           "ID": 1,
                           "FullName": "John",
                           "Username": "John3142",
+                          "Bio": "I'm a software engineer",
                           "DOB": "2011-01-04T00:00:00.000Z",
                           "Email": "johndoe.22@gmail.com",
                           "PhoneNumber": "+201050790880",
+                          "ProfileImage": "https://example.com/image.jpg",
                           "Connected": false
                         }
                       ]
@@ -5500,27 +5506,33 @@
                           "ID": 1,
                           "FullName": "John",
                           "Username": "John3142",
+                          "Bio": "I'm a software engineer",
                           "DOB": "2011-01-04T00:00:00.000Z",
                           "Email": "johndoe.22@gmail.com",
                           "PhoneNumber": "+201050790880",
+                          "ProfileImage": "https://example.com/image.jpg",
                           "Connected": false
                         },
                         {
                           "ID": 1,
                           "FullName": "John",
                           "Username": "John3142",
+                          "Bio": "I'm a software engineer",
                           "DOB": "2011-01-04T00:00:00.000Z",
                           "Email": "johndoe.22@gmail.com",
                           "PhoneNumber": "+201050790880",
+                          "ProfileImage": "https://example.com/image.jpg",
                           "Connected": false
                         },
                         {
                           "ID": 1,
                           "FullName": "John",
                           "Username": "John3142",
+                          "Bio": "I'm a software engineer",
                           "DOB": "2011-01-04T00:00:00.000Z",
                           "Email": "johndoe.22@gmail.com",
                           "PhoneNumber": "+201050790880",
+                          "ProfileImage": "https://example.com/image.jpg",
                           "Connected": false
                         }
                       ]
@@ -5573,7 +5585,141 @@
                   "properties": {
                     "data": {
                       "type": "object",
-                      "properties": null
+                      "properties": null,
+                      "example": [
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        },
+                        {
+                          "ID": 7,
+                          "GroupTitle": "Dummy Title Updated",
+                          "GroupDescription": "Dummy Description",
+                          "GroupCoverImage": "www.google.com",
+                          "CreatedAt": "2024-02-17T21:09:02.050Z",
+                          "UpdatedAt": "2024-03-05T16:14:17.355Z",
+                          "GroupTags": [
+                            "software",
+                            "backend",
+                            "web-development"
+                          ],
+                          "GroupOwner": {
+                            "ID": 1,
+                            "FullName": "John",
+                            "Username": "John3142",
+                            "DOB": "2011-01-04T00:00:00.000Z",
+                            "Email": "johndoe.22@gmail.com",
+                            "PhoneNumber": "+201050790880",
+                            "Connected": false
+                          },
+                          "GroupMembers": [
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "ADMIN"
+                            },
+                            {
+                              "ID": 1,
+                              "FullName": "John",
+                              "Username": "John3142",
+                              "DOB": "2011-01-04T00:00:00.000Z",
+                              "Email": "johndoe.22@gmail.com",
+                              "PhoneNumber": "+201050790880",
+                              "Connected": false,
+                              "Type": "MEMBER"
+                            }
+                          ]
+                        }
+                      ]
                     }
                   }
                 }
