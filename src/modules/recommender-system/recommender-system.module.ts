@@ -5,12 +5,12 @@ import { HttpModule } from '@nestjs/axios';
 import { HttpRecommenderConfigService } from '../../configs/http-service/recommender.config';
 
 @Module({
-  imports: [
-    HttpModule.registerAsync({
-      useClass: HttpRecommenderConfigService,
-    }),
-  ],
-  controllers: [RecommenderSystemController],
-  providers: [RecommenderSystemService],
+    imports: [
+        HttpModule.registerAsync({
+            useClass: HttpRecommenderConfigService,
+        }),
+    ],
+    controllers: [RecommenderSystemController],
+    providers: [RecommenderSystemService],
 })
 export class RecommenderSystemModule {}

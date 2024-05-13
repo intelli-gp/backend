@@ -3,11 +3,11 @@ import { ToInteger } from 'src/utils/class-transformer-decorators/int-transforme
 import { IsGteZero } from 'src/utils/class-validator-decorators';
 
 export class JoinChatGroupDto {
-  @ApiProperty({
-    example: 1,
-    description: 'The Id of the chatgroup',
-  })
-  @ToInteger()
-  @IsGteZero()
-  ChatGroupId: number;
+    @ApiProperty({
+        example: 1,
+        description: 'The Id of the chatgroup',
+    })
+    @ToInteger()
+    @IsGteZero()
+    ChatGroupId: number;
 }

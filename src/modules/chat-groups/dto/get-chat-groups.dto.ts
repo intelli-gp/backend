@@ -5,24 +5,24 @@ import { ToInteger } from 'src/utils/class-transformer-decorators/int-transforme
 import { IsGteZero } from 'src/utils/class-validator-decorators';
 
 export class GetChatGroupsDto extends PaginationDto {
-  @ApiProperty({
-    example: 1,
-    description: 'The Id of the chatgroup',
-    required: false,
-  })
-  @IsOptional()
-  @ToInteger()
-  @IsGteZero()
-  ID?: number;
+    @ApiProperty({
+        example: 1,
+        description: 'The Id of the chatgroup',
+        required: false,
+    })
+    @IsOptional()
+    @ToInteger()
+    @IsGteZero()
+    ID?: number;
 }
 
 export class GetSingleChatGroupDto {
-  @ApiProperty({
-    example: 1,
-    description: 'The Id of the chatgroup',
-    required: true,
-  })
-  @ToInteger()
-  @IsGteZero()
-  ID: number;
+    @ApiProperty({
+        example: 1,
+        description: 'The Id of the chatgroup',
+        required: true,
+    })
+    @ToInteger()
+    @IsGteZero()
+    ID: number;
 }

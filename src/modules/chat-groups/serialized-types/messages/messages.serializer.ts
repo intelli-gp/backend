@@ -1,74 +1,74 @@
-import { Prisma,  message, message_reaction } from '@prisma/client';
+import { Prisma, message, message_reaction } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 import { SerializedChatGroup } from '../chat-group/chat-group.serializer';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 import { SerializedMessageReaction } from './message-reaction.serializer';
 
 interface SerializedMessageOptions {
-  isNotification?: boolean;
-  isReply?: boolean;
+    isNotification?: boolean;
+    isReply?: boolean;
 }
 
 export class SerializedMessage {
-  MessageID: number;
+    MessageID: number;
 
-  User: any;
+    User: any;
 
-  Content: string;
+    Content: string;
 
-  Type: string;
+    Type: string;
 
-  CreatedAt: string;
+    CreatedAt: string;
 
-  IsDeleted: boolean;
+    IsDeleted: boolean;
 
-  Group: SerializedChatGroup;
+    Group: SerializedChatGroup;
 
-  UpdatedAt: string;
+    UpdatedAt: string;
 
-  RepliedToMessage: SerializedMessage;
+    RepliedToMessage: SerializedMessage;
 
-  Reactions: SerializedMessageReaction[];
+    Reactions: SerializedMessageReaction[];
 
-  @Exclude()
-  reply_to: number;
+    @Exclude()
+    reply_to: number;
 
-  @Exclude()
-  replies: message[];
+    @Exclude()
+    replies: message[];
 
-  constructor(
-    partial: Partial<Omit<Prisma.messageWhereInput, 'AND' | 'OR' | 'NOT'>>,
-    options?: SerializedMessageOptions,
-  ) {
-    partial
-    this.MessageID = Number(partial?.message_id);
-    this.Content = partial?.deleted
-      ? 'This message has been deleted'
-      : (partial?.content as string);
+    constructor(
+        partial: Partial<Omit<Prisma.messageWhereInput, 'AND' | 'OR' | 'NOT'>>,
+        options?: SerializedMessageOptions,
+    ) {
+        partial;
+        this.MessageID = Number(partial?.message_id);
+        this.Content = partial?.deleted
+            ? 'This message has been deleted'
+            : (partial?.content as string);
 
-    this.User = new SerializedUser(partial?.user);
-    this.IsDeleted = partial?.deleted as boolean;
- 
-    this.Type =partial?.type as string;
-    this.CreatedAt = partial?.created_at as string;
+        this.User = new SerializedUser(partial?.user);
+        this.IsDeleted = partial?.deleted as boolean;
 
-    this.UpdatedAt = partial?.updated_at as string;
+        this.Type = partial?.type as string;
+        this.CreatedAt = partial?.created_at as string;
 
-    this.Reactions = (partial?.message_reactions as message_reaction[])?.map(
-      (reaction) => new SerializedMessageReaction(reaction),
-    );
+        this.UpdatedAt = partial?.updated_at as string;
 
-    if (!options?.isReply && partial?.replied_to_message) {
-      this.RepliedToMessage = new SerializedMessage(
-        partial?.replied_to_message,
-        {
-          isReply: true,
-        },
-      );
+        this.Reactions = (
+            partial?.message_reactions as message_reaction[]
+        )?.map((reaction) => new SerializedMessageReaction(reaction));
+
+        if (!options?.isReply && partial?.replied_to_message) {
+            this.RepliedToMessage = new SerializedMessage(
+                partial?.replied_to_message,
+                {
+                    isReply: true,
+                },
+            );
+        }
+
+        if (options?.isNotification) {
+            this.Group = new SerializedChatGroup(partial?.group);
+        }
     }
-
-    if (options?.isNotification) {
-      this.Group = new SerializedChatGroup(partial?.group);
-    }
-  }
 }

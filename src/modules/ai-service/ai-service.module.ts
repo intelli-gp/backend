@@ -5,12 +5,12 @@ import { HttpModule } from '@nestjs/axios';
 import { AiServiceHttpConfig } from 'src/configs/http-service/ai-service.config';
 
 @Module({
-  imports: [
-    HttpModule.registerAsync({
-      useClass: AiServiceHttpConfig,
-    }),
-  ],
-  controllers: [AiServiceController],
-  providers: [AiServiceService],
+    imports: [
+        HttpModule.registerAsync({
+            useClass: AiServiceHttpConfig,
+        }),
+    ],
+    controllers: [AiServiceController],
+    providers: [AiServiceService],
 })
 export class AiServiceModule {}

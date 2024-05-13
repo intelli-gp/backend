@@ -1,7 +1,7 @@
 export default class templates {
-  static verification(data: { username: string; token: string }): string {
-    const { username, token } = data;
-    return `
+    static verification(data: { username: string; token: string }): string {
+        const { username, token } = data;
+        return `
   <!DOCTYPE html>
   <html>
   <head>
@@ -233,11 +233,11 @@ export default class templates {
   </body>
   </html>
       `;
-  }
-  static reset_password(data: { email: string; token: string }): string {
-    const { email, token } = data;
-    const targetUrl = `${process.env.FRONT_URL}/auth/reset-password?email=${email}&token=${token}`;
-    return `
+    }
+    static reset_password(data: { email: string; token: string }): string {
+        const { email, token } = data;
+        const targetUrl = `${process.env.FRONT_URL}/auth/reset-password?email=${email}&token=${token}`;
+        return `
 <!DOCTYPE html>
   <html>
   <head>
@@ -469,15 +469,15 @@ export default class templates {
   </html>
 
       `;
-  }
-  static congratsMail(): string {
-    return `
+    }
+    static congratsMail(): string {
+        return `
         <h1> congratulations your mail is now verified </h1>
       `;
-  }
-  static passwordChanged(): string {
-    return `
+    }
+    static passwordChanged(): string {
+        return `
         <h1> your password has been changed </h1>
       `;
-  }
+    }
 }

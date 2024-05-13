@@ -1,4 +1,4 @@
 export type FailurePayload = {
-  errorMessage: string;
-  errorTarget?: string;
+    errorMessage: string;
+    errorTarget?: string;
 };

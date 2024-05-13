@@ -3,52 +3,55 @@ import { Exclude, Expose, Transform } from 'class-transformer';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 
 export class SerializedChatGroup {
-  ID: number;
+    ID: number;
 
-  GroupTitle: string;
+    GroupTitle: string;
 
-  GroupDescription?: string;
+    GroupDescription?: string;
 
-  GroupCoverImage?: string;
+    GroupCoverImage?: string;
 
-  CreatedAt?: string;
+    CreatedAt?: string;
 
-  UpdatedAt?: string;
+    UpdatedAt?: string;
 
-  GroupTags?: string[];
+    GroupTags?: string[];
 
-  GroupMembers?: SerializedUser[];
+    GroupMembers?: SerializedUser[];
 
-  GroupOwner?: SerializedUser;
+    GroupOwner?: SerializedUser;
 
-  @Exclude()
-  created_by: number;
+    @Exclude()
+    created_by: number;
 
-  constructor(partial: Partial<Prisma.groupWhereInput>) {
-    this.ID = +partial?.group_id;
+    constructor(partial: Partial<Prisma.groupWhereInput>) {
+        this.ID = +partial?.group_id;
 
-    this.GroupTitle = partial?.title as string;
+        this.GroupTitle = partial?.title as string;
 
-    this.GroupDescription = partial?.description as string;
+        this.GroupDescription = partial?.description as string;
 
-    this.GroupCoverImage = partial?.cover_image_url as string;
+        this.GroupCoverImage = partial?.cover_image_url as string;
 
-    this.CreatedAt = partial?.created_at as string;
+        this.CreatedAt = partial?.created_at as string;
 
-    this.UpdatedAt = partial?.updated_at as string;
+        this.UpdatedAt = partial?.updated_at as string;
 
-    this.GroupTags =
-      (partial?.group_tag as group_tag[])?.map((tag) => tag.tag_name) || [];
+        this.GroupTags =
+            (partial?.group_tag as group_tag[])?.map((tag) => tag.tag_name) ||
+            [];
 
-    partial?.user && (this.GroupOwner = new SerializedUser(partial?.user));
+        partial?.user && (this.GroupOwner = new SerializedUser(partial?.user));
 
-    this.GroupMembers = (partial?.group_user as Prisma.group_userWhereInput[])
-      ?.filter((groupUser) => groupUser.joining_status !== false)
-      .map((groupUser) => {
-        return {
-          ...new SerializedUser(groupUser?.user),
-          Type: groupUser.type,
-        };
-      });
-  }
+        this.GroupMembers = (
+            partial?.group_user as Prisma.group_userWhereInput[]
+        )
+            ?.filter((groupUser) => groupUser.joining_status !== false)
+            .map((groupUser) => {
+                return {
+                    ...new SerializedUser(groupUser?.user),
+                    Type: groupUser.type,
+                };
+            });
+    }
 }

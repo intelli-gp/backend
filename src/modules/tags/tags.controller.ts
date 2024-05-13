@@ -7,17 +7,17 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('tags')
 @ApiTags('Tags')
 export class TagsController {
-  constructor(private readonly tagsService: TagsService) {}
+    constructor(private readonly tagsService: TagsService) {}
 
-  @Get()
-  async getAllTags(@Query() paginationData: PaginationDto) {
-    const tags = await this.tagsService.getAllTags(paginationData);
-    return sendSuccessResponse(tags);
-  }
+    @Get()
+    async getAllTags(@Query() paginationData: PaginationDto) {
+        const tags = await this.tagsService.getAllTags(paginationData);
+        return sendSuccessResponse(tags);
+    }
 
-  @Get('suggested')
-  async getSuggestedTags(@Query() paginationData: PaginationDto) {
-    const tags = await this.tagsService.getSuggestedTags(paginationData);
-    return sendSuccessResponse(tags);
-  }
+    @Get('suggested')
+    async getSuggestedTags(@Query() paginationData: PaginationDto) {
+        const tags = await this.tagsService.getSuggestedTags(paginationData);
+        return sendSuccessResponse(tags);
+    }
 }

@@ -4,7 +4,7 @@ import { ArticlesService } from './articles.service';
 import { TagsService } from '../tags/tags.service';
 
 @Module({
-  controllers: [ArticlesController],
-  providers: [ArticlesService, TagsService],
+    controllers: [ArticlesController],
+    providers: [ArticlesService, TagsService],
 })
 export class ArticlesModule {}

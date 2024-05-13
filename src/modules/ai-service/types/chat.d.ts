@@ -1,4 +1,4 @@
 export type ReceivedChatResponse = {
-  recipient_id: string;
-  text: string;
+    recipient_id: string;
+    text: string;
 };

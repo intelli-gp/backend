@@ -4,18 +4,18 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class AtGuard extends AuthGuard('jwt-access') {
-  constructor(private reflector: Reflector) {
-    super();
-  }
+    constructor(private reflector: Reflector) {
+        super();
+    }
 
-  canActivate(context: ExecutionContext) {
-    const isPublic = this.reflector.getAllAndOverride('isPublic', [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    canActivate(context: ExecutionContext) {
+        const isPublic = this.reflector.getAllAndOverride('isPublic', [
+            context.getHandler(),
+            context.getClass(),
+        ]);
 
-    if (isPublic) return true;
+        if (isPublic) return true;
 
-    return super.canActivate(context);
-  }
+        return super.canActivate(context);
+    }
 }

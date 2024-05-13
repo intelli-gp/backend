@@ -7,14 +7,14 @@ import { sendSuccessResponse } from 'src/utils/response-handler/success.response
 @ApiTags('Ai-Service')
 @Controller('ai-service')
 export class AiServiceController {
-  private readonly logger = new Logger(AiServiceController.name);
-  constructor(private readonly aiServiceService: AiServiceService) {}
+    private readonly logger = new Logger(AiServiceController.name);
+    constructor(private readonly aiServiceService: AiServiceService) {}
 
-  @Post('chat')
-  async chatWithChatbot(@Body() messageData: SendMessageDto) {
-    const response = await this.aiServiceService.chatWithChatbot(
-      messageData.Content,
-    );
-    return sendSuccessResponse(response);
-  }
+    @Post('chat')
+    async chatWithChatbot(@Body() messageData: SendMessageDto) {
+        const response = await this.aiServiceService.chatWithChatbot(
+            messageData.Content,
+        );
+        return sendSuccessResponse(response);
+    }
 }

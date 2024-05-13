@@ -26,71 +26,71 @@ import { validateConfig } from './utils/config-validation.schema';
 import { SecondFactorAtGuard } from './modules/auth/guards/2fa-access-jwt.guard';
 import { AiServiceModule } from './modules/ai-service/ai-service.module';
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      cache: true,
-      validate: validateConfig,
-      isGlobal: true,
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'frontend-dist'),
-      exclude: ['/api*'],
-    }),
-    PrismaModule,
-    AuthModule,
-    UsersModule,
-    CacheModule.register({
-      isGlobal: true,
-      store: redisStore,
-      host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT,
-      max: 100,
-    }),
-    TagsModule,
-    ArticlesModule,
-    StudyPlannerModule,
-    ChatGroupsModule,
-    NotificationModule,
-    PaymentMethodModule,
-    SearchModule,
-    CoursesModule,
-    RecommenderSystemModule,
-    AiServiceModule,
-  ],
-  providers: [
-    DbInitializationService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ClassSerializerInterceptor,
-    },
-    {
-      provide: APP_PIPE,
-      useClass: TrimStringsPipe,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: CustomFilter,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: PrismaExceptionFilter,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: AtGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: SecondFactorAtGuard,
-    },
-  ],
+    imports: [
+        ConfigModule.forRoot({
+            cache: true,
+            validate: validateConfig,
+            isGlobal: true,
+        }),
+        ServeStaticModule.forRoot({
+            rootPath: join(__dirname, '..', 'frontend-dist'),
+            exclude: ['/api*'],
+        }),
+        PrismaModule,
+        AuthModule,
+        UsersModule,
+        CacheModule.register({
+            isGlobal: true,
+            store: redisStore,
+            host: process.env.REDIS_HOST,
+            port: process.env.REDIS_PORT,
+            max: 100,
+        }),
+        TagsModule,
+        ArticlesModule,
+        StudyPlannerModule,
+        ChatGroupsModule,
+        NotificationModule,
+        PaymentMethodModule,
+        SearchModule,
+        CoursesModule,
+        RecommenderSystemModule,
+        AiServiceModule,
+    ],
+    providers: [
+        DbInitializationService,
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: ClassSerializerInterceptor,
+        },
+        {
+            provide: APP_PIPE,
+            useClass: TrimStringsPipe,
+        },
+        {
+            provide: APP_FILTER,
+            useClass: CustomFilter,
+        },
+        {
+            provide: APP_FILTER,
+            useClass: PrismaExceptionFilter,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: AtGuard,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: SecondFactorAtGuard,
+        },
+    ],
 })
 export class AppModule {
-  constructor(
-    private readonly dbInitializationService: DbInitializationService,
-  ) {}
-  async onModuleInit() {
-    await this.dbInitializationService.init();
-    console.log('The module has been initialized.');
-  }
+    constructor(
+        private readonly dbInitializationService: DbInitializationService,
+    ) {}
+    async onModuleInit() {
+        await this.dbInitializationService.init();
+        console.log('The module has been initialized.');
+    }
 }

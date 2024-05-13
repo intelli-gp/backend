@@ -4,18 +4,18 @@ import { ToInteger } from 'src/utils/class-transformer-decorators/int-transforme
 import { IsGteZero } from 'src/utils/class-validator-decorators';
 
 export class ReactToMessageDto {
-  @ApiProperty({
-    example: 'like',
-    description: 'The reaction to the message',
-  })
-  @IsString()
-  Reaction: string;
+    @ApiProperty({
+        example: 'like',
+        description: 'The reaction to the message',
+    })
+    @IsString()
+    Reaction: string;
 
-  @ApiProperty({
-    example: 1,
-    description: 'The ID of the message',
-  })
-  @ToInteger()
-  @IsGteZero()
-  MessageID: number;
+    @ApiProperty({
+        example: 1,
+        description: 'The ID of the message',
+    })
+    @ToInteger()
+    @IsGteZero()
+    MessageID: number;
 }

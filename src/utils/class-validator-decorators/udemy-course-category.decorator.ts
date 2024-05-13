@@ -1,7 +1,7 @@
 import {
-  registerDecorator,
-  ValidationOptions,
-  ValidationArguments,
+    registerDecorator,
+    ValidationOptions,
+    ValidationArguments,
 } from 'class-validator';
 import { udemyCourseCategories } from 'src/modules/courses/constants';
 
@@ -11,22 +11,22 @@ import { udemyCourseCategories } from 'src/modules/courses/constants';
  * @returns
  */
 export function IsValidUdemyCourseCategory(
-  validationOptions?: ValidationOptions,
+    validationOptions?: ValidationOptions,
 ) {
-  return function (object: object, propertyName: string) {
-    registerDecorator({
-      name: 'isValidUdemyCourseCategory',
-      target: object.constructor,
-      propertyName: propertyName,
-      options: validationOptions,
-      validator: {
-        validate(value: string) {
-          return udemyCourseCategories.includes(value as any);
-        },
-        defaultMessage(args: ValidationArguments) {
-          return `${args.property} must be a valid udemy category.`;
-        },
-      },
-    });
-  };
+    return function (object: object, propertyName: string) {
+        registerDecorator({
+            name: 'isValidUdemyCourseCategory',
+            target: object.constructor,
+            propertyName: propertyName,
+            options: validationOptions,
+            validator: {
+                validate(value: string) {
+                    return udemyCourseCategories.includes(value as any);
+                },
+                defaultMessage(args: ValidationArguments) {
+                    return `${args.property} must be a valid udemy category.`;
+                },
+            },
+        });
+    };
 }

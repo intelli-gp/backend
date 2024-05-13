@@ -10,14 +10,14 @@ import { UsersService } from '../users/users.service';
 
 // TODO: Add the provider for gateway
 @Module({
-  providers: [
-    ChatGroupsService,
-    TagsService,
-    GroupUsersService,
-    ChatGroupsGateway,
-    MessagingService,
-    UsersService,
-  ],
-  controllers: [ChatGroupsController],
+    providers: [
+        ChatGroupsService,
+        TagsService,
+        GroupUsersService,
+        ChatGroupsGateway,
+        MessagingService,
+        UsersService,
+    ],
+    controllers: [ChatGroupsController],
 })
 export class ChatGroupsModule {}

@@ -2,6 +2,6 @@ import { SerializedUser } from 'src/modules/users/serialized-types/serialized-us
 import { NotificationType } from '../enums/notification-primary-types.enum';
 
 export type FollowNotification = {
-  eventName: NotificationType<'FOLLOW'>;
-  message: SerializedUser;
+    eventName: NotificationType<'FOLLOW'>;
+    message: SerializedUser;
 };

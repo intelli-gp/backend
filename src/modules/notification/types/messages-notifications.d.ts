@@ -3,12 +3,12 @@ import { SerializedMessage } from 'src/modules/chat-groups/serialized-types/mess
 import { NotificationType } from '../enums/notification-primary-types.enum';
 
 export type ChatGroupMessagesNotification = {
-  group: group;
-  lastMessage: message;
-  unreadMessagesCount: number;
+    group: group;
+    lastMessage: message;
+    unreadMessagesCount: number;
 };
 
 export type chatNotification = {
-  eventName: NotificationType<'MESSAGE'>;
-  message: SerializedMessage;
+    eventName: NotificationType<'MESSAGE'>;
+    message: SerializedMessage;
 };

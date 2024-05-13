@@ -3,22 +3,24 @@ import { Exclude } from 'class-transformer';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 
 export class SerializedArticleLike {
-  LikedAt: string;
+    LikedAt: string;
 
-  Liker: SerializedUser;
+    Liker: SerializedUser;
 
-  IsNotificationViewed: boolean;
+    IsNotificationViewed: boolean;
 
-  ArticleID: number;
+    ArticleID: number;
 
-  @Exclude()
-  user_id: number;
-  constructor(
-    partial: Partial<Omit<Prisma.article_likeWhereInput, 'AND' | 'OR' | 'NOT'>>,
-  ) {
-    this.ArticleID = +partial?.article_id;
-    this.LikedAt = partial?.liked_at as string;
-    this.Liker = new SerializedUser(partial?.user);
-    this.IsNotificationViewed = partial?.isNotificationViewed as boolean;
-  }
+    @Exclude()
+    user_id: number;
+    constructor(
+        partial: Partial<
+            Omit<Prisma.article_likeWhereInput, 'AND' | 'OR' | 'NOT'>
+        >,
+    ) {
+        this.ArticleID = +partial?.article_id;
+        this.LikedAt = partial?.liked_at as string;
+        this.Liker = new SerializedUser(partial?.user);
+        this.IsNotificationViewed = partial?.isNotificationViewed as boolean;
+    }
 }

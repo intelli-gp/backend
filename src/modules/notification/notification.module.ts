@@ -5,8 +5,8 @@ import { EventsService } from './event.service';
 
 @Global()
 @Module({
-  controllers: [NotificationController],
-  providers: [NotificationService, EventsService],
-  exports: [NotificationService],
+    controllers: [NotificationController],
+    providers: [NotificationService, EventsService],
+    exports: [NotificationService],
 })
 export class NotificationModule {}

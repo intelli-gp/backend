@@ -4,24 +4,24 @@ import { ToLowerCase } from 'src/utils/class-transformer-decorators/lowercase-tr
 import { IsStrongPassword } from 'src/utils/class-validator-decorators/password.decorator';
 
 export class ResetPasswordDto {
-  @ApiProperty({ required: true, example: 'John32@gmail.com' })
-  @IsString()
-  @IsNotEmpty()
-  @IsEmail()
-  @ToLowerCase()
-  email: string;
+    @ApiProperty({ required: true, example: 'John32@gmail.com' })
+    @IsString()
+    @IsNotEmpty()
+    @IsEmail()
+    @ToLowerCase()
+    email: string;
 }
 
 export class ResetPasswordConfirmationParamDto extends ResetPasswordDto {
-  @ApiProperty({ required: true, example: 'Standard JWT token' })
-  @IsNotEmpty()
-  @IsString()
-  token: string;
+    @ApiProperty({ required: true, example: 'Standard JWT token' })
+    @IsNotEmpty()
+    @IsString()
+    token: string;
 }
 
 export class ResetPasswordConfirmationBodyDto {
-  @ApiProperty({ required: true, example: 'Testpassword@1234' })
-  @IsNotEmpty()
-  @IsStrongPassword()
-  password: string;
+    @ApiProperty({ required: true, example: 'Testpassword@1234' })
+    @IsNotEmpty()
+    @IsStrongPassword()
+    password: string;
 }

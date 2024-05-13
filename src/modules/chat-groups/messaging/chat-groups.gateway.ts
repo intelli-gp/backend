@@ -1,29 +1,29 @@
 import {
-  WebSocketGateway,
-  SubscribeMessage,
-  MessageBody,
-  WebSocketServer,
-  ConnectedSocket,
+    WebSocketGateway,
+    SubscribeMessage,
+    MessageBody,
+    WebSocketServer,
+    ConnectedSocket,
 } from '@nestjs/websockets';
 import {
-  BadRequestException,
-  ClassSerializerInterceptor,
-  Injectable,
-  Logger,
-  UseFilters,
-  UseGuards,
-  UseInterceptors,
-  UsePipes,
-  ValidationPipe,
+    BadRequestException,
+    ClassSerializerInterceptor,
+    Injectable,
+    Logger,
+    UseFilters,
+    UseGuards,
+    UseInterceptors,
+    UsePipes,
+    ValidationPipe,
 } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { WsAuthMiddleware } from '../middleware/ws.auth.middleware';
 import { WsJwtGuard } from 'src/modules/auth/guards/ws.jwt.guard';
 import {
-  CreateMessageDto,
-  IsTypingDto,
-  JoinChatGroupDto,
-  ReactToMessageDto,
+    CreateMessageDto,
+    IsTypingDto,
+    JoinChatGroupDto,
+    ReactToMessageDto,
 } from '../dto';
 import { ServerToClientEvents, ClientToServerEvents } from './types';
 import { WebsocketExceptionsFilter } from 'src/exception-filters/ws.filter';
@@ -42,8 +42,8 @@ import { MessageReadReceipt } from './types/message-read';
 
 @Injectable()
 @WebSocketGateway({
-  namespace: 'chat-groups',
-  cors: true,
+    namespace: 'chat-groups',
+    cors: true,
 })
 @UseFilters(new WebsocketExceptionsFilter(), new WsPrismaExceptionFilter())
 @UseInterceptors(new ClassSerializerInterceptor(new Reflector()))
@@ -53,34 +53,34 @@ import { MessageReadReceipt } from './types/message-read';
  */
 @UseGuards(WsJwtGuard)
 @UsePipes(
-  new ValidationPipe({
-    whitelist: true,
-  }),
+    new ValidationPipe({
+        whitelist: true,
+    }),
 )
 export class ChatGroupsGateway {
-  private gatewayLogger = new Logger('ChatGroupsGateway');
+    private gatewayLogger = new Logger('ChatGroupsGateway');
 
-  @WebSocketServer()
-  // we can add event types here to the Server type Server<any, EventsTypes>
-  // add event type and event payload type
-  private wss: Server<ClientToServerEvents, ServerToClientEvents>;
+    @WebSocketServer()
+    // we can add event types here to the Server type Server<any, EventsTypes>
+    // add event type and event payload type
+    private wss: Server<ClientToServerEvents, ServerToClientEvents>;
 
-  constructor(
-    private readonly groupUsersService: GroupUsersService,
-    private readonly messagingService: MessagingService,
-    private readonly usersService: UsersService,
-  ) { }
-  createGroupTitle(groupId: number) {
-    return `Chat-Group-${groupId}`;
-  }
+    constructor(
+        private readonly groupUsersService: GroupUsersService,
+        private readonly messagingService: MessagingService,
+        private readonly usersService: UsersService,
+    ) {}
+    createGroupTitle(groupId: number) {
+        return `Chat-Group-${groupId}`;
+    }
 
-  createMessageInfoRoomTitle(messageId: number) {
-    return `Message-${messageId}-Info`;
-  }
+    createMessageInfoRoomTitle(messageId: number) {
+        return `Message-${messageId}-Info`;
+    }
 
-  async afterInit(client: Socket) {
-    this.gatewayLogger.log('ChatGroupsGateway initialized');
-    /*
+    async afterInit(client: Socket) {
+        this.gatewayLogger.log('ChatGroupsGateway initialized');
+        /*
     We use this way of middleware using at the afterInit that is exposed to us by nestjs 
     because we need to authenticate the user before any other event is triggered
     therefore applying the middleware at initialization is the best way to do it so far
@@ -88,293 +88,308 @@ export class ChatGroupsGateway {
 
     Notice: This type assertion is necessary because the client.use() method Types are wrong
     */
-    client.use(WsAuthMiddleware() as any);
+        client.use(WsAuthMiddleware() as any);
 
-    // Reset All connection if the server is restarted
-    await this.usersService.resetUsersConnectedStatus();
-  }
-
-  async handleConnection(@ConnectedSocket() client: Socket) {
-    this.gatewayLogger.log(`Client connected: ${client.id}`);
-    const currentUser = client?.['user'] as user;
-
-    if (!currentUser) {
-      return;
+        // Reset All connection if the server is restarted
+        await this.usersService.resetUsersConnectedStatus();
     }
 
-    // update online status of the user in db
-    await this.usersService.updateUserConnectedStatus(
-      currentUser?.user_id,
-      true,
-    );
+    async handleConnection(@ConnectedSocket() client: Socket) {
+        this.gatewayLogger.log(`Client connected: ${client.id}`);
+        const currentUser = client?.['user'] as user;
 
-    // send to all users that this user's status
-    // we should send to all friends but we don't have friends yet
-    client.broadcast.emit('userStatus', {
-      username: currentUser.username,
-      status: 'online',
-    });
-    // TODO: handle message delivered Status here
-  }
-
-  async handleDisconnect(client: Socket) {
-    this.gatewayLogger.log(`Client disconnected: ${client.id}`);
-    const currentUser = client['user'] as user;
-
-    // update online status of the user in db
-    await this.usersService.updateUserConnectedStatus(
-      currentUser.user_id,
-      false,
-    );
-
-    // send to all users that this user's status
-    // we should send to all friends but we don't have friends yet
-    client.broadcast.emit('userStatus', {
-      username: currentUser.username,
-      status: 'offline',
-    });
-  }
-
-  @SubscribeMessage('createMessage')
-  async createMessage(
-    @WsGetCurrentUser('user_id') userId: number,
-    @MessageBody() data: CreateMessageDto,
-  ) {
-    this.gatewayLogger.log(
-      `Creating message in room ${data.GroupID} with content ${data.Content}`,
-    );
-    if (
-      !(await this.groupUsersService.isUserMemberOfGroup(userId, data.GroupID))
-    ) {
-      throw new BadRequestException('User is not a member of this group');
-    }
-    const messagePayload = await this.messagingService.createMessage(
-      data.GroupID,
-      userId,
-      data.Content,
-      data.Type,
-      data.RepliedToMessageID,
-    );
-
-    const groupTitle = this.createGroupTitle(data.GroupID);
-
-    this.wss
-      .to(groupTitle)
-      .emit(
-        'newMessage',
-        new SerializedMessage(
-          messagePayload as unknown as Prisma.messageWhereInput,
-        ),
-      );
-  }
-
-  @SubscribeMessage('joinRoom')
-  async joinRoom(
-    @WsGetCurrentUser('user_id') userId: number,
-    @ConnectedSocket() client: Socket,
-    @MessageBody() dto: JoinChatGroupDto,
-  ) {
-    if (
-      !(await this.groupUsersService.isUserMemberOfGroup(
-        userId,
-        dto.ChatGroupId,
-      ))
-    ) {
-      throw new BadRequestException('User is not a member of this group');
-    }
-
-    const readMessages = await this.groupUsersService.toggleJoinSocketRoom(
-      userId,
-      dto.ChatGroupId,
-      false,
-    );
-
-    const groupTitle = this.createGroupTitle(dto.ChatGroupId);
-
-    this.gatewayLogger.log(`Joining room ${groupTitle}`);
-    const messages = await this.messagingService.getMessages(dto.ChatGroupId);
-    client.join(groupTitle);
-    client.emit(
-      'allMessages',
-      messages.map((message) => {
-        return new SerializedMessage(message as Prisma.messageWhereInput);
-      }),
-    );
-
-    // Emit to all users in every message Room that this user has read the message
-    const groupedMessages: MessageReadReceipt[][] = Object.values(
-      readMessages.reduce((acc, obj) => {
-        const messageId = obj.message_id;
-        if (!acc[messageId]) {
-          acc[messageId] = [obj];
-        } else {
-          acc[messageId].push(obj);
+        if (!currentUser) {
+            return;
         }
-        return acc;
-      }, {}),
-    );
 
-    this.gatewayLogger.debug({ groupedMessages });
+        // update online status of the user in db
+        await this.usersService.updateUserConnectedStatus(
+            currentUser?.user_id,
+            true,
+        );
 
-    groupedMessages.forEach((groupedMessage) => {
-      const messageRoom = this.createMessageInfoRoomTitle(
-        groupedMessage[0].message_id,
-      );
-      client.to(messageRoom).emit(
-        'newMessageReadInfo',
-        groupedMessage.map((message) => new SerializedReadMessageInfo(message)),
-      );
-    });
-  }
-
-  @SubscribeMessage('leaveRoom')
-  async leaveRoom(
-    @WsGetCurrentUser('user_id') userId: number,
-    @ConnectedSocket() client: Socket,
-    @MessageBody() dto: JoinChatGroupDto,
-  ) {
-    if (
-      !(await this.groupUsersService.isUserMemberOfGroup(
-        userId,
-        dto.ChatGroupId,
-      ))
-    ) {
-      throw new BadRequestException('User is not a member of this group');
+        // send to all users that this user's status
+        // we should send to all friends but we don't have friends yet
+        client.broadcast.emit('userStatus', {
+            username: currentUser.username,
+            status: 'online',
+        });
+        // TODO: handle message delivered Status here
     }
 
-    await this.groupUsersService.toggleJoinSocketRoom(
-      userId,
-      dto.ChatGroupId,
-      true,
-    );
+    async handleDisconnect(client: Socket) {
+        this.gatewayLogger.log(`Client disconnected: ${client.id}`);
+        const currentUser = client['user'] as user;
 
-    const groupTitle = this.createGroupTitle(dto.ChatGroupId);
+        // update online status of the user in db
+        await this.usersService.updateUserConnectedStatus(
+            currentUser.user_id,
+            false,
+        );
 
-    this.gatewayLogger.log(`Leaving room ${groupTitle}`);
+        // send to all users that this user's status
+        // we should send to all friends but we don't have friends yet
+        client.broadcast.emit('userStatus', {
+            username: currentUser.username,
+            status: 'offline',
+        });
+    }
 
-    client.leave(groupTitle);
-  }
+    @SubscribeMessage('createMessage')
+    async createMessage(
+        @WsGetCurrentUser('user_id') userId: number,
+        @MessageBody() data: CreateMessageDto,
+    ) {
+        this.gatewayLogger.log(
+            `Creating message in room ${data.GroupID} with content ${data.Content}`,
+        );
+        if (
+            !(await this.groupUsersService.isUserMemberOfGroup(
+                userId,
+                data.GroupID,
+            ))
+        ) {
+            throw new BadRequestException('User is not a member of this group');
+        }
+        const messagePayload = await this.messagingService.createMessage(
+            data.GroupID,
+            userId,
+            data.Content,
+            data.Type,
+            data.RepliedToMessageID,
+        );
 
-  @SubscribeMessage('typing')
-  typing(
-    @MessageBody() dto: IsTypingDto,
-    @WsGetCurrentUser() user: user,
-    @ConnectedSocket() client: Socket,
-  ) {
-    // get group name
-    const groupTitle = this.createGroupTitle(dto.GroupID);
+        const groupTitle = this.createGroupTitle(data.GroupID);
 
-    // broadcast emit that this client is typing except this client himself
-    client.to(groupTitle).emit('isTyping', {
-      IsTyping: dto.IsTyping,
-      Username: user.username,
-      FullName: user.full_name,
-    });
-  }
+        this.wss
+            .to(groupTitle)
+            .emit(
+                'newMessage',
+                new SerializedMessage(
+                    messagePayload as unknown as Prisma.messageWhereInput,
+                ),
+            );
+    }
 
-  @SubscribeMessage('deleteMessage')
-  async deleteMessage(
-    @MessageBody() dto: DeleteMessageDto,
-    @WsGetCurrentUser('user_id') userId: number,
-  ) {
-    this.gatewayLogger.debug({ deleteMessageData: dto });
-    const { messagesAfterDeletion, groupId } =
-      await this.messagingService.deleteMessage(dto.MessageID, userId);
+    @SubscribeMessage('joinRoom')
+    async joinRoom(
+        @WsGetCurrentUser('user_id') userId: number,
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto: JoinChatGroupDto,
+    ) {
+        if (
+            !(await this.groupUsersService.isUserMemberOfGroup(
+                userId,
+                dto.ChatGroupId,
+            ))
+        ) {
+            throw new BadRequestException('User is not a member of this group');
+        }
 
-    this.gatewayLogger.debug({ messagesAfterDeletion, groupId });
+        const readMessages = await this.groupUsersService.toggleJoinSocketRoom(
+            userId,
+            dto.ChatGroupId,
+            false,
+        );
 
-    const groupTitle = this.createGroupTitle(groupId);
+        const groupTitle = this.createGroupTitle(dto.ChatGroupId);
 
-    this.wss.to(groupTitle).emit(
-      'allMessages',
-      messagesAfterDeletion.map((message) => {
-        return new SerializedMessage(message as Prisma.messageWhereInput);
-      }),
-    );
-  }
+        this.gatewayLogger.log(`Joining room ${groupTitle}`);
+        const messages = await this.messagingService.getMessages(
+            dto.ChatGroupId,
+        );
+        client.join(groupTitle);
+        client.emit(
+            'allMessages',
+            messages.map((message) => {
+                return new SerializedMessage(
+                    message as Prisma.messageWhereInput,
+                );
+            }),
+        );
 
-  @SubscribeMessage('reactToMessage')
-  async reactToMessage(
-    @MessageBody() data: ReactToMessageDto,
-    @WsGetCurrentUser('user_id') userId: number,
-  ) {
-    this.gatewayLogger.debug({ reactionData: data });
-    const { messageAfterReaction, groupId } =
-      await this.messagingService.reactToMessage(
-        data.MessageID,
-        userId,
-        data.Reaction,
-      );
+        // Emit to all users in every message Room that this user has read the message
+        const groupedMessages: MessageReadReceipt[][] = Object.values(
+            readMessages.reduce((acc, obj) => {
+                const messageId = obj.message_id;
+                if (!acc[messageId]) {
+                    acc[messageId] = [obj];
+                } else {
+                    acc[messageId].push(obj);
+                }
+                return acc;
+            }, {}),
+        );
 
-    this.gatewayLogger.debug({ messageAfterReaction, groupId });
+        this.gatewayLogger.debug({ groupedMessages });
 
-    const groupTitle = this.createGroupTitle(groupId);
+        groupedMessages.forEach((groupedMessage) => {
+            const messageRoom = this.createMessageInfoRoomTitle(
+                groupedMessage[0].message_id,
+            );
+            client.to(messageRoom).emit(
+                'newMessageReadInfo',
+                groupedMessage.map(
+                    (message) => new SerializedReadMessageInfo(message),
+                ),
+            );
+        });
+    }
 
-    const serializedMessage = new SerializedMessage(messageAfterReaction);
+    @SubscribeMessage('leaveRoom')
+    async leaveRoom(
+        @WsGetCurrentUser('user_id') userId: number,
+        @ConnectedSocket() client: Socket,
+        @MessageBody() dto: JoinChatGroupDto,
+    ) {
+        if (
+            !(await this.groupUsersService.isUserMemberOfGroup(
+                userId,
+                dto.ChatGroupId,
+            ))
+        ) {
+            throw new BadRequestException('User is not a member of this group');
+        }
 
-    this.gatewayLogger.debug({ serializedMessage });
+        await this.groupUsersService.toggleJoinSocketRoom(
+            userId,
+            dto.ChatGroupId,
+            true,
+        );
 
-    // TODO: change this in edit message as well
-    this.wss.to(groupTitle).emit('editedMessage', serializedMessage);
-  }
+        const groupTitle = this.createGroupTitle(dto.ChatGroupId);
 
-  @SubscribeMessage('editMessage')
-  async editMessage(
-    @MessageBody() data: EditMessageDto,
-    @WsGetCurrentUser('user_id') userId: number,
-  ) {
-    this.gatewayLogger.debug({ messageData: data });
-    const { messagesAfterEdit, groupId } =
-      await this.messagingService.editMessage(
-        data.MessageID,
-        userId,
-        data.Content,
-      );
+        this.gatewayLogger.log(`Leaving room ${groupTitle}`);
 
-    this.gatewayLogger.debug({ messagesAfterEdit, groupId });
+        client.leave(groupTitle);
+    }
 
-    const groupTitle = this.createGroupTitle(groupId);
+    @SubscribeMessage('typing')
+    typing(
+        @MessageBody() dto: IsTypingDto,
+        @WsGetCurrentUser() user: user,
+        @ConnectedSocket() client: Socket,
+    ) {
+        // get group name
+        const groupTitle = this.createGroupTitle(dto.GroupID);
 
-    this.wss.to(groupTitle).emit(
-      'allMessages',
-      messagesAfterEdit.map((message) => {
-        return new SerializedMessage(message as Prisma.messageWhereInput);
-      }),
-    );
-  }
+        // broadcast emit that this client is typing except this client himself
+        client.to(groupTitle).emit('isTyping', {
+            IsTyping: dto.IsTyping,
+            Username: user.username,
+            FullName: user.full_name,
+        });
+    }
 
-  @SubscribeMessage('getMessageInfo')
-  async getMessageInfo(
-    @MessageBody() data: DeleteMessageDto,
-    @ConnectedSocket() client: Socket,
-  ) {
-    const messageReadStatusInfo =
-      await this.messagingService.getMessageReadReceipts(data.MessageID);
-    const messageInfoRoomTitle = this.createMessageInfoRoomTitle(
-      data.MessageID,
-    );
+    @SubscribeMessage('deleteMessage')
+    async deleteMessage(
+        @MessageBody() dto: DeleteMessageDto,
+        @WsGetCurrentUser('user_id') userId: number,
+    ) {
+        this.gatewayLogger.debug({ deleteMessageData: dto });
+        const { messagesAfterDeletion, groupId } =
+            await this.messagingService.deleteMessage(dto.MessageID, userId);
 
-    this.gatewayLogger.debug({ messageReadStatusInfo });
-    this.gatewayLogger.debug({ messageInfoRoomTitle });
+        this.gatewayLogger.debug({ messagesAfterDeletion, groupId });
 
-    client.join(messageInfoRoomTitle);
-    client.emit(
-      'messageInfo',
-      messageReadStatusInfo.map((singleMessageReadStatusInfo) => {
-        return new SerializedReadMessageInfo(singleMessageReadStatusInfo);
-      }),
-    );
-  }
+        const groupTitle = this.createGroupTitle(groupId);
 
-  @SubscribeMessage('leaveMessageInfoRoom')
-  async leaveMessageInfoRoom(
-    @MessageBody() data: DeleteMessageDto,
-    @ConnectedSocket() client: Socket,
-  ) {
-    const messageInfoRoomTitle = this.createMessageInfoRoomTitle(
-      data.MessageID,
-    );
+        this.wss.to(groupTitle).emit(
+            'allMessages',
+            messagesAfterDeletion.map((message) => {
+                return new SerializedMessage(
+                    message as Prisma.messageWhereInput,
+                );
+            }),
+        );
+    }
 
-    client.leave(messageInfoRoomTitle);
-  }
+    @SubscribeMessage('reactToMessage')
+    async reactToMessage(
+        @MessageBody() data: ReactToMessageDto,
+        @WsGetCurrentUser('user_id') userId: number,
+    ) {
+        this.gatewayLogger.debug({ reactionData: data });
+        const { messageAfterReaction, groupId } =
+            await this.messagingService.reactToMessage(
+                data.MessageID,
+                userId,
+                data.Reaction,
+            );
+
+        this.gatewayLogger.debug({ messageAfterReaction, groupId });
+
+        const groupTitle = this.createGroupTitle(groupId);
+
+        const serializedMessage = new SerializedMessage(messageAfterReaction);
+
+        this.gatewayLogger.debug({ serializedMessage });
+
+        // TODO: change this in edit message as well
+        this.wss.to(groupTitle).emit('editedMessage', serializedMessage);
+    }
+
+    @SubscribeMessage('editMessage')
+    async editMessage(
+        @MessageBody() data: EditMessageDto,
+        @WsGetCurrentUser('user_id') userId: number,
+    ) {
+        this.gatewayLogger.debug({ messageData: data });
+        const { messagesAfterEdit, groupId } =
+            await this.messagingService.editMessage(
+                data.MessageID,
+                userId,
+                data.Content,
+            );
+
+        this.gatewayLogger.debug({ messagesAfterEdit, groupId });
+
+        const groupTitle = this.createGroupTitle(groupId);
+
+        this.wss.to(groupTitle).emit(
+            'allMessages',
+            messagesAfterEdit.map((message) => {
+                return new SerializedMessage(
+                    message as Prisma.messageWhereInput,
+                );
+            }),
+        );
+    }
+
+    @SubscribeMessage('getMessageInfo')
+    async getMessageInfo(
+        @MessageBody() data: DeleteMessageDto,
+        @ConnectedSocket() client: Socket,
+    ) {
+        const messageReadStatusInfo =
+            await this.messagingService.getMessageReadReceipts(data.MessageID);
+        const messageInfoRoomTitle = this.createMessageInfoRoomTitle(
+            data.MessageID,
+        );
+
+        this.gatewayLogger.debug({ messageReadStatusInfo });
+        this.gatewayLogger.debug({ messageInfoRoomTitle });
+
+        client.join(messageInfoRoomTitle);
+        client.emit(
+            'messageInfo',
+            messageReadStatusInfo.map((singleMessageReadStatusInfo) => {
+                return new SerializedReadMessageInfo(
+                    singleMessageReadStatusInfo,
+                );
+            }),
+        );
+    }
+
+    @SubscribeMessage('leaveMessageInfoRoom')
+    async leaveMessageInfoRoom(
+        @MessageBody() data: DeleteMessageDto,
+        @ConnectedSocket() client: Socket,
+    ) {
+        const messageInfoRoomTitle = this.createMessageInfoRoomTitle(
+            data.MessageID,
+        );
+
+        client.leave(messageInfoRoomTitle);
+    }
 }

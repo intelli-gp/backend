@@ -5,20 +5,20 @@ import { IsValidChatGroupPermission } from 'src/utils/class-validator-decorators
 import { GroupUserTypeEnum } from '@prisma/client';
 
 export class UpdatePermissionDto {
-  @ApiProperty({
-    example: 1,
-    description: 'The Id of the user',
-    required: true,
-  })
-  @ToInteger()
-  @IsGteZero()
-  TargetID: number;
+    @ApiProperty({
+        example: 1,
+        description: 'The Id of the user',
+        required: true,
+    })
+    @ToInteger()
+    @IsGteZero()
+    TargetID: number;
 
-  @ApiProperty({
-    example: 'ADMIN',
-    description: 'The new permission level for the user in the group',
-    required: true,
-  })
-  @IsValidChatGroupPermission()
-  permissionLevel: GroupUserTypeEnum;
+    @ApiProperty({
+        example: 'ADMIN',
+        description: 'The new permission level for the user in the group',
+        required: true,
+    })
+    @IsValidChatGroupPermission()
+    permissionLevel: GroupUserTypeEnum;
 }

@@ -4,8 +4,8 @@ import { UsersService } from './users.service';
 import { TagsService } from '../tags/tags.service';
 
 @Module({
-  controllers: [UsersController],
-  providers: [UsersService, TagsService],
-  exports: [UsersService],
+    controllers: [UsersController],
+    providers: [UsersService, TagsService],
+    exports: [UsersService],
 })
 export class UsersModule {}

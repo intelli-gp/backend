@@ -14,20 +14,20 @@ import { SecondFactorAccessJwtStrategy } from './strategy/access-jwt-2fa.strateg
 import { SecondFactorAuthRefreshJwtStrategy } from './strategy/refresh-2fa.jwt.strategy';
 
 @Module({
-  imports: [JwtModule.register({})],
-  providers: [
-    AuthService,
-    GoogleStrategy,
-    AccessJwtStrategy,
-    PrismaService,
-    RefreshJwtStrategy,
-    LinkedinStrategy,
-    SecondFactorAccessJwtStrategy,
-    SecondFactorAuthRefreshJwtStrategy,
-    MailsService,
-    UsersService,
-    TagsService,
-  ],
-  controllers: [AuthController],
+    imports: [JwtModule.register({})],
+    providers: [
+        AuthService,
+        GoogleStrategy,
+        AccessJwtStrategy,
+        PrismaService,
+        RefreshJwtStrategy,
+        LinkedinStrategy,
+        SecondFactorAccessJwtStrategy,
+        SecondFactorAuthRefreshJwtStrategy,
+        MailsService,
+        UsersService,
+        TagsService,
+    ],
+    controllers: [AuthController],
 })
 export class AuthModule {}

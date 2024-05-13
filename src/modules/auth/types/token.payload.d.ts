@@ -1,5 +1,5 @@
 export type TokenPayload = {
-  userId: number;
-  userEmail: string;
-  isUserTwoFactorAuthenticated?: boolean;
+    userId: number;
+    userEmail: string;
+    isUserTwoFactorAuthenticated?: boolean;
 };

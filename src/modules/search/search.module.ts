@@ -5,7 +5,7 @@ import { ChatGroupsService } from '../chat-groups/chat-groups.service';
 import { TagsService } from '../tags/tags.service';
 
 @Module({
-  controllers: [SearchController],
-  providers: [SearchService, ChatGroupsService, TagsService],
+    controllers: [SearchController],
+    providers: [SearchService, ChatGroupsService, TagsService],
 })
 export class SearchModule {}

@@ -1,15 +1,15 @@
 import { group_tag } from '@prisma/client';
 
 export class DeserializedChatGroup {
-  title: string;
+    title: string;
 
-  description: string;
+    description: string;
 
-  cover_image_url: string;
+    cover_image_url: string;
 
-  constructor(partial: Partial<any>) {
-    this.title = partial?.GroupTitle;
-    this.description = partial?.GroupDescription;
-    this.cover_image_url = partial?.GroupCoverImageUrl;
-  }
+    constructor(partial: Partial<any>) {
+        this.title = partial?.GroupTitle;
+        this.description = partial?.GroupDescription;
+        this.cover_image_url = partial?.GroupCoverImageUrl;
+    }
 }
