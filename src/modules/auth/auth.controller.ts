@@ -8,19 +8,18 @@ import {
   UseGuards,
   HttpStatus,
   HttpCode,
-  ClassSerializerInterceptor,
-  UseInterceptors,
   Param,
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import {
   sendRefreshToken,
   sendSuccessResponse,
 } from 'src/utils/response-handler/success.response-handler';
-import { GetCurrentUser, Public } from './ParamDecorator';
+import { GetCurrentUser, Public, SecondFactorPublic } from './ParamDecorator';
 import { GoogleGuard } from './guards/google.guard';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 import { SignUpDto } from './dto/signup.dto';
@@ -39,6 +38,9 @@ import {
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { SwaggerLoginExample, SwaggerRefreshExample } from './swagger-examples';
 import { SwaggerFailureResponseExample } from 'src/common/swagger-examples/failure.example';
+import { user } from '@prisma/client';
+import { OtpDto } from './dto/otp.dto';
+import { SecondFactorRtGuard } from './guards/2fa-refresh.jwt.guard';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -49,6 +51,7 @@ export class AuthController {
   ) {}
 
   @Public()
+  @SecondFactorPublic()
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   @HttpCode(HttpStatus.BAD_REQUEST)
@@ -85,6 +88,7 @@ export class AuthController {
   }
 
   @Public()
+  @SecondFactorPublic()
   @Get('verify/:username/:token')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -110,6 +114,7 @@ export class AuthController {
   }
 
   @Public()
+  @SecondFactorPublic()
   @Get('reset-password/:email')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -129,6 +134,7 @@ export class AuthController {
   }
 
   @Public()
+  @SecondFactorPublic()
   @Post('reset-password/:email/:token')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -155,7 +161,7 @@ export class AuthController {
   }
 
   @Public()
-  @UseGuards(RtGuard)
+  @UseGuards(RtGuard, SecondFactorRtGuard)
   @Post('refresh')
   @HttpCode(HttpStatus.CREATED)
   @ApiResponse({
@@ -173,7 +179,7 @@ export class AuthController {
   async refresh(
     @Req() req,
     @Res({ passthrough: true }) res,
-    @GetCurrentUser('user_id') userId,
+    @GetCurrentUser('user_id') userId: number,
   ) {
     const refreshToken = req.cookies['refresh_token'];
     const tokens = await this.authService.refreshTokens(refreshToken, userId);
@@ -182,6 +188,7 @@ export class AuthController {
   }
 
   @Public()
+  @SecondFactorPublic()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
@@ -220,11 +227,13 @@ export class AuthController {
 
   @ApiExcludeEndpoint()
   @Public()
+  @SecondFactorPublic()
   @UseGuards(GoogleGuard)
   @Get('login/google')
   googleLogin() {}
 
   @Public()
+  @SecondFactorPublic()
   @UseGuards(GoogleGuard)
   @Get('google/callback')
   async googleCallback(
@@ -236,15 +245,93 @@ export class AuthController {
 
   @ApiExcludeEndpoint()
   @Public()
+  @SecondFactorPublic()
   @UseGuards(LinkedinGuard)
   @Get('login/linkedin')
   linkedinLogin() {}
 
   @ApiExcludeEndpoint()
   @Public()
+  @SecondFactorPublic()
   @UseGuards(LinkedinGuard)
   @Get('linkedin/callback')
   async linkedinCallback() {
     return 'linkedin login ';
+  }
+
+  // 2FA
+
+  @SecondFactorPublic()
+  @Get('2fa/generate')
+  async register(
+    @Res() response: Response,
+    @GetCurrentUser() currentUser: user,
+  ) {
+    const { otpAuthUrl } =
+      await this.authService.generateTwoFactorAuthenticationSecret(currentUser);
+
+    return this.authService.pipeQrCodeStream(response, otpAuthUrl);
+  }
+
+  @SecondFactorPublic()
+  @Post('2fa/authenticate')
+  async authenticate(
+    @Body() otpData: OtpDto,
+    @GetCurrentUser() currentUser: user,
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ) {
+    const tokens = await this.authService.authenticateSecondFactorForUser(
+      otpData.otp,
+      currentUser,
+    );
+
+    sendRefreshToken(response, tokens.refreshToken);
+    return sendSuccessResponse({
+      access_token: tokens.accessToken,
+    });
+  }
+
+  @SecondFactorPublic()
+  @Post('2fa/enable')
+  async enableTwoFactorAuthenticationForUser(
+    @Body() otpData: OtpDto,
+    @GetCurrentUser() currentUser: user,
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ) {
+    const tokens =
+      await this.authService.enableSecondFactorAuthenticationForUser(
+        otpData.otp,
+        currentUser,
+      );
+    sendRefreshToken(response, tokens.refreshToken);
+    return sendSuccessResponse({
+      access_token: tokens.accessToken,
+    });
+  }
+
+  @Post('2fa/disable')
+  async disableTwoFactorAuthenticationForUser(
+    @Body() otpData: OtpDto,
+    @GetCurrentUser() currentUser: user,
+    @Res({
+      passthrough: true,
+    })
+    response: Response,
+  ) {
+    const tokens =
+      await this.authService.disableSecondFactorAuthenticationForUser(
+        otpData.otp,
+        currentUser,
+      );
+    sendRefreshToken(response, tokens.refreshToken);
+    return sendSuccessResponse({
+      access_token: tokens.accessToken,
+    });
   }
 }

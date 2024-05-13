@@ -8,6 +8,10 @@ import { RefreshJwtStrategy } from './strategy/refresh.jwt.strategy';
 import { MailsService } from '../mails/mails.service';
 import { LinkedinStrategy } from './strategy/linkedin.strategy';
 import { PrismaService } from '../prisma/prisma.service';
+import { UsersService } from '../users/users.service';
+import { TagsService } from '../tags/tags.service';
+import { SecondFactorAccessJwtStrategy } from './strategy/access-jwt-2fa.strategy';
+import { SecondFactorAuthRefreshJwtStrategy } from './strategy/refresh-2fa.jwt.strategy';
 
 @Module({
   imports: [JwtModule.register({})],
@@ -18,7 +22,11 @@ import { PrismaService } from '../prisma/prisma.service';
     PrismaService,
     RefreshJwtStrategy,
     LinkedinStrategy,
+    SecondFactorAccessJwtStrategy,
+    SecondFactorAuthRefreshJwtStrategy,
     MailsService,
+    UsersService,
+    TagsService,
   ],
   controllers: [AuthController],
 })

@@ -6,9 +6,9 @@ import { TokenPayload } from '../types/token.payload';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 
 @Injectable()
-export class AccessJwtStrategy extends PassportStrategy(
+export class SecondFactorAccessJwtStrategy extends PassportStrategy(
   Strategy,
-  'jwt-access',
+  'jwt-2fa',
 ) {
   constructor(
     config: ConfigService,
@@ -27,9 +27,11 @@ export class AccessJwtStrategy extends PassportStrategy(
       },
     });
 
-    if (!user) {
-      throw new ForbiddenException('Access Denied');
+    // if 2fa is enabled for the user check 2fa status
+    if (user.two_factor_auth_enabled && !payload.isUserTwoFactorAuthenticated) {
+      throw new ForbiddenException('Access Denied - 2FA required');
     }
+
     return user;
   }
 }

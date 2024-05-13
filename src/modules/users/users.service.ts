@@ -328,17 +328,6 @@ export class UsersService {
     return;
   }
 
-  async toggleTwoFactorAuthentication(
-    userId: number,
-    status: 'enable' | 'disable',
-  ) {
-    await this.prismaService.user.update({
-      where: { user_id: userId },
-      data: { two_factor_auth_enabled: status === 'enable' },
-    });
-    return;
-  }
-
   async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
     await this.prismaService.user.update({
       where: { user_id: userId },
@@ -347,14 +336,16 @@ export class UsersService {
     return;
   }
 
-  async toggleTwoFactorAuthenticationStatus(
-    userId: number,
-    status: 'enabled' | 'disabled',
-  ) {
+  async toggleTwoFactorAuthenticationStatus(userId: number, status: boolean) {
     await this.prismaService.user.update({
       where: { user_id: userId },
-      data: { two_factor_auth_enabled: status === 'enabled' },
+      data: { two_factor_auth_enabled: status },
     });
+    // when disabling 2fa clear the secret
+    if (!status) {
+      this.logger.debug('Disabling 2FA');
+      await this.setTwoFactorAuthenticationSecret(null, userId);
+    }
     return;
   }
 
@@ -371,6 +362,7 @@ export class UsersService {
               select: {
                 user_id: true,
                 username: true,
+                full_name: true,
                 image: true,
               },
             },
@@ -398,6 +390,7 @@ export class UsersService {
               select: {
                 user_id: true,
                 username: true,
+                full_name: true,
                 image: true,
               },
             },

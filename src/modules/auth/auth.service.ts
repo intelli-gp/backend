@@ -23,6 +23,9 @@ import { v4 as uuid } from 'uuid';
 import { loginResult } from './types/login.response';
 import { sendRefreshToken } from 'src/utils/response-handler/success.response-handler';
 import { SerializedUser } from '../users/serialized-types/serialized-user';
+import { authenticator } from 'otplib';
+import { toFileStream } from 'qrcode';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -32,22 +35,45 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly mailService: MailsService,
+    private readonly usersService: UsersService,
     @Inject(CACHE_MANAGER) private readonly cacheService: Cache,
   ) {}
 
-  async issueAccessToken(payload: TokenPayload): Promise<string> {
-    const accessToken = await this.jwt.signAsync(payload, {
-      expiresIn: this.config.get('ACCESS_TOKEN_EXPIRATION_TIME'),
-      secret: this.config.get('ACCESS_TOKEN_SECRET'),
-    });
+  async issueAccessToken({
+    userId,
+    userEmail,
+    isUserTwoFactorAuthenticated = false,
+  }: TokenPayload): Promise<string> {
+    const accessToken = await this.jwt.signAsync(
+      {
+        userId,
+        userEmail,
+        isUserTwoFactorAuthenticated,
+      },
+      {
+        expiresIn: this.config.get('ACCESS_TOKEN_EXPIRATION_TIME'),
+        secret: this.config.get('ACCESS_TOKEN_SECRET'),
+      },
+    );
     return accessToken;
   }
 
-  async issueRefreshToken(payload: TokenPayload): Promise<string> {
-    const refreshToken = await this.jwt.signAsync(payload, {
-      expiresIn: this.config.get('REFRESH_TOKEN_EXPIRATION_TIME'),
-      secret: this.config.get('REFRESH_TOKEN_SECRET'),
-    });
+  async issueRefreshToken({
+    userEmail,
+    userId,
+    isUserTwoFactorAuthenticated = false,
+  }: TokenPayload): Promise<string> {
+    const refreshToken = await this.jwt.signAsync(
+      {
+        userEmail,
+        userId,
+        isUserTwoFactorAuthenticated,
+      },
+      {
+        expiresIn: this.config.get('REFRESH_TOKEN_EXPIRATION_TIME'),
+        secret: this.config.get('REFRESH_TOKEN_SECRET'),
+      },
+    );
     return refreshToken;
   }
 
@@ -137,6 +163,7 @@ export class AuthService {
     const tokens = await this.issueTokens({
       userId: user.user_id,
       userEmail: user.email,
+      isUserTwoFactorAuthenticated: user.two_factor_auth_enabled,
     });
     await this.updateHashedRefreshToken(
       {
@@ -179,7 +206,7 @@ export class AuthService {
   }
 
   async logout(userId: number) {
-    // TODO: remove from cookie as well
+    // TODOIMP: remove from cookie as well
     await this.prismaService.user.updateMany({
       where: {
         user_id: userId,
@@ -248,7 +275,7 @@ export class AuthService {
       level_id: 1,
       plan_id: 1,
     };
-    
+
     const user = await this.prismaService.user.create({
       data: { ...userData },
       include: {
@@ -350,5 +377,93 @@ export class AuthService {
 
       return user;
     } else return null;
+  }
+
+  //2FA
+
+  authenticateSecondFactorForUser(otp: string, user: user) {
+    const isOtpValid = this.isTwoFactorAuthenticationCodeValid(otp, user);
+
+    if (!user.two_factor_auth_enabled) {
+      throw new UnauthorizedException('2FA is not enabled for this user');
+    }
+
+    if (!isOtpValid) {
+      throw new UnauthorizedException('Invalid 2FA Code');
+    }
+
+    return this.issueTokens({
+      userEmail: user.email,
+      userId: user.user_id,
+      isUserTwoFactorAuthenticated: true,
+    });
+  }
+
+  async enableSecondFactorAuthenticationForUser(otp: string, user: user) {
+    await this.usersService.toggleTwoFactorAuthenticationStatus(
+      user.user_id,
+      true,
+    );
+
+    // optimistic update considering no error is thrown in previous query
+    user.two_factor_auth_enabled = true;
+
+    const tokens = await this.authenticateSecondFactorForUser(otp, user);
+
+    return tokens;
+  }
+
+  async disableSecondFactorAuthenticationForUser(otp: string, user: user) {
+    const isOtpValid = this.isTwoFactorAuthenticationCodeValid(otp, user);
+
+    if (!isOtpValid) {
+      throw new UnauthorizedException('Invalid 2FA Code');
+    }
+
+    await this.usersService.toggleTwoFactorAuthenticationStatus(
+      user.user_id,
+      false,
+    );
+
+    // TODO: invalidate access token
+
+    return await this.issueTokens({
+      userEmail: user.email,
+      userId: user.user_id,
+    });
+  }
+
+  isTwoFactorAuthenticationCodeValid(
+    twoFactorAuthenticationCode: string,
+    user: user,
+  ) {
+    return authenticator.verify({
+      token: twoFactorAuthenticationCode,
+      secret: user.two_factor_auth_secret,
+    });
+  }
+
+  async generateTwoFactorAuthenticationSecret(user: user) {
+    const secret = authenticator.generateSecret();
+
+    const otpAuthUrl = authenticator.keyuri(
+      user.email,
+      this.config.get('TWO_FACTOR_AUTHENTICATION_APP_NAME'),
+      secret,
+    );
+
+    await this.usersService.setTwoFactorAuthenticationSecret(
+      secret,
+      user.user_id,
+    );
+
+    return {
+      secret,
+      otpAuthUrl,
+    };
+  }
+
+  async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
+    return toFileStream(stream, otpauthUrl);
   }
 }

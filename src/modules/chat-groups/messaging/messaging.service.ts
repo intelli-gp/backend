@@ -119,7 +119,7 @@ export class MessagingService {
     groupId: number,
     userId: number,
     messageContent: string,
-    messageType:string,
+    messageType: string,
     repliedToMessageId?: number,
   ) {
     const newMessage = await this.prismaService.message.create({
@@ -127,7 +127,7 @@ export class MessagingService {
         content: messageContent,
         group_id: groupId,
         user_id: userId,
-        type:messageType,
+        type: messageType,
         reply_to: repliedToMessageId,
       },
       include: {
@@ -172,8 +172,12 @@ export class MessagingService {
       },
     );
 
+    const eligibleUserIds = eligibleUsersForNotification.map(
+      (groupUser: group_user) => groupUser.user_id,
+    );
+
     this.notificationsService.emitChatNotification(
-      eligibleUsersForNotification,
+      eligibleUserIds,
       new SerializedMessage(newMessage as unknown as Prisma.messageWhereInput, {
         isNotification: true,
       }),

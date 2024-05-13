@@ -320,7 +320,7 @@ model user_system_tag {
 model follows {
   follower_id          Int
   followed_id          Int
-  isNotificationViewed Boolean @default(false)
+  isNotificationViewed Boolean  @default(false)
   created_at           DateTime @default(now())
 
   followed user @relation(name: "followed_by", fields: [followed_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
@@ -330,28 +330,30 @@ model follows {
 }
 
 model user {
-  user_id              Int       @id @default(autoincrement())
-  username             String    @unique @db.VarChar(100)
-  email                String    @unique @db.VarChar(100)
-  password             String    @db.VarChar(100)
-  dob                  DateTime? @db.Date
-  points               Int?      @default(0)
-  full_name            String    @db.VarChar(100)
-  bio                  String?   @db.VarChar(2000)
-  headline             String?   @db.VarChar(255)
-  cover_image          String?   @db.VarChar(255)
-  phone_number         String?   @db.VarChar(50)
-  image                String?   @db.Text
-  level_id             Int       @default(1)
-  plan_id              Int       @default(1)
-  renewal_date         DateTime  @db.Date
-  subscription_date    DateTime  @db.Date
-  isNotificationMuted  Boolean   @default(false)
-  connected            Boolean   @default(false)
-  active               Boolean   @default(false)
-  followers_count      Int       @default(0)
-  following_count      Int       @default(0)
-  hashed_refresh_token String?   @db.VarChar(100)
+  user_id                     Int       @id @default(autoincrement())
+  username                    String    @unique @db.VarChar(100)
+  email                       String    @unique @db.VarChar(100)
+  password                    String    @db.VarChar(100)
+  dob                         DateTime? @db.Date
+  points                      Int?      @default(0)
+  full_name                   String    @db.VarChar(100)
+  bio                         String?   @db.VarChar(2000)
+  headline                    String?   @db.VarChar(255)
+  cover_image                 String?   @db.VarChar(255)
+  phone_number                String?   @db.VarChar(50)
+  image                       String?   @db.Text
+  level_id                    Int       @default(1)
+  plan_id                     Int       @default(1)
+  renewal_date                DateTime  @db.Date
+  subscription_date           DateTime  @db.Date
+  isNotificationMuted         Boolean   @default(false)
+  connected                   Boolean   @default(false)
+  active                      Boolean   @default(false)
+  followers_count             Int       @default(0)
+  following_count             Int       @default(0)
+  two_factor_auth_enabled     Boolean   @default(false)
+  two_factor_auth_secret      String?   @db.VarChar(255)
+  hashed_refresh_token        String?   @db.VarChar(100)
 
   ai_output            ai_output[]
   article              article[]
