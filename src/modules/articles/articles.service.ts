@@ -16,6 +16,12 @@ import {
   NOTIFICATION_TYPES,
 } from '../notification/enums/notification-primary-types.enum';
 import { ARTICLE_NOTIFICATION_TYPES } from '../notification/enums/article-notifications.enum';
+import {
+  article,
+  article_comment,
+  article_like,
+  follows,
+} from '@prisma/client';
 
 @Injectable()
 export class ArticlesService {
@@ -181,7 +187,11 @@ export class ArticlesService {
       },
       include: {
         article_tag: true,
-        user: true,
+        user: {
+          include: {
+            followed_by: true,
+          },
+        },
         articles_content: true,
         // article_likes: {
         //   include: {
@@ -220,6 +230,23 @@ export class ArticlesService {
           )
         );
       });
+
+    const notificationRecipients = this.getArticleNotificationRecipients(
+      addedArticle.user.user_id,
+      addedArticle.user.followed_by,
+    );
+
+    // Remove the followed_by field from the user object to avoid circular serialization
+    delete addedArticle.user.followed_by;
+
+    await this.notificationsService.emitArticleNotification(
+      notificationRecipients,
+      {
+        type: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].CREATE,
+        article: addedArticle as article,
+      },
+    );
+
     return addedArticle;
   }
 
@@ -241,27 +268,43 @@ export class ArticlesService {
         md_content: commentContent,
       },
       include: {
-        user: true,
+        user: {
+          include: {
+            followed_by: true,
+          },
+        },
         article: {
           include: {
-            user: true,
+            user: {
+              include: {
+                followed_by: true,
+              },
+            },
           },
         },
-        article_comment_likes: {
-          include: {
-            user: true,
-          },
-        },
+        // article_comment_likes: {
+        //   include: {
+        //     user: true,
+        //   },
+        // },
       },
     });
 
-    const { article_comment_likes, ...notificationComment } = articleComment;
+    const notificationRecipients = this.getArticleNotificationRecipients(
+      articleComment.article.user.user_id,
+      articleComment.article.user.followed_by,
+      articleComment.user.followed_by,
+    );
+
+    // remove the article_comment_likes from the response
+    delete articleComment.article.user.followed_by;
+    delete articleComment.user.followed_by;
 
     await this.notificationsService.emitArticleNotification(
-      articleComment.article.user,
+      notificationRecipients as number[],
       {
         type: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].COMMENT,
-        comment: notificationComment,
+        comment: articleComment as article_comment,
       },
     );
     return articleComment;
@@ -358,18 +401,36 @@ export class ArticlesService {
         include: {
           article: {
             include: {
-              user: true,
+              user: {
+                include: {
+                  followed_by: true,
+                },
+              },
             },
           },
-          user: true,
+          user: {
+            include: {
+              followed_by: true,
+            },
+          },
         },
       });
 
+      // no need to add a filter here bec a user shouldnt be able to follow himself
+      const notificationRecipients = this.getArticleNotificationRecipients(
+        articleLike.article.user.user_id,
+        articleLike.article.user.followed_by,
+        articleLike.user.followed_by,
+      );
+      // Remove the followed_by field from the user object to avoid circular serialization
+      delete articleLike.article.user.followed_by;
+      delete articleLike.user.followed_by;
+
       await this.notificationsService.emitArticleNotification(
-        articleLike.article.user,
+        notificationRecipients,
         {
           type: ARTICLE_NOTIFICATION_TYPES.LIKE,
-          like: articleLike,
+          like: articleLike as article_like,
         },
       );
 
@@ -402,7 +463,7 @@ export class ArticlesService {
         },
       });
     } else {
-      return await this.prismaService.article_comment_like.create({
+      const like = await this.prismaService.article_comment_like.create({
         data: {
           comment_id: commentId,
           user_id: userId,
@@ -411,6 +472,7 @@ export class ArticlesService {
           user: true,
         },
       });
+      return like;
     }
   }
 
@@ -531,6 +593,34 @@ export class ArticlesService {
       },
     });
     return true;
+  }
+
+  private getArticleNotificationRecipients(
+    authorId: number,
+    authorFollowers: follows[],
+    notificationSenderFollowers?: follows[],
+  ): number[] {
+    const notificationRecepients: number[] = [];
+    notificationRecepients.push(authorId);
+
+    if (!notificationSenderFollowers) {
+      const authorFollowerIds = authorFollowers.map((f) => f.follower_id);
+      notificationRecepients.push(...authorFollowerIds);
+    }
+
+    // if the notification sender followers are provided
+    const commonFollowers = authorFollowers
+      ?.filter((follower) =>
+        notificationSenderFollowers.some(
+          (senderFollower) =>
+            senderFollower.follower_id === follower.follower_id,
+        ),
+      )
+      ?.map((f) => f.follower_id);
+
+    notificationRecepients.push(...commonFollowers);
+
+    return notificationRecepients;
   }
 
   private async addTagsToUser(articleId: number, userId: number) {

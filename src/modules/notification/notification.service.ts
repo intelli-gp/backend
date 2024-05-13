@@ -7,7 +7,7 @@ import {
 import { EventsService } from './event.service';
 import { SerializedMessage } from '../chat-groups/serialized-types/messages/messages.serializer';
 import { PrismaService } from '../prisma/prisma.service';
-import { group_user, user } from '@prisma/client';
+import { article, group_user, user } from '@prisma/client';
 import { ChatGroupMessagesNotification } from './types/messages-notifications';
 import { SseEvents } from './types/events';
 import { ArticleNotificationArgs } from './types/article-notifications';
@@ -26,6 +26,7 @@ import {
 
 import { ViewNotificationDto } from './dto/view-notification.dto';
 import { SerializedUser } from '../users/serialized-types/serialized-user';
+import { SerializedArticle } from '../articles/serialized-types/article.serialized';
 
 @Injectable()
 export class NotificationService {
@@ -314,14 +315,11 @@ export class NotificationService {
     };
 
     // TODO: fix this by changing what emit takes to just id
-    this.eventsService.emit(
-      [{ user_id: followedId } as user],
-      followNotification,
-    );
+    this.eventsService.emit([followedId], followNotification);
   }
 
   async emitArticleNotification(
-    articleAuthor: user,
+    notificationRecipients: number[],
     args: ArticleNotificationArgs,
   ) {
     switch (args.type) {
@@ -332,10 +330,7 @@ export class NotificationService {
           message: new SerializedArticleLike(args.like),
         };
 
-        await this.eventsService.emit(
-          [articleAuthor as user],
-          likeNotification,
-        );
+        await this.eventsService.emit(notificationRecipients, likeNotification);
         break;
       case NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].COMMENT:
         const commentNotification: SseEvents = {
@@ -344,8 +339,19 @@ export class NotificationService {
           message: new SerializedArticleComment(args.comment),
         };
         await this.eventsService.emit(
-          [articleAuthor as user],
+          notificationRecipients,
           commentNotification,
+        );
+        break;
+      case NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].CREATE:
+        const createNotification: SseEvents = {
+          eventName: NOTIFICATION_TYPES.ARTICLE,
+          type: args.type,
+          message: new SerializedArticle(args.article as article),
+        };
+        await this.eventsService.emit(
+          notificationRecipients,
+          createNotification,
         );
         break;
       default:
@@ -355,7 +361,7 @@ export class NotificationService {
   }
 
   async emitChatNotification(
-    eligibleUsersForNotification: group_user[],
+    eligibleUsersForNotification: number[],
     data: SerializedMessage,
   ) {
     await this.eventsService.emit(eligibleUsersForNotification, {

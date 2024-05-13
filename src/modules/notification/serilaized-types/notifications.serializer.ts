@@ -58,65 +58,66 @@ export class SerializedUserNotifications {
   ) {
     const userArticles = partial?.article as Prisma.articleWhereInput[];
 
-    const articlesNotifications = userArticles?.map((article) => {
-      const serializedArticleComments = (
-        article.article_comments as article_comment[]
-      )?.map((comment) => {
-        notificationsSerializerLogger.debug(comment);
+    const articlesNotifications =
+      userArticles?.map((article) => {
+        const serializedArticleComments =
+          (article.article_comments as article_comment[])?.map((comment) => {
+            notificationsSerializerLogger.debug(comment);
+            return new SerializedUserNotification<
+              article_comment,
+              SerializedArticleComment,
+              NotificationType<'ARTICLE'>
+            >(
+              {
+                CreatedAt: new Date(comment?.created_at),
+                PrimaryType: NOTIFICATION_TYPES.ARTICLE,
+                SubType:
+                  NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].COMMENT,
+                Content: comment,
+              },
+              SerializedArticleComment,
+            );
+          }) || [];
+
+        const serializedArticleLikes =
+          (article.article_likes as article_like[])?.map((like) => {
+            notificationsSerializerLogger.debug(like);
+            return new SerializedUserNotification<
+              article_like,
+              SerializedArticleLike,
+              NotificationType<'ARTICLE'>
+            >(
+              {
+                CreatedAt: new Date(like?.liked_at),
+                PrimaryType: NOTIFICATION_TYPES.ARTICLE,
+                SubType:
+                  NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].LIKE,
+                Content: like,
+              },
+              SerializedArticleLike,
+            );
+          }) || [];
+
+        // merge them into an array
+        return [...serializedArticleComments, ...serializedArticleLikes];
+      }) || [];
+
+    const followsNotifications =
+      (partial?.follows as Prisma.followsWhereInput[])?.map((follow) => {
         return new SerializedUserNotification<
-          article_comment,
-          SerializedArticleComment,
-          NotificationType<'ARTICLE'>
+          user,
+          SerializedUser,
+          NotificationType<'FOLLOW'>
         >(
           {
-            CreatedAt: new Date(comment?.created_at),
-            PrimaryType: NOTIFICATION_TYPES.ARTICLE,
-            SubType: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].COMMENT,
-            Content: comment,
+            CreatedAt: new Date(follow?.created_at as Date),
+            PrimaryType: NOTIFICATION_TYPES.FOLLOW,
+            SubType: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.FOLLOW].FOLLOW,
+            Content: follow?.follower as user,
           },
-          SerializedArticleComment,
+          SerializedUser,
         );
-      });
-
-      const serializedArticleLikes = (
-        article.article_likes as article_like[]
-      )?.map((like) => {
-        notificationsSerializerLogger.debug(like);
-        return new SerializedUserNotification<
-          article_like,
-          SerializedArticleLike,
-          NotificationType<'ARTICLE'>
-        >(
-          {
-            CreatedAt: new Date(like?.liked_at),
-            PrimaryType: NOTIFICATION_TYPES.ARTICLE,
-            SubType: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].LIKE,
-            Content: like,
-          },
-          SerializedArticleLike,
-        );
-      });
-      // merge them into an array
-      return [...serializedArticleComments, ...serializedArticleLikes];
-    });
-
-    const followsNotifications = (
-      partial?.follows as Prisma.followsWhereInput[]
-    )?.map((follow) => {
-      return new SerializedUserNotification<
-        user,
-        SerializedUser,
-        NotificationType<'FOLLOW'>
-      >(
-        {
-          CreatedAt: new Date(follow?.created_at as Date),
-          PrimaryType: NOTIFICATION_TYPES.FOLLOW,
-          SubType: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.FOLLOW].FOLLOW,
-          Content: follow?.follower as user,
-        },
-        SerializedUser,
-      );
-    });
+      }) || [];
 
     const combinedNotfications = [
       ...articlesNotifications,
