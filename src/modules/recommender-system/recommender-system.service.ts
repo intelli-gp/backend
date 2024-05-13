@@ -2,10 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PaginationDto } from '../../common/dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
 import { DeleteArticleDto } from '../articles/dto';
 import { GetSingleUserDto } from '../users/dto/get-user.dto';
 import { article, group, user } from '.prisma/client';
+import { GetSingleChatGroupDto } from '../chat-groups/dto';
 
 @Injectable()
 export class RecommenderSystemService {
@@ -24,15 +24,11 @@ export class RecommenderSystemService {
 
     if (!article) throw new BadRequestException('Article not found');
 
-    const { data } = await this.getData(idDto.articleId, 'article');
-    const totalEntityCount = data.length;
-
-    const articleNeeded = data.slice(
-      paginationData.offset,
-      paginationData.offset + paginationData.limit,
+    const articleNums = await this.getData(
+      idDto.articleId,
+      'article',
+      paginationData,
     );
-
-    const articleNums = articleNeeded.map((article) => Number(article[0]));
 
     const articles = await this.prismaService.article.findMany({
       where: {
@@ -68,11 +64,47 @@ export class RecommenderSystemService {
 
     return {
       articles: this.orderArticles(articles, articleNums),
-      totalEntityCount,
+      totalEntityCount: articleNums.length,
     };
   }
 
-  async getSpecificGroupRecommendations(paginationData: PaginationDto) {}
+  async getSpecificGroupRecommendations(
+    paginationData: PaginationDto,
+    chatGroupDto: GetSingleChatGroupDto,
+  ) {
+    const group = await this.prismaService.group.findUnique({
+      where: { group_id: chatGroupDto.ID },
+    });
+
+    if (!group) throw new BadRequestException('Group not found');
+
+    const groupNums = await this.getData(
+      group.group_id,
+      'group',
+      paginationData,
+    );
+
+    const groups = await this.prismaService.group.findMany({
+      where: {
+        group_id: {
+          in: groupNums,
+        },
+      },
+      include: {
+        group_tag: true,
+        group_user: {
+          include: {
+            user: true,
+          },
+        },
+        user: true,
+      },
+    });
+    return {
+      groups: this.orderGroups(groups, groupNums),
+      totalEntityCount: groupNums.length,
+    };
+  }
 
   async getSpecificUserRecommendations(
     paginationData: PaginationDto,
@@ -84,15 +116,7 @@ export class RecommenderSystemService {
 
     if (!user) throw new BadRequestException('User not found');
 
-    const { data } = await this.getData(user.user_id, 'user');
-    const totalEntityCount = data.length;
-
-    const userNeeded = data.slice(
-      paginationData.offset,
-      paginationData.offset + paginationData.limit,
-    );
-
-    const userNums = userNeeded.map((user) => Number(user[0]));
+    const userNums = await this.getData(user.user_id, 'user', paginationData);
 
     const users = await this.prismaService.user.findMany({
       where: {
@@ -103,7 +127,7 @@ export class RecommenderSystemService {
     });
     return {
       users: this.orderUsers(users, userNums),
-      totalEntityCount,
+      totalEntityCount: userNums.length,
     };
   }
 
@@ -111,15 +135,11 @@ export class RecommenderSystemService {
     paginationData: PaginationDto,
     userId: number,
   ) {
-    const { data } = await this.getData(userId, 'general-article');
-    const totalEntityCount = data.length;
-
-    const articleNeeded = data.slice(
-      paginationData.offset,
-      paginationData.offset + paginationData.limit,
+    const articleNums = await this.getData(
+      userId,
+      'general-article',
+      paginationData,
     );
-
-    const articleNums = articleNeeded.map((article) => Number(article[0]));
 
     const articles = await this.prismaService.article.findMany({
       where: {
@@ -155,25 +175,47 @@ export class RecommenderSystemService {
 
     return {
       articles: this.orderArticles(articles, articleNums),
-      totalEntityCount,
+      totalEntityCount: articleNums.length,
     };
   }
 
-  async getGeneralGroupRecommendations(paginationData: PaginationDto) {}
+  async getGeneralGroupRecommendations(
+    paginationData: PaginationDto,
+    userId: number,
+  ) {
+    const groupNums = await this.getData(
+      userId,
+      'general-group',
+      paginationData,
+    );
+
+    const groups = await this.prismaService.group.findMany({
+      where: {
+        group_id: {
+          in: groupNums,
+        },
+      },
+      include: {
+        group_tag: true,
+        group_user: {
+          include: {
+            user: true,
+          },
+        },
+        user: true,
+      },
+    });
+    return {
+      groups: this.orderGroups(groups, groupNums),
+      totalEntityCount: groupNums.length,
+    };
+  }
 
   async getGeneralUserRecommendations(
     paginationData: PaginationDto,
     userId: number,
   ) {
-    const { data } = await this.getData(userId, 'general-user');
-    const totalEntityCount = data.length;
-
-    const userNeeded = data.slice(
-      paginationData.offset,
-      paginationData.offset + paginationData.limit,
-    );
-
-    const userNums = userNeeded.map((user) => Number(user[0]));
+    const userNums = await this.getData(userId, 'general-user', paginationData);
 
     const users = await this.prismaService.user.findMany({
       where: {
@@ -185,7 +227,7 @@ export class RecommenderSystemService {
 
     return {
       users: this.orderUsers(users, userNums),
-      totalEntityCount,
+      totalEntityCount: userNums.length,
     };
   }
 
@@ -198,10 +240,19 @@ export class RecommenderSystemService {
       | 'general-article'
       | 'general-user'
       | 'general-group',
-  ): Promise<AxiosResponse<number[]>> {
+    paginationData?: PaginationDto,
+  ): Promise<number[]> {
     const urlPath = `/${type}-recommendations/${id}`;
 
-    return await this.recommenderHttpService.axiosRef.get(urlPath);
+    const { data } = await this.recommenderHttpService.axiosRef.get(urlPath);
+
+    const dataNeeded = data.slice(
+      paginationData.offset,
+      paginationData.offset + paginationData.limit,
+    );
+
+    const dataNums = dataNeeded.map((data) => Number(data[0]));
+    return dataNums;
   }
   private orderArticles(articles: article[], indexes: number[]) {
     return indexes.map((articleNum) => {

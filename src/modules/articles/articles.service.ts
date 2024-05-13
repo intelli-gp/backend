@@ -64,7 +64,7 @@ export class ArticlesService {
     return articles;
   }
 
-  async getArticle(articleId: number) {
+  async getArticle(articleId: number, userId?: number) {
     const article = await this.prismaService.article.findUnique({
       where: {
         article_id: articleId,
@@ -94,7 +94,7 @@ export class ArticlesService {
     if (!article) throw new NotFoundException('Article not found');
 
     // add tags to user for recommendation (system only not visible to users)
-    this.addTagsToUser(articleId, article.user_id);
+    if (userId) this.addTagsToUser(articleId, userId);
     return article;
   }
 

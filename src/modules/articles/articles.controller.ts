@@ -35,7 +35,7 @@ import { PaginationDto } from 'src/common/dto';
 import { MultipleArticlesExample } from './swagger-examples/multiple-articles.example';
 import { SerializedUser } from '../users/serialized-types/serialized-user';
 import { SerializedArticleComment } from './serialized-types/article-comment.serializer';
-import { Prisma } from '@prisma/client';
+import { Prisma, user } from '@prisma/client';
 import { SerializedPaginated } from 'src/common/paginated-results.serializer';
 
 @Controller('articles')
@@ -101,11 +101,14 @@ export class ArticlesController {
     schema: swaggerSuccessExample(null, CreateArticleExample),
   })
   // @Public()
-  // @SecondFactorPublic()
   @Get('/:articleId([0-9]+)')
-  async getArticle(@Param() articleData: DeleteArticleDto) {
+  async getArticle(
+    @Param() articleData: DeleteArticleDto,
+    @GetCurrentUser() user: user,
+  ) {
     const article = await this.articlesService.getArticle(
       articleData.articleId,
+      user?.user_id,
     );
     return sendSuccessResponse(new SerializedArticle(article));
   }
