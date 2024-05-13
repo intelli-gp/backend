@@ -82,13 +82,10 @@ export class EventsService {
     clientEmitter.emit('notifications', { data });
   }
 
-  async emit(
-    eligibleNotificationRecepients: group_user[] | user[],
-    data: SseEvents,
-  ) {
+  async emit(eligibleNotificationRecepientsIds: number[], data: SseEvents) {
     // this encapsulation may be unnecessary
-    eligibleNotificationRecepients.forEach((user: group_user | user) => {
-      this.emitToUser(user.user_id, data);
+    eligibleNotificationRecepientsIds.forEach((userId) => {
+      this.emitToUser(userId, data);
     });
   }
 }
