@@ -10,7 +10,11 @@ import {
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
-import { GetCurrentUser, Public } from '../auth/ParamDecorator';
+import {
+  GetCurrentUser,
+  Public,
+  SecondFactorPublic,
+} from '../auth/ParamDecorator';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
 import { SerializedArticle } from './serialized-types/article.serialized';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -40,6 +44,7 @@ export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
   @Public()
+  @SecondFactorPublic()
   @Get()
   @ApiResponse({
     status: 200,
@@ -95,7 +100,8 @@ export class ArticlesController {
     description: 'Returns article',
     schema: swaggerSuccessExample(null, CreateArticleExample),
   })
-  @Public()
+  // @Public()
+  // @SecondFactorPublic()
   @Get('/:articleId([0-9]+)')
   async getArticle(@Param() articleData: DeleteArticleDto) {
     const article = await this.articlesService.getArticle(

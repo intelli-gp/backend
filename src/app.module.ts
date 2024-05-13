@@ -22,10 +22,14 @@ import { PaymentMethodModule } from './modules/payment-method/payment-method.mod
 import { CoursesModule } from './modules/courses/courses.module';
 import { DbInitializationService } from './db-initialization.service';
 import { RecommenderSystemModule } from './modules/recommender-system/recommender-system.module';
-
+import { validateConfig } from './utils/config-validation.schema';
+import { SecondFactorAtGuard } from './modules/auth/guards/2fa-access-jwt.guard';
+import { AiServiceModule } from './modules/ai-service/ai-service.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
+      cache: true,
+      validate: validateConfig,
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
@@ -51,8 +55,8 @@ import { RecommenderSystemModule } from './modules/recommender-system/recommende
     SearchModule,
     CoursesModule,
     RecommenderSystemModule,
+    AiServiceModule,
   ],
-  controllers: [],
   providers: [
     DbInitializationService,
     {
@@ -74,6 +78,10 @@ import { RecommenderSystemModule } from './modules/recommender-system/recommende
     {
       provide: APP_GUARD,
       useClass: AtGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: SecondFactorAtGuard,
     },
   ],
 })
