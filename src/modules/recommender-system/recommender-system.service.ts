@@ -4,8 +4,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { HttpService } from '@nestjs/axios';
 import { DeleteArticleDto } from '../articles/dto';
 import { GetSingleUserDto } from '../users/dto/get-user.dto';
-import { article, group, user } from '.prisma/client';
+import { article, group, user, Prisma } from '.prisma/client';
 import { GetSingleChatGroupDto } from '../chat-groups/dto';
+import { follows, group_user } from '@prisma/client';
 
 @Injectable()
 export class RecommenderSystemService {
@@ -100,6 +101,7 @@ export class RecommenderSystemService {
                 user: true,
             },
         });
+
         return {
             groups: this.orderGroups(groups, groupNums),
             totalEntityCount: groupNums.length,
@@ -129,8 +131,17 @@ export class RecommenderSystemService {
                 },
             },
         });
+
+        // Get the users that the current user follows to filter them out
+        const FollowedUsers = await this.prismaService.follows.findMany({
+            where: {
+                follower_id: user.user_id,
+            },
+        });
+
+        const filteredUsers = this.filterFollowedUsers(users, FollowedUsers);
         return {
-            users: this.orderUsers(users, userNums),
+            users: this.orderUsers(filteredUsers, userNums),
             totalEntityCount: userNums.length,
         };
     }
@@ -209,8 +220,19 @@ export class RecommenderSystemService {
                 user: true,
             },
         });
+
+        // Get the groups that the current user is a member of to filter them out
+
+        const userGroups = await this.prismaService.group_user.findMany({
+            where: {
+                user_id: userId,
+            },
+        });
+
+        const filteredGroups = this.filterJoinedGroups(groups, userGroups);
+
         return {
-            groups: this.orderGroups(groups, groupNums),
+            groups: this.orderGroups(filteredGroups, groupNums),
             totalEntityCount: groupNums.length,
         };
     }
@@ -233,8 +255,18 @@ export class RecommenderSystemService {
             },
         });
 
+        // Get the users that the current user follows to filter them out
+
+        const FollowedUsers = await this.prismaService.follows.findMany({
+            where: {
+                follower_id: userId,
+            },
+        });
+
+        const filteredUsers = this.filterFollowedUsers(users, FollowedUsers);
+
         return {
-            users: this.orderUsers(users, userNums),
+            users: this.orderUsers(filteredUsers as user[], userNums),
             totalEntityCount: userNums.length,
         };
     }
@@ -263,6 +295,31 @@ export class RecommenderSystemService {
         const dataNums = dataNeeded.map((data) => Number(data[0]));
         return dataNums;
     }
+
+    private filterFollowedUsers(
+        recommendedUsers: user[],
+        FollowedUsers: follows[],
+    ) {
+        // Filter out the users that I already follow from the recommendations
+        const followedUserIds = FollowedUsers.map(
+            (follow) => follow.followed_id,
+        );
+        return recommendedUsers.filter(
+            (user) => !followedUserIds.includes(user.user_id as number),
+        );
+    }
+
+    private filterJoinedGroups(
+        recommendedGroups: group[],
+        userGroups: group_user[],
+    ) {
+        // Filter out the groups that I am already a member of from the recommendations
+        const userGroupIds = userGroups.map((group) => group.group_id);
+        return recommendedGroups.filter(
+            (group) => !userGroupIds.includes(group.group_id as number),
+        );
+    }
+
     private orderArticles(articles: article[], indexes: number[]) {
         return indexes.map((articleNum) => {
             return articles.find(
@@ -272,14 +329,18 @@ export class RecommenderSystemService {
     }
 
     private orderUsers(users: user[], indexes: number[]) {
-        return indexes.map((userNum) => {
-            return users.find((user) => user.user_id === userNum);
-        });
+        return indexes
+            .map((userNum) => {
+                return users.find((user) => user.user_id === userNum);
+            })
+            .filter((user) => !user);
     }
 
     private orderGroups(groups: group[], indexes: number[]) {
-        return indexes.map((groupNum) => {
-            return groups.find((group) => group.group_id === groupNum);
-        });
+        return indexes
+            .map((groupNum) => {
+                return groups.find((group) => group.group_id === groupNum);
+            })
+            .filter((group) => !group);
     }
 }
