@@ -22,6 +22,16 @@ export default class AddTaskDto {
   Description: string;
 
   @ApiProperty({
+    description: 'The color of the task',
+    maxLength: 255,
+    required: false,
+    example: 'red',
+  })
+  @IsNotEmpty()
+  @MaxLength(255)
+  Color: string;
+
+  @ApiProperty({
     description: 'The start date of the task in the format yyyy-mm-ddThh:mm',
     pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$',
     required: true,

@@ -18,6 +18,11 @@ export class SerializedTask {
   Description: string;
 
   @ApiProperty({
+    example: 'red',
+  })
+  Color: string;
+
+  @ApiProperty({
     example: '2021-01-01T00:00',
   })
   StartDate: Date;

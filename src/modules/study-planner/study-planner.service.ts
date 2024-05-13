@@ -49,6 +49,7 @@ export class StudyPlannerService {
           description: addTaskDto.Description,
           start_date,
           due_date,
+          color: addTaskDto.Color,
           status: addTaskDto.Status,
           user_id: id,
         },
