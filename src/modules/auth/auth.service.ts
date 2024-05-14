@@ -24,7 +24,7 @@ import { loginResult } from './types/login.response';
 import { sendRefreshToken } from 'src/utils/response-handler/success.response-handler';
 import { SerializedUser } from '../users/serialized-types/serialized-user';
 import { authenticator } from 'otplib';
-import { toFileStream } from 'qrcode';
+import { toFileStream, toDataURL } from 'qrcode';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -393,10 +393,21 @@ export class AuthService {
 
     //2FA
 
-    authenticateSecondFactorForUser(otp: string, user: user) {
+    /**
+     *
+     * @param otp  The 2FA code
+     * @param user  The user to authenticate
+     * @param initialAuth  If this is the first time the user is authenticating (the one with the enable)
+     * @returns
+     */
+    authenticateSecondFactorForUser(
+        otp: string,
+        user: user,
+        initialAuth = false,
+    ) {
         const isOtpValid = this.isTwoFactorAuthenticationCodeValid(otp, user);
 
-        if (!user.two_factor_auth_enabled) {
+        if (!user.two_factor_auth_enabled && !initialAuth) {
             throw new UnauthorizedException('2FA is not enabled for this user');
         }
 
@@ -412,15 +423,16 @@ export class AuthService {
     }
 
     async enableSecondFactorAuthenticationForUser(otp: string, user: user) {
+        const tokens = await this.authenticateSecondFactorForUser(
+            otp,
+            user,
+            true,
+        );
+
         await this.usersService.toggleTwoFactorAuthenticationStatus(
             user.user_id,
             true,
         );
-
-        // optimistic update considering no error is thrown in previous query
-        user.two_factor_auth_enabled = true;
-
-        const tokens = await this.authenticateSecondFactorForUser(otp, user);
 
         return tokens;
     }
@@ -473,6 +485,10 @@ export class AuthService {
             secret,
             otpAuthUrl,
         };
+    }
+
+    async generateQrCodeDataUrl(otpauthUrl: string) {
+        return toDataURL(otpauthUrl);
     }
 
     async pipeQrCodeStream(stream: Response, otpauthUrl: string) {

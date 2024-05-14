@@ -53,6 +53,8 @@ export class SerializedUser {
 
     PaymentMethods: SerializedPaymentMethod[];
 
+    TwoFactorAuthEnabled: boolean;
+
     FollowersCount: number;
 
     FollowingCount: number;
@@ -101,6 +103,8 @@ export class SerializedUser {
 
         if (partial?.connected !== null && partial?.connected !== undefined)
             this.Connected = partial?.connected as boolean;
+
+        this.TwoFactorAuthEnabled = partial?.two_factor_auth_enabled as boolean;
 
         this.HashedRefreshToken &&
             (this.HashedRefreshToken = partial?.hashed_refresh_token as string);
