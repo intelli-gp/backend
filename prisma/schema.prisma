@@ -38,12 +38,11 @@ model article_tag {
 }
 
 model article_like {
-  article_id           Int
-  user_id              Int
-  liked_at             DateTime @default(now())
-  isNotificationViewed Boolean  @default(false)
-  article              article  @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
-  user                 user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  article_id Int
+  user_id    Int
+  liked_at   DateTime @default(now())
+  article    article  @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
+  user       user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([article_id, user_id])
 }
@@ -56,7 +55,6 @@ model article_comment {
   created_at            DateTime               @default(now())
   updated_at            DateTime               @updatedAt
   deleted               Boolean                @default(false)
-  isNotificationViewed  Boolean                @default(false)
   article               article                @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
   user                  user                   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   article_comment_likes article_comment_like[]
@@ -318,11 +316,29 @@ model user_system_tag {
   @@index([user_id])
 }
 
+model notifications {
+  notification_id Int      @id @default(autoincrement())
+  sender_id       Int
+  receiver_id     Int
+  // types validated in code for extensabilty
+  primary_type    String
+  secondary_type  String?
+  // the entity is the id of the entity that the notification is about
+  // its decided by the primary type there is a mapping in the code and the frontend
+  // so its not a foreign key
+  entity_id       Int?
+  created_at      DateTime @default(now())
+  is_read         Boolean  @default(false)
+  sender          user     @relation(name: "sender", fields: [sender_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  receiver        user     @relation(name: "receiver", fields: [receiver_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([created_at, receiver_id])
+}
+
 model follows {
-  follower_id          Int
-  followed_id          Int
-  isNotificationViewed Boolean  @default(false)
-  created_at           DateTime @default(now())
+  follower_id Int
+  followed_id Int
+  created_at  DateTime @default(now())
 
   followed user @relation(name: "followed_by", fields: [followed_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   follower user @relation(name: "follows", fields: [follower_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
@@ -356,26 +372,28 @@ model user {
   two_factor_auth_secret  String?   @db.VarChar(255)
   hashed_refresh_token    String?   @db.VarChar(100)
 
-  ai_output            ai_output[]
-  article              article[]
-  group_user           group_user[]
-  group                group[]
-  message_ai           message_ai[]
-  message              message[]
-  payment_method       payment_method[]
-  task                 task[]
-  user_badge           user_badge[]
-  user_tag             user_tag[]
-  level                level                  @relation(fields: [level_id], references: [level_id], onDelete: Restrict, onUpdate: Cascade)
-  plan                 plan                   @relation(fields: [plan_id], references: [plan_id], onDelete: Restrict, onUpdate: Cascade)
-  liked_articles       article_like[]
-  article_comment      article_comment[]
-  article_comment_like article_comment_like[]
-  message_reactions    message_reaction[]
-  bookmarked_articles  article_bookmark[]
-  user_system_tag      user_system_tag[]
-  follows              follows[]              @relation(name: "follows")
-  followed_by          follows[]              @relation(name: "followed_by")
+  ai_output              ai_output[]
+  article                article[]
+  group_user             group_user[]
+  group                  group[]
+  message_ai             message_ai[]
+  message                message[]
+  payment_method         payment_method[]
+  task                   task[]
+  user_badge             user_badge[]
+  user_tag               user_tag[]
+  level                  level                  @relation(fields: [level_id], references: [level_id], onDelete: Restrict, onUpdate: Cascade)
+  plan                   plan                   @relation(fields: [plan_id], references: [plan_id], onDelete: Restrict, onUpdate: Cascade)
+  liked_articles         article_like[]
+  article_comment        article_comment[]
+  article_comment_like   article_comment_like[]
+  message_reactions      message_reaction[]
+  bookmarked_articles    article_bookmark[]
+  user_system_tag        user_system_tag[]
+  follows                follows[]              @relation(name: "follows")
+  followed_by            follows[]              @relation(name: "followed_by")
+  received_notifications notifications[]        @relation(name: "receiver")
+  sent_notifications     notifications[]        @relation(name: "sender")
 }
 
 enum GroupUserTypeEnum {
@@ -387,3 +405,4 @@ enum MessageTypeEnum {
   MESSAGE
   IMAGE
 }
+
