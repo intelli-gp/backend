@@ -1,15 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PaginationDto } from '../../common/dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { HttpService } from '@nestjs/axios';
 import { DeleteArticleDto } from '../articles/dto';
 import { GetSingleUserDto } from '../users/dto/get-user.dto';
-import { article, group, user, Prisma } from '.prisma/client';
+import { article, group, user } from '.prisma/client';
 import { GetSingleChatGroupDto } from '../chat-groups/dto';
 import { follows, group_user } from '@prisma/client';
 
 @Injectable()
 export class RecommenderSystemService {
+    private readonly logger = new Logger(RecommenderSystemService.name);
     constructor(
         private readonly prismaService: PrismaService,
         private readonly recommenderHttpService: HttpService,
@@ -139,9 +140,16 @@ export class RecommenderSystemService {
             },
         });
 
+        this.logger.debug('users recommended', users);
+        this.logger.debug('followed users', FollowedUsers);
+
         const filteredUsers = this.filterFollowedUsers(users, FollowedUsers);
+        this.logger.debug('filtered users', filteredUsers);
+
+        const orderedUsers = this.orderUsers(filteredUsers, userNums);
+        this.logger.debug('ordered users', orderedUsers);
         return {
-            users: this.orderUsers(filteredUsers, userNums),
+            users: orderedUsers,
             totalEntityCount: userNums.length,
         };
     }
@@ -321,26 +329,30 @@ export class RecommenderSystemService {
     }
 
     private orderArticles(articles: article[], indexes: number[]) {
-        return indexes.map((articleNum) => {
-            return articles.find(
-                (article) => article.article_id === articleNum,
-            );
-        });
+        const articleMap = new Map(
+            articles.map((article) => [article.article_id, article]),
+        );
+
+        return indexes
+            .map((index) => articleMap.get(index))
+            .filter((article) => !!article);
     }
 
     private orderUsers(users: user[], indexes: number[]) {
+        const userMap = new Map(users.map((user) => [user.user_id, user]));
+
         return indexes
-            .map((userNum) => {
-                return users.find((user) => user.user_id === userNum);
-            })
-            .filter((user) => !user);
+            .map((index) => userMap.get(index))
+            .filter((user) => !!user);
     }
 
     private orderGroups(groups: group[], indexes: number[]) {
+        const groupMap = new Map(
+            groups.map((group) => [group.group_id, group]),
+        );
+
         return indexes
-            .map((groupNum) => {
-                return groups.find((group) => group.group_id === groupNum);
-            })
-            .filter((group) => !group);
+            .map((index) => groupMap.get(index))
+            .filter((group) => !!group);
     }
 }
