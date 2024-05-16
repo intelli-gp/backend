@@ -6,21 +6,14 @@ export class ConfigSchema {
     @IsString()
     PORT: string;
 
-    @IsNotEmpty()
     @IsString()
     FRONT_URL: string;
 
-    @IsNotEmpty()
     @IsString()
     FRONT_ORIGIN: string;
 
-    @IsNotEmpty()
     @IsString()
     SERVER_URL: string;
-
-    @IsNotEmpty()
-    @IsString()
-    BASE_URL: string;
 
     @IsNotEmpty()
     @IsString()
