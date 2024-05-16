@@ -1,32 +1,22 @@
-import {
-    BadRequestException,
-    Inject,
-    Injectable,
-    Logger,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { EventsService } from './event.service';
-import { SerializedMessage } from '../chat-groups/serialized-types/messages/messages.serializer';
 import { PrismaService } from '../prisma/prisma.service';
-import { article, group_user, user } from '@prisma/client';
-import { ChatGroupMessagesNotification } from './types/messages-notifications';
-import { SseEvents } from './types/events';
-import { ArticleNotificationArgs } from './types/article-notifications';
-import { SerializedArticleComment } from '../articles/serialized-types/article-comment.serializer';
-import { SerializedArticleLike } from '../articles/serialized-types/article-like.serializer';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { article, notifications } from '@prisma/client';
+import { CreateNotificationDto } from './dto/create-notification.dto';
+import { plainToInstance } from 'class-transformer';
+import { validateSync } from 'class-validator';
 import {
-    NOTIFICATION_SUB_TYPES,
+    ArticleNotification,
+    ChatGroupMessagesNotification,
+    NotificationEvents,
+} from './types/notifications';
+import {
     NOTIFICATION_TYPES,
+    NotificationType,
 } from './enums/notification-primary-types.enum';
-
-import {
-    ARTICLE_NOTIFICATION_TYPES,
-    ArticleNotificationType,
-} from './enums/article-notifications.enum';
-
-import { ViewNotificationDto } from './dto/view-notification.dto';
-import { SerializedUser } from '../users/serialized-types/serialized-user';
-import { SerializedArticle } from '../articles/serialized-types/article.serialized';
+import { PaginationDto } from 'src/common/dto';
+import { SerializedUserNotification } from './serilaized-types/notifications.serializer';
+import { ArticleNotificationType } from './enums/article-notifications.enum';
 
 @Injectable()
 export class NotificationService {
@@ -36,8 +26,117 @@ export class NotificationService {
     constructor(
         private readonly eventsService: EventsService,
         private readonly prismaService: PrismaService,
-        @Inject(CACHE_MANAGER) private readonly cacheService: Cache,
     ) {}
+
+    deserializeNotification(notification: CreateNotificationDto) {
+        return {
+            sender_id: notification.SenderID,
+            receiver_id: notification.ReceiverID,
+            primary_type: notification.PrimaryType,
+            secondary_type: notification.SubType,
+            entity_id: notification.EntityID,
+        } as notifications;
+    }
+
+    validateNotification(notificationData: CreateNotificationDto) {
+        this.NotificationServiceLogger.debug({
+            notificationData,
+        });
+        const validatedNotification = plainToInstance(
+            CreateNotificationDto,
+            notificationData,
+            {
+                enableImplicitConversion: true,
+            },
+        );
+        const errors = validateSync(validatedNotification, {
+            skipMissingProperties: false,
+        });
+        if (errors.length > 0) {
+            this.NotificationServiceLogger.error({
+                errorMsgs: errors.toString(),
+            });
+            throw new BadRequestException(
+                `Error creating notification ${errors.toString()}`,
+            );
+        }
+
+        return notificationData;
+    }
+
+    async createNotification(notification: CreateNotificationDto) {
+        this.NotificationServiceLogger.log(
+            `Creating notification entity for receiver ${notification.ReceiverID} from sender ${notification.SenderID} of type ${notification.PrimaryType} with subType ${notification.SubType} and entity id ${notification.EntityID}`,
+        );
+
+        // maybe validation is not needed as its not exposed to client
+        // validate notification data
+        const validatedNotification = this.validateNotification(notification);
+
+        const deserializeNotification = this.deserializeNotification(
+            validatedNotification,
+        );
+
+        const notificationCreated =
+            await this.prismaService.notifications.create({
+                data: deserializeNotification,
+                include: {
+                    sender: true,
+                },
+            });
+
+        // TODO: find a cleaner way to resolve this issue
+
+        // I was doing this from the start to obtain notification ID
+        switch (notificationCreated.primary_type) {
+            case NOTIFICATION_TYPES.ARTICLE: {
+                const article = await this.prismaService.article.findUnique({
+                    where: {
+                        article_id: notificationCreated.entity_id,
+                    },
+                });
+                const notificationWithEntity = {
+                    ...notificationCreated,
+                    entity: article,
+                } as notifications & { entity: article };
+                return new SerializedUserNotification<
+                    NotificationType<'ARTICLE'>,
+                    ArticleNotificationType<void>
+                >(notificationWithEntity);
+            }
+            case NOTIFICATION_TYPES.FOLLOW: {
+                const notificationWithEntity = {
+                    ...notificationCreated,
+                    entity: null,
+                } as notifications & { entity: null };
+
+                return new SerializedUserNotification<
+                    NotificationType<'FOLLOW'>,
+                    null
+                >(notificationWithEntity);
+            }
+            default: {
+                this.NotificationServiceLogger.error(
+                    'Unknown notification type',
+                );
+                break;
+            }
+        }
+    }
+
+    async createManyNotifications(notifications: CreateNotificationDto[]) {
+        this.NotificationServiceLogger.log(
+            `Creating bulk notifications for ${notifications.length} entities`,
+        );
+
+        const allNotifications = await Promise.all(
+            notifications.map(async (notification) => {
+                return await this.createNotification(notification);
+            }),
+        );
+
+        return allNotifications;
+    }
 
     async getGroupUserMessageNotifications(
         userId: number,
@@ -122,264 +221,123 @@ export class NotificationService {
         return messagesNotifications;
     }
 
-    /**
-     *
-     * @param userId id of the user
-     * @returns all notifications for a user except messages
-     */
-    async getUserNotifications(userId: number) {
+    async getUserNotifications(userId: number, paginationData: PaginationDto) {
         this.NotificationServiceLogger.log(
             `Getting notifications for user ${userId}`,
         );
 
-        // const cachedUser = await this.cacheService.get(
-        //   `user-${userId}-notifications`,
-        // );
-
-        // if (cachedUser) {
-        //   return cachedUser;
-        // }
-
-        const userWithNotifications = await this.prismaService.user.findUnique({
+        const notifications = await this.prismaService.notifications.findMany({
+            take: paginationData.limit,
+            skip: paginationData.offset,
             where: {
-                user_id: userId,
+                receiver_id: userId,
             },
             include: {
-                article: {
-                    select: {
-                        article_id: true,
-                        article_comments: {
-                            select: {
-                                article_id: true,
-                                created_at: true,
-                                comment_id: true,
-                                isNotificationViewed: true,
-                                user: {
-                                    select: {
-                                        image: true,
-                                        user_id: true,
-                                        username: true,
-                                        full_name: true,
-                                    },
-                                },
-                            },
-                        },
-                        article_likes: {
-                            select: {
-                                article_id: true,
-                                liked_at: true,
-                                isNotificationViewed: true,
-                                user: {
-                                    select: {
-                                        image: true,
-                                        user_id: true,
-                                        username: true,
-                                        full_name: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                followed_by: {
-                    select: {
-                        follower_id: true,
-                        follower: {
-                            select: {
-                                user_id: true,
-                                username: true,
-                                full_name: true,
-                                image: true,
-                            },
-                        },
-                    },
-                },
+                sender: true,
+            },
+            orderBy: {
+                created_at: 'desc',
             },
         });
 
-        // await this.cacheService.set(
-        //   `user-${userId}-notifications`,
-        //   userWithNotifications,
-        //   3600,
-        // );
-
-        return userWithNotifications;
-    }
-
-    async viewAllUserNotifications(userId: number) {
-        this.NotificationServiceLogger.log(
-            `Viewing notifications for user ${userId}`,
+        // fill the entity
+        const filledNotifications = await Promise.all(
+            notifications.map(async (notification) => {
+                switch (notification.primary_type) {
+                    case NOTIFICATION_TYPES.ARTICLE: {
+                        const article =
+                            await this.prismaService.article.findUnique({
+                                where: {
+                                    article_id: notification.entity_id,
+                                },
+                            });
+                        return {
+                            ...notification,
+                            entity: article,
+                        } as notifications & { entity: article };
+                    }
+                    case NOTIFICATION_TYPES.FOLLOW: {
+                        return {
+                            ...notification,
+                            entity: null,
+                        } as notifications & { entity: null };
+                    }
+                    default: {
+                        this.NotificationServiceLogger.error(
+                            'Unknown notification type',
+                        );
+                        break;
+                    }
+                }
+            }),
         );
 
-        throw new Error('Method not implemented');
+        return filledNotifications;
     }
 
-    async viewSingleUserNotification(
-        userId: number,
-        notificationData: ViewNotificationDto,
-    ) {
+    async readUserNotification(notificationId: number) {
         this.NotificationServiceLogger.log(
-            `Viewing notification for user ${userId}of type ${notificationData.PrimaryType}, subType ${notificationData.SubType} with id ${notificationData.ID}`,
+            `Marking notification ${notificationId} as read`,
         );
 
-        switch (notificationData.PrimaryType) {
-            case NOTIFICATION_TYPES.ARTICLE: {
-                await this.#viewUserSingleArticleNotification(
-                    notificationData.ID,
-                    notificationData.SubType as ArticleNotificationType<void>,
-                    notificationData.NotificationSenderID,
-                );
-                break;
-            }
-            case NOTIFICATION_TYPES.FOLLOW: {
-                await this.#viewSingleFollowNotification(
-                    notificationData.NotificationSenderID,
-                    notificationData.ID,
-                );
-                break;
-            }
-            default: {
-                this.NotificationServiceLogger.error(
-                    'Invalid notification type',
-                );
-                throw new BadRequestException('Invalid notification type');
-            }
-        }
-    }
-
-    async #viewUserSingleArticleNotification(
-        notificationId: number,
-        type: ArticleNotificationType<void>,
-        notificationSenderId?: number,
-    ) {
-        this.NotificationServiceLogger.log(
-            `Viewing article notification of type ${type} with id ${notificationId}`,
-        );
-
-        switch (type) {
-            case ARTICLE_NOTIFICATION_TYPES.COMMENT:
-                await this.prismaService.article_comment.update({
-                    where: {
-                        comment_id: notificationId as number,
-                    },
-                    data: {
-                        isNotificationViewed: true,
-                    },
-                });
-                break;
-            case ARTICLE_NOTIFICATION_TYPES.LIKE: {
-                this.NotificationServiceLogger.debug({
-                    notificationId,
-                    notificationSenderId,
-                });
-                await this.prismaService.article_like.update({
-                    where: {
-                        article_id_user_id: {
-                            article_id: notificationId,
-                            user_id: notificationSenderId,
-                        },
-                    },
-                    data: {
-                        isNotificationViewed: true,
-                    },
-                });
-                break;
-            }
-            default:
-                this.NotificationServiceLogger.error(
-                    'Invalid article notification sub-type',
-                );
-                throw new BadRequestException(
-                    'Invalid article notification sub-type',
-                );
-        }
-    }
-
-    async #viewSingleFollowNotification(
-        followerId: number,
-        followedId: number,
-    ) {
-        this.NotificationServiceLogger.log(
-            `Viewing follow notification for user ${followedId} from ${followerId}`,
-        );
-
-        await this.prismaService.follows.update({
+        await this.prismaService.notifications.update({
             where: {
-                followed_id_follower_id: {
-                    follower_id: followerId,
-                    followed_id: followedId,
-                },
+                notification_id: notificationId,
             },
             data: {
-                isNotificationViewed: true,
+                is_read: true,
             },
         });
     }
 
-    emitFollowNotification(follower: user, followedId: number) {
-        const followNotification: SseEvents = {
-            eventName: NOTIFICATION_TYPES.FOLLOW,
-            message: new SerializedUser(follower),
-        };
-
-        // TODO: fix this by changing what emit takes to just id
-        this.eventsService.emit([followedId], followNotification);
-    }
-
-    async emitArticleNotification(
-        notificationRecipients: number[],
-        args: ArticleNotificationArgs,
+    async emitNotification(
+        recipients: number[],
+        notificationData: NotificationEvents,
+        store = true,
     ) {
-        switch (args.type) {
-            case NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].LIKE:
-                const likeNotification: SseEvents = {
-                    eventName: NOTIFICATION_TYPES.ARTICLE,
-                    type: args.type,
-                    message: new SerializedArticleLike(args.like),
-                };
+        this.NotificationServiceLogger.log(
+            `Emitting notification to ${recipients.length} users`,
+        );
 
-                await this.eventsService.emit(
-                    notificationRecipients,
-                    likeNotification,
-                );
-                break;
-            case NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].COMMENT:
-                const commentNotification: SseEvents = {
-                    eventName: NOTIFICATION_TYPES.ARTICLE,
-                    type: args.type,
-                    message: new SerializedArticleComment(args.comment),
-                };
-                await this.eventsService.emit(
-                    notificationRecipients,
-                    commentNotification,
-                );
-                break;
-            case NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].CREATE:
-                const createNotification: SseEvents = {
-                    eventName: NOTIFICATION_TYPES.ARTICLE,
-                    type: args.type,
-                    message: new SerializedArticle(args.article as article),
-                };
-                await this.eventsService.emit(
-                    notificationRecipients,
-                    createNotification,
-                );
-                break;
-            default:
-                this.NotificationServiceLogger.error(
-                    'Invalid notification type',
-                );
-                break;
+        // Create the notification entity
+        if (store) {
+            let entityId = 0;
+
+            switch (notificationData.EventName) {
+                case NOTIFICATION_TYPES.ARTICLE:
+                    entityId = +(notificationData as ArticleNotification).Entity
+                        .ID;
+                    break;
+                default:
+                    break;
+            }
+
+            const notifications = recipients.map((recipient) => ({
+                SenderID: notificationData.Sender.ID,
+                ReceiverID: recipient,
+                PrimaryType: notificationData.EventName,
+                SubType: notificationData.Type,
+                EntityID: entityId,
+            }));
+
+            const createdNotifications =
+                await this.createManyNotifications(notifications);
+
+            await Promise.all(
+                recipients.map(async (recipient, index) => {
+                    await this.eventsService.emitToUser(
+                        recipient,
+                        createdNotifications[index],
+                    );
+                }),
+            );
+        } else {
+            this.NotificationServiceLogger.debug({
+                recipients,
+                notificationData,
+            });
+            this.NotificationServiceLogger.debug('Emitting notification event');
+            this.eventsService.emit(recipients, notificationData);
         }
-    }
-
-    async emitChatNotification(
-        eligibleUsersForNotification: number[],
-        data: SerializedMessage,
-    ) {
-        await this.eventsService.emit(eligibleUsersForNotification, {
-            eventName: NOTIFICATION_TYPES.MESSAGE,
-            message: data,
-        });
     }
 }

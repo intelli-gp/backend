@@ -1,8 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { fromEvent } from 'rxjs';
 import { EventEmitter } from 'events';
-import { SseEvents } from './types/events';
-import { group_user, user } from '@prisma/client';
+import { NotificationEvents } from './types/notifications';
 
 const TTLTime = 50; // 6 seconds
 
@@ -59,9 +58,9 @@ export class EventsService {
         return fromEvent(clientEmitter, 'notifications');
     }
 
-    async emitToUser(userId: number, data: SseEvents) {
+    async emitToUser(userId: number, data: any) {
         this.eventsServiceLogger.log(
-            `Emitting event ${data.eventName} to user sse-user-${userId}`,
+            `Emitting event ${data.EventName} to user sse-user-${userId}`,
         );
         const clientEmitter = this.clients.get(`sse-user-${userId}`);
 
@@ -82,9 +81,9 @@ export class EventsService {
         clientEmitter.emit('notifications', { data });
     }
 
-    async emit(eligibleNotificationRecepientsIds: number[], data: SseEvents) {
-        // this encapsulation may be unnecessary
-        eligibleNotificationRecepientsIds.forEach((userId) => {
+    async emit(eligibleNotificationRecipientsIds: number[], data: any) {
+        // may not be a necessary encapsulation
+        eligibleNotificationRecipientsIds.forEach((userId) => {
             this.emitToUser(userId, data);
         });
     }

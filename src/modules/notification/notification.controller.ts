@@ -1,8 +1,8 @@
 import {
-    Body,
     Controller,
     Get,
     Logger,
+    Param,
     Patch,
     Query,
     Sse,
@@ -16,9 +16,14 @@ import { ApiResponse } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { multipleUserNotificationsResponseExample } from './swagger-examples';
 import { PaginationDto } from 'src/common/dto';
-import { Prisma } from '@prisma/client';
-import { SerializedUserNotifications } from './serilaized-types/notifications.serializer';
-import { ViewNotificationDto } from './dto/view-notification.dto';
+import { article, notifications } from '@prisma/client';
+import { SerializedUserNotification } from './serilaized-types/notifications.serializer';
+import {
+    NOTIFICATION_TYPES,
+    NotificationType,
+} from './enums/notification-primary-types.enum';
+import { ArticleNotificationType } from './enums/article-notifications.enum';
+import { GetNotificationDto } from './dto/get-notification.dto';
 
 @Controller('notifications')
 export class NotificationController {
@@ -29,20 +34,10 @@ export class NotificationController {
         private readonly notificationsService: NotificationService,
     ) {}
 
-    // @Public()
     @Sse('events')
     async events(@GetCurrentUser('user_id') userId: number) {
         return await this.eventsService.subscribe(userId);
     }
-
-    // @Public()
-    // @Post('emit')
-    // async emit() {
-    //   await this.eventsService.emit({
-    //     eventName: 'warning',
-    //     message: 1,
-    //   });
-    // }
 
     @ApiResponse({
         status: 200,
@@ -53,7 +48,7 @@ export class NotificationController {
         ),
     })
     @Get('/messages')
-    async getMessagesNotifications(@GetCurrentUser('user_id') userId) {
+    async getMessagesNotifications(@GetCurrentUser('user_id') userId: number) {
         this.logger.log(`Getting messages for user ${userId}`);
         const messagesNotifications =
             await this.notificationsService.getGroupUserMessageNotifications(
@@ -72,27 +67,40 @@ export class NotificationController {
     ) {
         this.logger.log(`Getting notifications for user ${userId}`);
         const userWithNotifications =
-            await this.notificationsService.getUserNotifications(userId);
+            await this.notificationsService.getUserNotifications(
+                userId,
+                paginationData,
+            );
 
         return sendSuccessResponse(
-            new SerializedUserNotifications(
-                userWithNotifications as Prisma.userWhereInput,
-                paginationData,
-            ),
+            userWithNotifications.map((notification) => {
+                switch (notification.primary_type) {
+                    case NOTIFICATION_TYPES.ARTICLE: {
+                        return new SerializedUserNotification<
+                            NotificationType<'ARTICLE'>,
+                            ArticleNotificationType<void>
+                        >(notification as notifications & { entity: article });
+                    }
+                    case NOTIFICATION_TYPES.FOLLOW: {
+                        return new SerializedUserNotification<
+                            NotificationType<'FOLLOW'>,
+                            null
+                        >(notification as notifications & { entity: null });
+                    }
+                    default:
+                        break;
+                }
+            }),
         );
     }
 
-    @Patch('read')
-    async markNotificationAsViewed(
-        @GetCurrentUser('user_id') userId: number,
-        @Body() notificationData: ViewNotificationDto,
-    ) {
+    @Patch('read/:notificationID([0-9]+)')
+    async readUserNotification(@Param() notificationData: GetNotificationDto) {
         this.logger.log(
-            `Marking notification ${notificationData.ID} as viewed`,
+            `Marking notification ${notificationData.notificationID} as viewed`,
         );
-        await this.notificationsService.viewSingleUserNotification(
-            userId,
-            notificationData,
+        await this.notificationsService.readUserNotification(
+            notificationData.notificationID,
         );
 
         return sendSuccessResponse('Notification marked as viewed');
