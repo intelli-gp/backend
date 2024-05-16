@@ -15,13 +15,7 @@ import {
     NOTIFICATION_SUB_TYPES,
     NOTIFICATION_TYPES,
 } from '../notification/enums/notification-primary-types.enum';
-import { ARTICLE_NOTIFICATION_TYPES } from '../notification/enums/article-notifications.enum';
-import {
-    article,
-    article_comment,
-    article_like,
-    follows,
-} from '@prisma/client';
+import { follows } from '@prisma/client';
 
 @Injectable()
 export class ArticlesService {
@@ -240,11 +234,27 @@ export class ArticlesService {
         // Remove the followed_by field from the user object to avoid circular serialization
         delete addedArticle.user.followed_by;
 
-        await this.notificationsService.emitArticleNotification(
+        await this.notificationsService.emitNotification(
             notificationRecipients,
             {
-                type: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].CREATE,
-                article: addedArticle as article,
+                EventName: NOTIFICATION_TYPES.ARTICLE,
+                Type: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE].CREATE,
+                Sender: {
+                    ID: userId,
+                    Username: addedArticle?.user?.username,
+                    FullName: addedArticle?.user?.full_name,
+                    ProfileImage: addedArticle?.user?.image,
+                },
+                Entity: {
+                    ID: addedArticle.article_id,
+                    Title: addedArticle.title,
+                    EntityCreator: {
+                        ID: addedArticle?.user?.user_id,
+                        Username: addedArticle?.user?.username,
+                        FullName: addedArticle?.user?.full_name,
+                        ProfileImage: addedArticle?.user?.image,
+                    },
+                },
             },
         );
 
@@ -297,18 +307,35 @@ export class ArticlesService {
             articleComment.user.followed_by,
         );
 
+        await this.notificationsService.emitNotification(
+            notificationRecipients,
+            {
+                EventName: NOTIFICATION_TYPES.ARTICLE,
+                Type: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE]
+                    .COMMENT,
+                Sender: {
+                    ID: userId,
+                    Username: articleComment?.user?.username,
+                    FullName: articleComment?.user?.full_name,
+                    ProfileImage: articleComment?.user?.image,
+                },
+                Entity: {
+                    ID: articleComment?.article_id,
+                    Title: articleComment?.article?.title,
+                    EntityCreator: {
+                        ID: articleComment?.article?.user?.user_id,
+                        Username: articleComment?.article?.user?.username,
+                        FullName: articleComment?.article?.user?.full_name,
+                        ProfileImage: articleComment?.article?.user?.image,
+                    },
+                },
+            },
+        );
+
         // remove the article_comment_likes from the response
         delete articleComment.article.user.followed_by;
         delete articleComment.user.followed_by;
 
-        await this.notificationsService.emitArticleNotification(
-            notificationRecipients as number[],
-            {
-                type: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE]
-                    .COMMENT,
-                comment: articleComment as article_comment,
-            },
-        );
         return articleComment;
     }
 
@@ -429,17 +456,35 @@ export class ArticlesService {
                     articleLike.article.user.followed_by,
                     articleLike.user.followed_by,
                 );
+
+            await this.notificationsService.emitNotification(
+                notificationRecipients,
+                {
+                    EventName: NOTIFICATION_TYPES.ARTICLE,
+                    Type: NOTIFICATION_SUB_TYPES[NOTIFICATION_TYPES.ARTICLE]
+                        .LIKE,
+                    Sender: {
+                        ID: userId,
+                        Username: articleLike?.user?.username,
+                        FullName: articleLike?.user?.full_name,
+                        ProfileImage: articleLike?.user?.image,
+                    },
+                    Entity: {
+                        ID: articleLike?.article_id,
+                        Title: articleLike?.article?.title,
+                        EntityCreator: {
+                            ID: articleLike?.article?.user?.user_id,
+                            Username: articleLike?.article?.user?.username,
+                            FullName: articleLike?.article?.user?.full_name,
+                            ProfileImage: articleLike?.article?.user?.image,
+                        },
+                    },
+                },
+            );
+
             // Remove the followed_by field from the user object to avoid circular serialization
             delete articleLike.article.user.followed_by;
             delete articleLike.user.followed_by;
-
-            await this.notificationsService.emitArticleNotification(
-                notificationRecipients,
-                {
-                    type: ARTICLE_NOTIFICATION_TYPES.LIKE,
-                    like: articleLike as article_like,
-                },
-            );
 
             return articleLike;
         }
@@ -606,12 +651,12 @@ export class ArticlesService {
         authorFollowers: follows[],
         notificationSenderFollowers?: follows[],
     ): number[] {
-        const notificationRecepients: number[] = [];
-        notificationRecepients.push(authorId);
+        const notificationRecipients: number[] = [];
+        notificationRecipients.push(authorId);
 
         if (!notificationSenderFollowers) {
             const authorFollowerIds = authorFollowers.map((f) => f.follower_id);
-            notificationRecepients.push(...authorFollowerIds);
+            notificationRecipients.push(...authorFollowerIds);
         }
 
         // if the notification sender followers are provided
@@ -624,9 +669,9 @@ export class ArticlesService {
             )
             ?.map((f) => f.follower_id);
 
-        notificationRecepients.push(...commonFollowers);
+        notificationRecipients.push(...commonFollowers);
 
-        return notificationRecepients;
+        return notificationRecipients;
     }
 
     private async addTagsToUser(articleId: number, userId: number) {

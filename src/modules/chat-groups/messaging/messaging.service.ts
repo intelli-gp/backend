@@ -4,6 +4,8 @@ import { NotificationService } from 'src/modules/notification/notification.servi
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { SerializedMessage } from '../serialized-types/messages/messages.serializer';
 import { MessageReadReceipt } from './types/message-read';
+import { NOTIFICATION_TYPES } from 'src/modules/notification/enums/notification-primary-types.enum';
+import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 
 @Injectable()
 export class MessagingService {
@@ -131,7 +133,14 @@ export class MessagingService {
                 reply_to: repliedToMessageId,
             },
             include: {
-                user: true,
+                user: {
+                    select: {
+                        user_id: true,
+                        full_name: true,
+                        username: true,
+                        image: true,
+                    },
+                },
                 replied_to_message: {
                     include: {
                         user: {
@@ -176,16 +185,24 @@ export class MessagingService {
             (groupUser: group_user) => groupUser.user_id,
         );
 
-        this.notificationsService.emitChatNotification(
+        this.notificationsService.emitNotification(
             eligibleUserIds,
-            new SerializedMessage(
-                newMessage as unknown as Prisma.messageWhereInput,
-                {
-                    isNotification: true,
+            {
+                EventName: NOTIFICATION_TYPES.MESSAGE,
+                Type: null,
+                Sender: new SerializedUser(newMessage.user),
+                Entity: {
+                    ...new SerializedMessage(newMessage as message),
+                    Group: {
+                        ID: newMessage.group_id,
+                        GroupTitle: newMessage.group?.title,
+                        GroupCoverImage: newMessage.group?.cover_image_url,
+                    },
+                    User: null,
                 },
-            ),
+            },
+            false,
         );
-
         return newMessage;
     }
 

@@ -6,6 +6,8 @@ import { TagsService } from '../tags/tags.service';
 import { hashS10 } from '../../utils/bcrypt';
 import { NotificationService } from '../notification/notification.service';
 import { PaginationDto } from 'src/common/dto';
+import { NOTIFICATION_TYPES } from '../notification/enums/notification-primary-types.enum';
+import { SerializedUser } from './serialized-types/serialized-user';
 
 @Injectable()
 export class UsersService {
@@ -439,6 +441,7 @@ export class UsersService {
             select: {
                 following_count: true,
                 user_id: true,
+                full_name: true,
                 username: true,
                 image: true,
             },
@@ -464,10 +467,12 @@ export class UsersService {
         });
         this.logger.debug(`Followers count: ${user.following_count}`);
 
-        this.notificationsService.emitFollowNotification(
-            user as user,
-            followedId,
-        );
+        this.notificationsService.emitNotification([followedId], {
+            EventName: NOTIFICATION_TYPES.FOLLOW,
+            Sender: new SerializedUser(user),
+            Type: null,
+            Entity: null,
+        });
 
         return user.following_count;
     }
