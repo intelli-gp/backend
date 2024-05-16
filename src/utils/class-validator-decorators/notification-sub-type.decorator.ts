@@ -27,8 +27,10 @@ export function IsValidNotificationSubType(
                 validate(value: string, args: ValidationArguments) {
                     const PrimaryNotificationType = (args.object as any)
                         ?.PrimaryType;
+
                     notificationSubtypeValidatorLogger.debug(
-                        PrimaryNotificationType,
+                        { PrimaryNotificationType },
+                        { SecondaryNotificationType: value },
                     );
                     if (!PrimaryNotificationType) {
                         notificationSubtypeValidatorLogger.error(
@@ -44,10 +46,7 @@ export function IsValidNotificationSubType(
                                 value as ArticleNotificationType<void>,
                             );
                         default:
-                            notificationSubtypeValidatorLogger.error(
-                                'Invalid Primary Notification Type provided for IsValidNotificationSubType decorator',
-                            );
-                            return false;
+                            return true;
                     }
                 },
                 defaultMessage(args: ValidationArguments) {
