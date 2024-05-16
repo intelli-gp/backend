@@ -7,8 +7,6 @@ export class SerializedArticleLike {
 
     Liker: SerializedUser;
 
-    IsNotificationViewed: boolean;
-
     ArticleID: number;
 
     @Exclude()
@@ -21,6 +19,5 @@ export class SerializedArticleLike {
         this.ArticleID = +partial?.article_id;
         this.LikedAt = partial?.liked_at as string;
         this.Liker = new SerializedUser(partial?.user);
-        this.IsNotificationViewed = partial?.isNotificationViewed as boolean;
     }
 }

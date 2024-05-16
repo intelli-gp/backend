@@ -14,8 +14,6 @@ export class SerializedArticleComment {
 
     LikedBy: SerializedUser[];
 
-    IsNotificationViewed: boolean;
-
     constructor(
         partial: Partial<
             Omit<Prisma.article_commentWhereInput, 'AND' | 'OR' | 'NOT'>
@@ -31,6 +29,5 @@ export class SerializedArticleComment {
         )?.map((articleCommentLike) => {
             return new SerializedUser(articleCommentLike?.user);
         });
-        this.IsNotificationViewed = partial?.isNotificationViewed as boolean;
     }
 }

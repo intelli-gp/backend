@@ -1,6 +1,6 @@
 import { SerializedChatGroup } from 'src/modules/chat-groups/serialized-types/chat-group/chat-group.serializer';
 import { SerializedMessage } from 'src/modules/chat-groups/serialized-types/messages/messages.serializer';
-import { ChatGroupMessagesNotification } from '../types/messages-notifications';
+import { ChatGroupMessagesNotification } from '../types/notifications';
 
 export class SerializedMessagesNotifications {
     Group: SerializedChatGroup;
