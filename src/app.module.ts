@@ -25,6 +25,7 @@ import { RecommenderSystemModule } from './modules/recommender-system/recommende
 import { validateConfig } from './utils/config-validation.schema';
 import { SecondFactorAtGuard } from './modules/auth/guards/2fa-access-jwt.guard';
 import { AiServiceModule } from './modules/ai-service/ai-service.module';
+import { PaymentModule } from './modules/payment/payment.module';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -56,6 +57,7 @@ import { AiServiceModule } from './modules/ai-service/ai-service.module';
         CoursesModule,
         RecommenderSystemModule,
         AiServiceModule,
+        PaymentModule,
     ],
     providers: [
         DbInitializationService,

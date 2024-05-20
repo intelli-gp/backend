@@ -162,6 +162,14 @@ export class ConfigSchema {
     @IsNotEmpty()
     @IsString()
     AI_SERVICE_BASE_URL: string;
+
+    @IsNotEmpty()
+    @IsString()
+    STRIPE_SECRET_KEY: string;
+
+    @IsNotEmpty()
+    @IsString()
+    STRIPE_CURRENCY: string;
 }
 
 export function validateConfig(config: ConfigSchema) {

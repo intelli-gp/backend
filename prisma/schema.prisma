@@ -369,6 +369,7 @@ model user {
   followers_count         Int       @default(0)
   following_count         Int       @default(0)
   two_factor_auth_enabled Boolean   @default(false)
+  stripe_customer_id      String?
   two_factor_auth_secret  String?   @db.VarChar(255)
   hashed_refresh_token    String?   @db.VarChar(100)
 
@@ -405,4 +406,3 @@ enum MessageTypeEnum {
   MESSAGE
   IMAGE
 }
-
