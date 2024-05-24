@@ -434,6 +434,92 @@
         ]
       }
     },
+    "/api/auth/2fa/generate": {
+      "get": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/2fa/authenticate": {
+      "post": {
+        "operationId": "AuthController_authenticate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OtpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/2fa/enable": {
+      "post": {
+        "operationId": "AuthController_enableTwoFactorAuthenticationForUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OtpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/2fa/disable": {
+      "post": {
+        "operationId": "AuthController_disableTwoFactorAuthenticationForUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OtpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/api/users": {
       "patch": {
         "operationId": "UsersController_update",
@@ -578,6 +664,188 @@
                 }
               }
             }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/toggle-follow/{userId}": {
+      "get": {
+        "operationId": "UsersController_followUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/followers/me": {
+      "get": {
+        "operationId": "UsersController_getFollowersForLoggedInUser",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/followers/{userId}": {
+      "get": {
+        "operationId": "UsersController_getFollowers",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/following/me": {
+      "get": {
+        "operationId": "UsersController_getFollowingForLoggedInUser",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/following/{userId}": {
+      "get": {
+        "operationId": "UsersController_getFollowing",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "example": 1,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "example": 10,
+            "description": "Number of items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "example": 1,
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
           }
         },
         "tags": [
@@ -3539,20 +3807,10 @@
         }
       }
     },
-    "/api/notifications/read": {
+    "/api/notifications/read/{notificationID}": {
       "patch": {
-        "operationId": "NotificationController_markNotificationAsViewed",
+        "operationId": "NotificationController_readUserNotification",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ViewNotificationDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": ""
@@ -5734,6 +5992,30 @@
           "recommender-system"
         ]
       }
+    },
+    "/api/ai-service/chat": {
+      "post": {
+        "operationId": "AiServiceController_chatWithChatbot",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Ai-Service"
+        ]
+      }
     }
   },
   "info": {
@@ -5826,6 +6108,19 @@
         "required": [
           "email",
           "password"
+        ]
+      },
+      "OtpDto": {
+        "type": "object",
+        "properties": {
+          "otp": {
+            "type": "string",
+            "description": "OTP to verify",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "otp"
         ]
       },
       "UpdateUserDto": {
@@ -6002,6 +6297,12 @@
             "maxLength": 255,
             "example": "task 1 for CS256 assignment"
           },
+          "Color": {
+            "type": "string",
+            "description": "The color of the task",
+            "maxLength": 255,
+            "example": "red"
+          },
           "StartDate": {
             "type": "string",
             "description": "The start date of the task in the format yyyy-mm-ddThh:mm",
@@ -6134,37 +6435,6 @@
           "permissionLevel"
         ]
       },
-      "ViewNotificationDto": {
-        "type": "object",
-        "properties": {
-          "ID": {
-            "type": "number",
-            "example": 1,
-            "description": "The ID of the notification in case of notifications with composite IDs its the one directly related to the notification entity e.g. article_id, comment_id, etc. for article its article_id"
-          },
-          "PrimaryType": {
-            "type": "string",
-            "example": "article-notification",
-            "description": "The primary type of the notification e.g. article-notification"
-          },
-          "SubType": {
-            "type": "string",
-            "example": "comment",
-            "description": "The sub-type of the notification e.g. comment, like, etc. for article notifications"
-          },
-          "NotificationSenderID": {
-            "type": "number",
-            "example": 1,
-            "description": "The ID of the notification sender which serves as the second key of the composite key e.g. user_id for article notifications"
-          }
-        },
-        "required": [
-          "ID",
-          "PrimaryType",
-          "SubType",
-          "NotificationSenderID"
-        ]
-      },
       "CreatePaymentMethodDto": {
         "type": "object",
         "properties": {
@@ -6195,6 +6465,19 @@
           "cardId",
           "cardNumber",
           "expiryDate"
+        ]
+      },
+      "SendMessageDto": {
+        "type": "object",
+        "properties": {
+          "Content": {
+            "type": "string",
+            "description": "Message to send to the chatbot",
+            "example": "Hello, chatbot!"
+          }
+        },
+        "required": [
+          "Content"
         ]
       }
     }
