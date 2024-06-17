@@ -170,6 +170,14 @@ export class ConfigSchema {
     @IsNotEmpty()
     @IsString()
     STRIPE_CURRENCY: string;
+
+    @IsNotEmpty()
+    @IsString()
+    PRO_MONTHLY_SUBSCRIPTION_PRICE_ID: string;
+
+    @IsNotEmpty()
+    @IsString()
+    PRO_YEARLY_SUBSCRIPTION_PRICE_ID: string;
 }
 
 export function validateConfig(config: ConfigSchema) {
