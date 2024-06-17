@@ -1,5 +1,5 @@
 # Environment Variables
-*.env
+*.env.*
 frontend-dist
 
 scripts/.*

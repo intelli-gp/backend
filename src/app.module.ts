@@ -31,6 +31,7 @@ import { PaymentModule } from './modules/payment/payment.module';
         ConfigModule.forRoot({
             cache: true,
             validate: validateConfig,
+            envFilePath: [`.env.${process.env.NODE_ENV || 'dev'}`, '.env'],
             isGlobal: true,
         }),
         ServeStaticModule.forRoot({
