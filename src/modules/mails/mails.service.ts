@@ -18,7 +18,7 @@ export class MailsService {
 
         // send mail with defined transport object
         const info = await transporter.sendMail({
-            from: 'intelli968@gmail.com', // sender address
+            from: 'Mujedd Team <intelli968@gmail.com>',
             to: to, // list of receivers
             subject: subject, // Subject line
             html, // plain html body
