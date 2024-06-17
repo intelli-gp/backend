@@ -11,6 +11,7 @@ import {
     Param,
     BadRequestException,
     NotFoundException,
+    Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -19,7 +20,12 @@ import {
     sendRefreshToken,
     sendSuccessResponse,
 } from 'src/utils/response-handler/success.response-handler';
-import { GetCurrentUser, Public, SecondFactorPublic } from './ParamDecorator';
+import {
+    GetCurrentUser,
+    GetFromCookie,
+    Public,
+    SecondFactorPublic,
+} from './ParamDecorator';
 import { GoogleGuard } from './guards/google.guard';
 import { SerializedUser } from 'src/modules/users/serialized-types/serialized-user';
 import { SignUpDto } from './dto/signup.dto';
@@ -45,6 +51,7 @@ import { SecondFactorRtGuard } from './guards/2fa-refresh.jwt.guard';
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
+    private readonly logger = new Logger(AuthController.name);
     constructor(
         private readonly authService: AuthService,
         private readonly config: ConfigService,
@@ -164,10 +171,10 @@ export class AuthController {
         throw new BadRequestException('broken link');
     }
 
-    @Public()
-    @UseGuards(RtGuard, SecondFactorRtGuard)
     @Post('refresh')
-    @HttpCode(HttpStatus.CREATED)
+    @Public()
+    @SecondFactorPublic()
+    @UseGuards(RtGuard, SecondFactorRtGuard)
     @ApiResponse({
         status: HttpStatus.CREATED,
         description: 'Refresh Token Generated',
@@ -181,15 +188,11 @@ export class AuthController {
         }),
     })
     async refresh(
-        @Req() req,
+        @GetFromCookie('refresh_token') rt,
+        @GetCurrentUser() user: user,
         @Res({ passthrough: true }) res,
-        @GetCurrentUser('user_id') userId: number,
     ) {
-        const refreshToken = req.cookies['refresh_token'];
-        const tokens = await this.authService.refreshTokens(
-            refreshToken,
-            userId,
-        );
+        const tokens = await this.authService.refreshTokens(rt, user);
         sendRefreshToken(res, tokens.refreshToken);
         return sendSuccessResponse({ access_token: tokens.accessToken });
     }

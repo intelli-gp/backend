@@ -26,6 +26,8 @@ import { SerializedUser } from '../users/serialized-types/serialized-user';
 import { authenticator } from 'otplib';
 import { toFileStream, toDataURL } from 'qrcode';
 import { UsersService } from '../users/users.service';
+import { StripeService } from '../payment/stripe.service';
+import { ConfigSchema } from 'src/utils/config-validation.schema';
 
 @Injectable()
 export class AuthService {
@@ -33,9 +35,10 @@ export class AuthService {
     constructor(
         private readonly prismaService: PrismaService,
         private readonly jwt: JwtService,
-        private readonly config: ConfigService,
+        private readonly config: ConfigService<ConfigSchema>,
         private readonly mailService: MailsService,
         private readonly usersService: UsersService,
+        private readonly stripeService: StripeService,
         @Inject(CACHE_MANAGER) private readonly cacheService: Cache,
     ) {}
 
@@ -110,24 +113,17 @@ export class AuthService {
         });
     }
 
-    async validateRefreshToken(
+    async validateRefreshTokenIsMatching(
         refreshToken: string,
-        userId: number,
-    ): Promise<user> {
-        const user = await this.prismaService.user.findUnique({
-            where: {
-                user_id: userId,
-            },
-        });
-        if (!user) throw new UnauthorizedException('unauthorized user');
-
+        user: user,
+    ): Promise<boolean> {
         const isMatching = await compare(
             refreshToken,
             user.hashed_refresh_token,
         );
-        if (!isMatching) throw new UnauthorizedException('Action Denied');
+        if (!isMatching) return false;
 
-        return user;
+        return true;
     }
 
     async validateGoogleUser(userProfile: Profile): Promise<GooglePayload> {
@@ -164,9 +160,13 @@ export class AuthService {
         return { user: serializedUser, state: 'signup' };
     }
 
-    async refreshTokens(refreshToken: string, userId: number): Promise<Tokens> {
-        const user = await this.validateRefreshToken(refreshToken, userId);
-        if (!user) throw new UnauthorizedException('Unauthorized User');
+    async refreshTokens(refreshToken: string, user: user): Promise<Tokens> {
+        const isMatching = await this.validateRefreshTokenIsMatching(
+            refreshToken,
+            user,
+        );
+        if (!isMatching) throw new UnauthorizedException('Action Denied');
+
         const tokens = await this.issueTokens({
             userId: user.user_id,
             userEmail: user.email,
@@ -263,6 +263,11 @@ export class AuthService {
     }
 
     async signUp(signUpDto: SignUpDto): Promise<loginResult> {
+        const stripeCustomer = await this.stripeService.createCustomer(
+            signUpDto.fullName,
+            signUpDto.email,
+        );
+
         const password = await hashS10(signUpDto.password);
         const dob = new Date(signUpDto.dob);
         const renewal_date = new Date(
@@ -279,6 +284,7 @@ export class AuthService {
             image: signUpDto.image,
             dob,
             subscription_date: new Date(),
+            stripe_customer_id: stripeCustomer.id,
             level_id: 1,
             plan_id: 1,
         };

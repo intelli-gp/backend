@@ -9,6 +9,13 @@ export const GetCurrentUser = createParamDecorator(
     },
 );
 
+export const GetFromCookie = createParamDecorator(
+    (data: string, context: ExecutionContext) => {
+        const request = context.switchToHttp().getRequest();
+        return request.cookies[data];
+    },
+);
+
 export const WsGetCurrentUser = createParamDecorator(
     (data: keyof user | undefined, context: ExecutionContext) => {
         const client = context.switchToWs().getClient();

@@ -12,6 +12,7 @@ import { UsersService } from '../users/users.service';
 import { TagsService } from '../tags/tags.service';
 import { SecondFactorAccessJwtStrategy } from './strategy/access-jwt-2fa.strategy';
 import { SecondFactorAuthRefreshJwtStrategy } from './strategy/refresh-2fa.jwt.strategy';
+import { StripeService } from '../payment/stripe.service';
 
 @Module({
     imports: [JwtModule.register({})],
@@ -27,6 +28,7 @@ import { SecondFactorAuthRefreshJwtStrategy } from './strategy/refresh-2fa.jwt.s
         MailsService,
         UsersService,
         TagsService,
+        StripeService,
     ],
     controllers: [AuthController],
 })
