@@ -4,12 +4,14 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from '../types/token.payload';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class RefreshJwtStrategy extends PassportStrategy(
     Strategy,
     'jwt-refresh',
 ) {
+    private readonly logger = new Logger(RefreshJwtStrategy.name);
     constructor(
         config: ConfigService,
         private readonly prisma: PrismaService,
@@ -31,6 +33,7 @@ export class RefreshJwtStrategy extends PassportStrategy(
                 user_id: payload.userId,
             },
         });
+
         if (!user) {
             throw new ForbiddenException('Access Denied');
         }

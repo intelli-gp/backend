@@ -1,6 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from '../types/token.payload';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -10,6 +10,7 @@ export class AccessJwtStrategy extends PassportStrategy(
     Strategy,
     'jwt-access',
 ) {
+    private logger = new Logger(AccessJwtStrategy.name);
     constructor(
         config: ConfigService,
         private readonly prisma: PrismaService,
