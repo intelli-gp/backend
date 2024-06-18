@@ -56,7 +56,6 @@ export class WsJwtGuard implements CanActivate {
             return payload;
         } catch (error) {
             wsValidationLogger.error('WS JWT validation error', error);
-            client.emit('error', { errorMessage: 'Invalid Credentials' });
             throw new UnauthorizedException('Invalid Credentials');
         }
     }

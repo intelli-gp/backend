@@ -136,7 +136,7 @@ export class ChatGroupsGateway {
         });
     }
 
-    // @Public()
+    @Public()
     @SubscribeMessage('refreshToken')
     async refreshToken(
         @ConnectedSocket() client: Socket,
