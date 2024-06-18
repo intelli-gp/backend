@@ -1,8 +1,13 @@
-import { IsTypingDto, JoinChatGroupDto } from '../../dto';
-import { DeleteMessageDto } from '../../dto/delete-message.dto';
-import { EditMessageDto } from '../../dto/edit-message.dto';
+import {
+    IsTypingDto,
+    JoinChatGroupDto,
+    RefreshTokenDto,
+    EditMessageDto,
+    DeleteMessageDto,
+} from '../../dto';
 
 export interface ClientToServerEvents {
+    refreshToken: (data: RefreshTokenDto) => void;
     createMessage: () => void;
     joinRoom: (client: Socket, dto: JoinChatGroupDto) => void;
     leaveRoom: (client: Socket, dto: JoinChatGroupDto) => void;

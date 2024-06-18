@@ -8,6 +8,7 @@ export type IsTypingSerialized = {
 };
 
 export interface ServerToClientEvents {
+    tokenRefreshed: (data: string) => void;
     isTyping: (data: IsTypingSerialized) => void;
     allMessages: (messages: SerializedMessage[]) => void;
     newMessage: (message: SerializedMessage) => void;

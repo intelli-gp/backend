@@ -4,17 +4,28 @@ import { ConfigService } from '@nestjs/config';
 import { verify } from 'jsonwebtoken';
 import { Socket } from 'socket.io';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { Reflector } from '@nestjs/core';
 import { ConfigSchema } from 'src/utils/config-validation.schema';
+import { IS_PUBLIC_KEY } from '../ParamDecorator';
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {
-    constructor(private readonly prismaService: PrismaService) {}
+    private logger = new Logger('WsJwtGuard');
+
+    constructor(
+        private readonly prismaService: PrismaService,
+        private readonly reflector: Reflector,
+    ) {}
+
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        if (context.getType() !== 'ws') {
+        const isPublic = this.reflector.getAllAndOverride<boolean>(
+            IS_PUBLIC_KEY,
+            [context.getHandler(), context.getClass()],
+        );
+
+        if (isPublic || context.getType() !== 'ws') {
             return true;
         }
-
-        const wsJwtGuardLogger = new Logger('WsJwtGuard');
 
         const client = context.switchToWs().getClient();
         const payload = WsJwtGuard.validateToken(client);
@@ -33,7 +44,10 @@ export class WsJwtGuard implements CanActivate {
         const config = new ConfigService<ConfigSchema>();
 
         // const { authorization } = client.handshake.headers;
+
         const { token } = client.handshake.auth;
+        wsValidationLogger.debug({ token });
+
         // wsValidationLogger.debug({ token });
         // const token: string = authorization?.split(' ')[1];
         try {
@@ -42,6 +56,7 @@ export class WsJwtGuard implements CanActivate {
             return payload;
         } catch (error) {
             wsValidationLogger.error('WS JWT validation error', error);
+            client.emit('error', { errorMessage: 'Invalid Credentials' });
             throw new UnauthorizedException('Invalid Credentials');
         }
     }

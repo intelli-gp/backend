@@ -8,3 +8,5 @@ export * from './create-message.dto';
 export * from './is-typing.dto';
 export * from './edit-message.dto';
 export * from './react-to-message.dto';
+export * from './refresh-token.dto';
+export * from './delete-message.dto';

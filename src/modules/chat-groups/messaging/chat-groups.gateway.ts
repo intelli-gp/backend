@@ -24,11 +24,12 @@ import {
     IsTypingDto,
     JoinChatGroupDto,
     ReactToMessageDto,
+    RefreshTokenDto,
 } from '../dto';
 import { ServerToClientEvents, ClientToServerEvents } from './types';
 import { WebsocketExceptionsFilter } from 'src/exception-filters/ws.filter';
 import { GroupUsersService } from './group-users.service';
-import { WsGetCurrentUser } from 'src/modules/auth/ParamDecorator';
+import { Public, WsGetCurrentUser } from 'src/modules/auth/ParamDecorator';
 import { MessagingService } from './messaging.service';
 import { WsPrismaExceptionFilter } from 'src/exception-filters/prisma.filter';
 import { SerializedMessage } from '../serialized-types/messages/messages.serializer';
@@ -133,6 +134,19 @@ export class ChatGroupsGateway {
             username: currentUser.username,
             status: 'offline',
         });
+    }
+
+    // @Public()
+    @SubscribeMessage('refreshToken')
+    async refreshToken(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() messageData: RefreshTokenDto,
+    ) {
+        this.gatewayLogger.log('Refreshing token');
+
+        client.handshake.auth.token = messageData.accessToken;
+
+        client.emit('tokenRefreshed', 'token refreshed successfully');
     }
 
     @SubscribeMessage('createMessage')
