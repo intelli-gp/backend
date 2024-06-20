@@ -46,17 +46,26 @@ export class CoursesService {
          * 4. filter out the primary category from the results
          * 5. return the results and the filtered categories
          */
-        const userTags = await this.prismaService.user_tag.findMany({
+        const maxTags = 10;
+        let userTags = await this.prismaService.user_system_tag.findMany({
             where: { user_id: userId },
+            select: { tag_name: true },
+            orderBy: { tag_importance: 'desc' },
+            take: maxTags,
         });
+
+        if (userTags.length < maxTags || !userTags) {
+            const lengthDiff = maxTags - userTags.length;
+            const nonSystemUserTags = await this.prismaService.tag.findMany({
+                select: { tag_name: true },
+                take: lengthDiff,
+            });
+            userTags = [...userTags, ...nonSystemUserTags];
+        }
 
         // TODO: this approach needs to change because once the tags increase udemy does not replyyes
         // We set a max Size to at least get some results
-        const maxTags = 10;
-        const tagsQuery = userTags
-            .map((tag) => tag.tag_name)
-            .slice(0, maxTags)
-            .join(',');
+        const tagsQuery = userTags.map((tag) => tag.tag_name).join(',');
 
         const recommendedCoursesResponse = await this.searchCourses(
             tagsQuery,
