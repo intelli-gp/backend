@@ -59,6 +59,14 @@ export class SerializedUser {
 
     FollowingCount: number;
 
+    IsAllNotificationsMuted: boolean;
+
+    IsGroupNotificationsMuted: boolean;
+
+    IsArticleNotificationsMuted: boolean;
+
+    IsFollowNotificationsMuted: boolean;
+
     @Exclude()
     renewal_date: Date;
 
@@ -78,6 +86,14 @@ export class SerializedUser {
         this.ID = +partial?.user_id;
         this.FullName = partial?.full_name as string;
         this.Username = partial?.username as string;
+
+        this.IsAllNotificationsMuted = partial?.is_notifications_muted as boolean;
+
+        this.IsGroupNotificationsMuted = partial?.is_group_notifications_muted as boolean;
+
+        this.IsArticleNotificationsMuted = partial?.is_article_notifications_muted as boolean;
+
+        this.IsFollowNotificationsMuted = partial?.is_follow_notifications_muted as boolean;
 
         partial?.headline && (this.Headline = partial?.headline as string);
 
