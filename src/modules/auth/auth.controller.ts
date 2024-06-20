@@ -188,9 +188,9 @@ export class AuthController {
         }),
     })
     async refresh(
-        @GetFromCookie('refresh_token') rt,
+        @GetFromCookie('refresh_token') rt: string,
         @GetCurrentUser() user: user,
-        @Res({ passthrough: true }) res,
+        @Res({ passthrough: true }) res: Response,
     ) {
         const tokens = await this.authService.refreshTokens(rt, user);
         sendRefreshToken(res, tokens.refreshToken);

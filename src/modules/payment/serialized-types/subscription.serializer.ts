@@ -44,6 +44,13 @@ export class SerializedSubscription {
     })
     Status: Stripe.Subscription.Status;
 
+    @ApiProperty({
+        type: Boolean,
+        description: 'Indicates if the subscription is cancelled',
+        example: false,
+    })
+    IsCancelled: boolean;
+
     constructor(subscription: Stripe.Subscription) {
         this.ID = subscription?.id;
 
@@ -58,5 +65,7 @@ export class SerializedSubscription {
         this.Price = subscription?.items?.data?.[0]?.plan?.amount / 100;
 
         this.Status = subscription?.status;
+
+        this.IsCancelled = subscription?.cancel_at_period_end;
     }
 }

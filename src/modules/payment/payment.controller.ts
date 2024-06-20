@@ -20,17 +20,16 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
-import { ConfigService } from '@nestjs/config';
-import { ConfigSchema } from 'src/utils/config-validation.schema';
 import { user } from '@prisma/client';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
+import { subscriptionExample } from './swagger/subscription.example';
+import { paymentMethodExample } from './swagger/payment-method.example';
 
 @ApiTags('Payment')
 @Controller('payment')
 export class PaymentController {
     constructor(
         private readonly stripeService: StripeService,
-        private readonly configService: ConfigService<ConfigSchema>,
     ) {}
 
     @Post('payment-method')
@@ -59,7 +58,10 @@ export class PaymentController {
     @Get('payment-method')
     @ApiAcceptedResponse({
         description: 'List of payment methods.',
-        schema: swaggerSuccessExample([SerializedPaymentMethod]),
+        schema: swaggerSuccessExample(null, [
+            paymentMethodExample,
+            paymentMethodExample,
+        ]),
     })
     @ApiBadRequestResponse({
         description: 'Failed to list payment methods.',
@@ -122,7 +124,7 @@ export class PaymentController {
     @Get('subscription')
     @ApiAcceptedResponse({
         description: 'Subscription details.',
-        schema: swaggerSuccessExample(SerializedSubscription),
+        schema: swaggerSuccessExample(null, subscriptionExample),
     })
     @ApiBadRequestResponse({
         description: 'Failed to get subscription details.',
