@@ -48,13 +48,15 @@ model article_like {
 }
 
 model article_comment {
-  comment_id            Int                    @id @default(autoincrement())
-  article_id            Int
-  user_id               Int
-  md_content            String
-  created_at            DateTime               @default(now())
-  updated_at            DateTime               @updatedAt
-  deleted               Boolean                @default(false)
+  comment_id  Int      @id @default(autoincrement())
+  article_id  Int
+  user_id     Int
+  md_content  String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted     Boolean  @default(false)
+  likes_count Int      @default(0)
+
   article               article                @relation(fields: [article_id], references: [article_id], onDelete: Cascade, onUpdate: Cascade)
   user                  user                   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   article_comment_likes article_comment_like[]
@@ -81,12 +83,14 @@ model article_bookmark {
 }
 
 model article {
-  article_id        Int                @id @default(autoincrement())
-  title             String             @db.VarChar(255)
-  created_at        DateTime?          @default(now())
-  updated_at        DateTime?          @updatedAt
-  cover_image_url   String?            @db.Text
-  user_id           Int
+  article_id      Int       @id @default(autoincrement())
+  title           String    @db.VarChar(255)
+  created_at      DateTime? @default(now())
+  updated_at      DateTime? @updatedAt
+  cover_image_url String?   @db.Text
+  user_id         Int
+  likes_count     Int       @default(0)
+
   article_tag       article_tag[]
   user              user               @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   articles_content  articles_content[]
@@ -168,17 +172,19 @@ model group_user {
 }
 
 model group {
-  group_id        Int          @id @default(autoincrement())
-  title           String       @unique @db.VarChar(255)
+  group_id        Int       @id @default(autoincrement())
+  title           String    @unique @db.VarChar(255)
   description     String
-  cover_image_url String       @db.VarChar(255)
-  created_at      DateTime?    @default(now())
-  updated_at      DateTime?    @updatedAt
+  cover_image_url String    @db.VarChar(255)
+  created_at      DateTime? @default(now())
+  updated_at      DateTime? @updatedAt
   created_by      Int
-  group_tag       group_tag[]
-  group_user      group_user[]
-  user            user         @relation(fields: [created_by], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
-  message         message[]
+  users_count     Int       @default(0)
+
+  group_tag  group_tag[]
+  group_user group_user[]
+  user       user         @relation(fields: [created_by], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
+  message    message[]
 }
 
 model level {
@@ -405,4 +411,3 @@ enum MessageTypeEnum {
   MESSAGE
   IMAGE
 }
-

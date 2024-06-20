@@ -414,6 +414,15 @@ export class ArticlesService {
         if (likeExists) {
             // TODO: decide whether to delete the like or just add an invisible flag
             // If invisible flag added then just use prisma upsert
+            this.prismaService.article.update({
+                where: { article_id: articleId },
+                data: {
+                    likes_count: {
+                        decrement: 1,
+                    },
+                },
+            });
+
             return await this.prismaService.article_like.delete({
                 where: {
                     article_id_user_id: {
@@ -426,6 +435,14 @@ export class ArticlesService {
                 },
             });
         } else {
+            this.prismaService.article.update({
+                where: { article_id: articleId },
+                data: {
+                    likes_count: {
+                        increment: 1,
+                    },
+                },
+            });
             const articleLike = await this.prismaService.article_like.create({
                 data: {
                     article_id: articleId,
@@ -489,6 +506,7 @@ export class ArticlesService {
             return articleLike;
         }
     }
+
     async toggleLikeArticleComment(commentId: number, userId: number) {
         // TODO: decide whether or not to delete the like or just add an invisible flag
         const likeExists =
@@ -502,6 +520,15 @@ export class ArticlesService {
             });
 
         if (likeExists) {
+            this.prismaService.article_comment.update({
+                where: { comment_id: commentId },
+                data: {
+                    likes_count: {
+                        decrement: 1,
+                    },
+                },
+            });
+
             return await this.prismaService.article_comment_like.delete({
                 where: {
                     comment_id_user_id: {
@@ -514,6 +541,15 @@ export class ArticlesService {
                 },
             });
         } else {
+            this.prismaService.article_comment.update({
+                where: { comment_id: commentId },
+                data: {
+                    likes_count: {
+                        increment: 1,
+                    },
+                },
+            });
+
             const like = await this.prismaService.article_comment_like.create({
                 data: {
                     comment_id: commentId,

@@ -262,6 +262,15 @@ export class ChatGroupsService {
         if (!joinedUser) {
             throw new NotFoundException('Chat group not found');
         }
+        this.prismaService.group.update({
+            where: { group_id: chatGroupId },
+            data: {
+                users_count: {
+                    increment: 1,
+                },
+            },
+        });
+
         return joinedUser;
     }
 
@@ -279,6 +288,7 @@ export class ChatGroupsService {
                 'Owner of the chat group cannot leave the chat group',
             );
         }
+
         const user = await this.prismaService.group_user.update({
             where: {
                 group_id_user_id: {
@@ -293,6 +303,16 @@ export class ChatGroupsService {
         if (!user) {
             throw new NotFoundException('Chat group not found');
         }
+
+        this.prismaService.group.update({
+            where: { group_id: chatGroupId },
+            data: {
+                users_count: {
+                    decrement: 1,
+                },
+            },
+        });
+
         return 'User left the chat group';
     }
 
