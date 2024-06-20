@@ -15,7 +15,8 @@ import {
     NOTIFICATION_SUB_TYPES,
     NOTIFICATION_TYPES,
 } from '../notification/enums/notification-primary-types.enum';
-import { follows } from '@prisma/client';
+import { Prisma, follows } from '@prisma/client';
+import { NotificationRecipient } from '../notification/types/notification-recepient';
 
 @Injectable()
 export class ArticlesService {
@@ -183,7 +184,11 @@ export class ArticlesService {
                 article_tag: true,
                 user: {
                     include: {
-                        followed_by: true,
+                        followed_by: {
+                            include: {
+                                follower: true,
+                            },
+                        },
                     },
                 },
                 articles_content: true,
@@ -227,7 +232,7 @@ export class ArticlesService {
             });
 
         const notificationRecipients = this.getArticleNotificationRecipients(
-            addedArticle.user.user_id,
+            null,
             addedArticle.user.followed_by,
         );
 
@@ -648,26 +653,49 @@ export class ArticlesService {
 
     private getArticleNotificationRecipients(
         authorId: number,
-        authorFollowers: follows[],
+        authorFollowers: Prisma.followsWhereInput[],
         notificationSenderFollowers?: follows[],
-    ): number[] {
-        const notificationRecipients: number[] = [];
-        notificationRecipients.push(authorId);
+    ): NotificationRecipient[] {
+        const notificationRecipients: NotificationRecipient[] = [];
+        // TODO: send author status
+        if (authorId)
+            notificationRecipients.push({
+                recipientId: authorId,
+                isMuted: false,
+            });
 
         if (!notificationSenderFollowers) {
-            const authorFollowerIds = authorFollowers.map((f) => f.follower_id);
+            const authorFollowerIds = authorFollowers.map((f) => {
+                return {
+                    recipientId: f.follower_id as number,
+                    isMuted:
+                        (f.follower.is_notifications_muted as boolean) ||
+                        (f.follower
+                            .is_article_notifications_muted as boolean) ||
+                        false,
+                };
+            });
             notificationRecipients.push(...authorFollowerIds);
         }
 
         // if the notification sender followers are provided
         const commonFollowers = authorFollowers
             ?.filter((follower) =>
-                notificationSenderFollowers.some(
+                notificationSenderFollowers?.some(
                     (senderFollower) =>
                         senderFollower.follower_id === follower.follower_id,
                 ),
             )
-            ?.map((f) => f.follower_id);
+            ?.map((f) => {
+                return {
+                    recipientId: f.follower_id as number,
+                    isMuted:
+                        (f.follower.is_notifications_muted as boolean) ||
+                        (f.follower
+                            .is_article_notifications_muted as boolean) ||
+                        false,
+                };
+            });
 
         notificationRecipients.push(...commonFollowers);
 

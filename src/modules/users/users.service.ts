@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    Logger,
+    NotFoundException,
+} from '@nestjs/common';
 import { user } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,6 +13,7 @@ import { NotificationService } from '../notification/notification.service';
 import { PaginationDto } from 'src/common/dto';
 import { NOTIFICATION_TYPES } from '../notification/enums/notification-primary-types.enum';
 import { SerializedUser } from './serialized-types/serialized-user';
+import { UpdateMuteSettingsDto } from './dto/update-mute-settings.dto';
 
 @Injectable()
 export class UsersService {
@@ -324,6 +330,35 @@ export class UsersService {
         return user ? user : null;
     }
 
+    async updateUserMuteSettings(
+        userId: number,
+        settings: UpdateMuteSettingsDto,
+    ) {
+        if (!settings) throw new BadRequestException('No settings provided');
+
+        const data: Record<string, any> = {};
+
+        if (settings.IsAllNotificationsMuted) {
+            data.is_notifications_muted = settings.IsAllNotificationsMuted;
+        }
+        if (settings.IsGroupNotificationsMuted) {
+            data.is_group_notifications_muted =
+                settings.IsGroupNotificationsMuted;
+        }
+        if (settings.IsArticleNotificationsMuted) {
+            data.is_article_notifications_muted =
+                settings.IsArticleNotificationsMuted;
+        }
+        if (settings.IsFollowNotificationsMuted) {
+            data.is_follow_notifications_muted =
+                settings.IsFollowNotificationsMuted;
+        }
+
+        return await this.prismaService.user.update({
+            where: { user_id: userId },
+            data,
+        });
+    }
     async updatePassword(id: number, password: string) {
         const hashedPassword = await hashS10(password);
         await this.prismaService.user.update({
@@ -444,6 +479,8 @@ export class UsersService {
                 full_name: true,
                 username: true,
                 image: true,
+                is_notifications_muted: true,
+                is_follow_notifications_muted: true,
             },
             data: {
                 following_count: {
@@ -467,7 +504,16 @@ export class UsersService {
         });
         this.logger.debug(`Followers count: ${user.following_count}`);
 
-        this.notificationsService.emitNotification([followedId], {
+        const recipients = [
+            {
+                recipientId: followedId,
+                isMuted:
+                    user.is_notifications_muted ||
+                    user.is_follow_notifications_muted,
+            },
+        ];
+
+        this.notificationsService.emitNotification(recipients, {
             EventName: NOTIFICATION_TYPES.FOLLOW,
             Sender: new SerializedUser(user),
             Type: null,
@@ -525,6 +571,16 @@ export class UsersService {
             where: { user_id: userId },
             data: {
                 plan_id: planMap[plan],
+            },
+        });
+    }
+
+    /** Tokens */
+
+    async clearUsersRefreshTokens() {
+        await this.prismaService.user.updateMany({
+            data: {
+                hashed_refresh_token: null,
             },
         });
     }

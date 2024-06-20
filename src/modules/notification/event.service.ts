@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { fromEvent } from 'rxjs';
 import { EventEmitter } from 'events';
 import { NotificationEvents } from './types/notifications';
+import { NotificationRecipient } from './types/notification-recepient';
 
 const TTLTime = 50; // 6 seconds
 
@@ -58,7 +59,7 @@ export class EventsService {
         return fromEvent(clientEmitter, 'notifications');
     }
 
-    async emitToUser(userId: number, data: any) {
+    async emitToUser(userId: number, data: any, isMuted: boolean) {
         this.eventsServiceLogger.log(
             `Emitting event ${data.EventName} to user sse-user-${userId}`,
         );
@@ -78,13 +79,18 @@ export class EventsService {
          */
         this.setWithTTL('sse-user-' + userId, clientEmitter, TTLTime);
 
-        clientEmitter.emit('notifications', { data });
+        clientEmitter.emit('notifications', { data }, isMuted);
     }
 
-    async emit(eligibleNotificationRecipientsIds: number[], data: any) {
+    async emit(
+        eligibleNotificationRecipientsIds: NotificationRecipient[],
+        data: any,
+    ) {
         // may not be a necessary encapsulation
-        eligibleNotificationRecipientsIds.forEach((userId) => {
-            this.emitToUser(userId, data);
-        });
+        eligibleNotificationRecipientsIds.forEach(
+            ({ recipientId, isMuted }) => {
+                this.emitToUser(recipientId, data, isMuted);
+            },
+        );
     }
 }

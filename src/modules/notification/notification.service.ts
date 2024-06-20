@@ -17,6 +17,7 @@ import {
 import { PaginationDto } from 'src/common/dto';
 import { SerializedUserNotification } from './serilaized-types/notifications.serializer';
 import { ArticleNotificationType } from './enums/article-notifications.enum';
+import { NotificationRecipient } from './types/notification-recepient';
 
 @Injectable()
 export class NotificationService {
@@ -291,7 +292,7 @@ export class NotificationService {
     }
 
     async emitNotification(
-        recipients: number[],
+        recipients: NotificationRecipient[],
         notificationData: NotificationEvents,
         store = true,
     ) {
@@ -312,9 +313,9 @@ export class NotificationService {
                     break;
             }
 
-            const notifications = recipients.map((recipient) => ({
+            const notifications = recipients.map(({ recipientId }) => ({
                 SenderID: notificationData.Sender.ID,
-                ReceiverID: recipient,
+                ReceiverID: recipientId,
                 PrimaryType: notificationData.EventName,
                 SubType: notificationData.Type,
                 EntityID: entityId,
@@ -324,10 +325,11 @@ export class NotificationService {
                 await this.createManyNotifications(notifications);
 
             await Promise.all(
-                recipients.map(async (recipient, index) => {
+                recipients.map(async ({ recipientId, isMuted }, index) => {
                     await this.eventsService.emitToUser(
-                        recipient,
+                        recipientId,
                         createdNotifications[index],
+                        isMuted,
                     );
                 }),
             );

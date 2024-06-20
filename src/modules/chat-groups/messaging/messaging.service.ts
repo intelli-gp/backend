@@ -153,7 +153,16 @@ export class MessagingService {
                 },
                 group: {
                     include: {
-                        group_user: true,
+                        group_user: {
+                            include: {
+                                user: {
+                                    select: {
+                                        is_group_notifications_muted: true,
+                                        is_notifications_muted: true,
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
             },
@@ -172,7 +181,7 @@ export class MessagingService {
         });
 
         const eligibleUsersForNotification = newMessage.group.group_user.filter(
-            (groupUser: group_user) => {
+            (groupUser) => {
                 return (
                     groupUser.user_id !== userId &&
                     !groupUser.inRoom &&
@@ -182,7 +191,14 @@ export class MessagingService {
         );
 
         const eligibleUserIds = eligibleUsersForNotification.map(
-            (groupUser: group_user) => groupUser.user_id,
+            (groupUser) => {
+                return {
+                    recipientId: groupUser.user_id,
+                    isMuted:
+                        groupUser.user.is_notifications_muted ||
+                        groupUser.user.is_group_notifications_muted,
+                };
+            },
         );
 
         this.notificationsService.emitNotification(

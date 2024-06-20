@@ -347,31 +347,38 @@ model follows {
 }
 
 model user {
-  user_id                 Int       @id @default(autoincrement())
-  username                String    @unique @db.VarChar(100)
-  email                   String    @unique @db.VarChar(100)
-  password                String    @db.VarChar(100)
-  dob                     DateTime? @db.Date
-  points                  Int?      @default(0)
-  full_name               String    @db.VarChar(100)
-  bio                     String?   @db.VarChar(2000)
-  headline                String?   @db.VarChar(255)
-  cover_image             String?   @db.VarChar(255)
-  phone_number            String?   @db.VarChar(50)
-  image                   String?   @db.Text
-  level_id                Int       @default(1)
-  plan_id                 Int       @default(1)
-  renewal_date            DateTime  @db.Date
-  subscription_date       DateTime  @db.Date
-  isNotificationMuted     Boolean   @default(false)
-  connected               Boolean   @default(false)
-  active                  Boolean   @default(false)
-  followers_count         Int       @default(0)
-  following_count         Int       @default(0)
-  two_factor_auth_enabled Boolean   @default(false)
-  stripe_customer_id      String?
-  two_factor_auth_secret  String?   @db.VarChar(255)
-  hashed_refresh_token    String?   @db.VarChar(100)
+  user_id                        Int       @id @default(autoincrement())
+  username                       String    @unique @db.VarChar(100)
+  email                          String    @unique @db.VarChar(100)
+  password                       String    @db.VarChar(100)
+  dob                            DateTime? @db.Date
+  points                         Int?      @default(0)
+  full_name                      String    @db.VarChar(100)
+  bio                            String?   @db.VarChar(2000)
+  headline                       String?   @db.VarChar(255)
+  cover_image                    String?   @db.VarChar(255)
+  phone_number                   String?   @db.VarChar(50)
+  image                          String?   @db.Text
+  level_id                       Int       @default(1)
+  plan_id                        Int       @default(1)
+  renewal_date                   DateTime  @db.Date
+  subscription_date              DateTime  @db.Date
+  connected                      Boolean   @default(false)
+  active                         Boolean   @default(false)
+  followers_count                Int       @default(0)
+  following_count                Int       @default(0)
+  two_factor_auth_enabled        Boolean   @default(false)
+  stripe_customer_id             String?
+  two_factor_auth_secret         String?   @db.VarChar(255)
+  hashed_refresh_token           String?   @db.VarChar(100)
+  // all of user notifications
+  is_notifications_muted         Boolean   @default(false)
+  // all of user article notifications
+  is_article_notifications_muted Boolean   @default(false)
+  // all of user group notifications
+  is_group_notifications_muted   Boolean   @default(false)
+  // all of user follow notifications
+  is_follow_notifications_muted  Boolean   @default(false)
 
   ai_output              ai_output[]
   article                article[]

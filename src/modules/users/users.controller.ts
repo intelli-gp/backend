@@ -21,6 +21,7 @@ import { SwaggerLoginExample } from '../auth/swagger-examples';
 import { GetSingleUserByIdDto, GetSingleUserDto } from './dto/get-user.dto';
 import { PaginationDto } from 'src/common/dto';
 import { SerializedPaginated } from 'src/common/paginated-results.serializer';
+import { UpdateMuteSettingsDto } from './dto/update-mute-settings.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -45,6 +46,29 @@ export class UsersController {
     ) {
         const updatedUser = new SerializedUser(
             await this.usersService.updateUser(userData, data),
+        );
+        return sendSuccessResponse({
+            updatedUser,
+        });
+    }
+
+    @Patch('/settings/mute')
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'User updated successfully',
+        schema: swaggerSuccessExample(SwaggerLoginExample),
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST,
+        description: 'Validation or a constraint error',
+    })
+    async updateMuteSettings(
+        @GetCurrentUser('user_id') userId: number,
+        @Body() data: UpdateMuteSettingsDto,
+    ) {
+        const updatedUser = new SerializedUser(
+            await this.usersService.updateUserMuteSettings(userId, data),
         );
         return sendSuccessResponse({
             updatedUser,
