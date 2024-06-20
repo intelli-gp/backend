@@ -10,10 +10,8 @@ import {
 import { Exclude } from 'class-transformer';
 import { SerializedArticle } from 'src/modules/articles/serialized-types/article.serialized';
 import { SerializedChatGroup } from 'src/modules/chat-groups/serialized-types/chat-group/chat-group.serializer';
-import { SerializedPaymentMethod } from 'src/modules/payment-method/serialized-types/serialized-payment-method';
 
 export class SerializedUser {
-    
     ID: number;
 
     FullName: string;
@@ -52,8 +50,6 @@ export class SerializedUser {
 
     GroupsJoined: SerializedChatGroup[];
 
-    PaymentMethods: SerializedPaymentMethod[];
-
     TwoFactorAuthEnabled: boolean;
 
     FollowersCount: number;
@@ -88,13 +84,17 @@ export class SerializedUser {
         this.FullName = partial?.full_name as string;
         this.Username = partial?.username as string;
 
-        this.IsAllNotificationsMuted = partial?.is_notifications_muted as boolean;
+        this.IsAllNotificationsMuted =
+            partial?.is_notifications_muted as boolean;
 
-        this.IsGroupNotificationsMuted = partial?.is_group_notifications_muted as boolean;
+        this.IsGroupNotificationsMuted =
+            partial?.is_group_notifications_muted as boolean;
 
-        this.IsArticleNotificationsMuted = partial?.is_article_notifications_muted as boolean;
+        this.IsArticleNotificationsMuted =
+            partial?.is_article_notifications_muted as boolean;
 
-        this.IsFollowNotificationsMuted = partial?.is_follow_notifications_muted as boolean;
+        this.IsFollowNotificationsMuted =
+            partial?.is_follow_notifications_muted as boolean;
 
         partial?.headline && (this.Headline = partial?.headline as string);
 
@@ -134,12 +134,6 @@ export class SerializedUser {
         if (partial?.article)
             this.Articles = (partial?.article as article[]).map((article) => {
                 return new SerializedArticle(article);
-            });
-        if (partial?.payment_method)
-            this.PaymentMethods = (
-                partial?.payment_method as payment_method[]
-            ).map((paymentMethod) => {
-                return new SerializedPaymentMethod(paymentMethod);
             });
 
         if (partial?.group)

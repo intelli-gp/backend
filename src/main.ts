@@ -25,15 +25,24 @@ async function bootstrap() {
 
     if (config.get('ENABLE_SWAGGER') === 'true') {
         const swaggerConfig = new DocumentBuilder()
-            .setTitle('INTELLI GP')
-            .setDescription('The INTELLI-GP API documentation')
+            .setTitle('Mujedd')
+            .setDescription('The Mujedd API documentation')
             .setVersion('1.0')
-            .addTag('INTELLI GP')
+            .addTag('Mujedd')
             .addBearerAuth()
             .build();
 
         const document = SwaggerModule.createDocument(app, swaggerConfig);
-        SwaggerModule.setup('/6YrzxCg81s/swagger-docs', app, document);
+
+        SwaggerModule.setup('/6YrzxCg81s/swagger-docs', app, document, {
+            swaggerOptions: {
+                docExpansion: 'none',
+                filter: true,
+                showRequestDuration: true,
+            },
+
+            customSiteTitle: 'Mujedd API Documentation',
+        });
 
         // Generate Swagger json schema
         const jsonOutput = JSON.stringify(document, null, 2);

@@ -6,7 +6,7 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PaginationDto } from 'src/common/dto';
 import { GetCurrentUser } from '../auth/ParamDecorator';
 import { SerializedUdemyCourse } from './serialized-types';
@@ -18,6 +18,7 @@ import { UdemyCourse } from './types';
 
 @Controller('courses')
 @ApiTags('Courses')
+@ApiBearerAuth()
 export class CoursesController {
     private coursesControllerLogger = new Logger(CoursesController.name);
     constructor(private readonly coursesService: CoursesService) {}

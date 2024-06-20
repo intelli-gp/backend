@@ -1,7 +1,12 @@
 import { Controller, Get, HttpCode, Param, Query } from '@nestjs/common';
 import { PaginationDto } from '../../common/dto';
 import { RecommenderSystemService } from './recommender-system.service';
-import { ApiBadRequestResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBadRequestResponse,
+    ApiBearerAuth,
+    ApiOkResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { MultipleArticlesExample } from '../articles/swagger-examples';
 import { swaggerSuccessExample } from '../../utils/swagger/example-generator';
 import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
@@ -21,6 +26,7 @@ import { group } from '@prisma/client';
 // TODO: Implement the Methods
 @Controller('recommender-system')
 @ApiTags('recommender-system')
+@ApiBearerAuth()
 export class RecommenderSystemController {
     constructor(
         private readonly recommenderSystemService: RecommenderSystemService,

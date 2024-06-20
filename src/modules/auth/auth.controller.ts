@@ -31,7 +31,13 @@ import { SerializedUser } from 'src/modules/users/serialized-types/serialized-us
 import { SignUpDto } from './dto/signup.dto';
 import { GooglePayload } from './types/google.payload';
 import { LinkedinGuard } from './guards/linkedin.guard';
-import { ApiExcludeEndpoint, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBasicAuth,
+    ApiBearerAuth,
+    ApiExcludeEndpoint,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { RtGuard } from './guards/refresh.jwt.guard';
 import { loginResult } from './types/login.response';
 import { ConfigService } from '@nestjs/config';
@@ -87,6 +93,7 @@ export class AuthController {
         });
     }
 
+    @ApiBearerAuth()
     @Get('send-verification/:username')
     @ApiResponse({
         status: HttpStatus.OK,
@@ -96,6 +103,7 @@ export class AuthController {
         await this.authService.sendVerificationMail(username, null);
         return sendSuccessResponse(null);
     }
+
 
     @Public()
     @SecondFactorPublic()
@@ -224,6 +232,7 @@ export class AuthController {
         });
     }
 
+    @ApiBearerAuth()
     @Post('logout')
     @HttpCode(HttpStatus.OK)
     @ApiResponse({
@@ -242,6 +251,7 @@ export class AuthController {
     @Get('login/google')
     googleLogin() {}
 
+    @ApiExcludeEndpoint()
     @Public()
     @SecondFactorPublic()
     @UseGuards(GoogleGuard)
@@ -271,6 +281,7 @@ export class AuthController {
 
     // 2FA
 
+    @ApiBearerAuth()
     @SecondFactorPublic()
     @Get('2fa/generate')
     async register(
@@ -285,6 +296,7 @@ export class AuthController {
         return this.authService.pipeQrCodeStream(response, otpAuthUrl);
     }
 
+    @ApiBearerAuth()
     @SecondFactorPublic()
     @Post('2fa/authenticate')
     async authenticate(
@@ -306,6 +318,7 @@ export class AuthController {
         });
     }
 
+    @ApiBearerAuth()
     @SecondFactorPublic()
     @Post('2fa/enable')
     async enableTwoFactorAuthenticationForUser(
@@ -327,6 +340,7 @@ export class AuthController {
         });
     }
 
+    @ApiBearerAuth()
     @Post('2fa/disable')
     async disableTwoFactorAuthenticationForUser(
         @Body() otpData: OtpDto,

@@ -12,7 +12,7 @@ import { GetCurrentUser } from 'src/modules/auth/ParamDecorator';
 import { NotificationService } from './notification.service';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
 import { SerializedMessagesNotifications } from './serilaized-types/message-notification.serialized';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { multipleUserNotificationsResponseExample } from './swagger-examples';
 import { PaginationDto } from 'src/common/dto';
@@ -27,6 +27,7 @@ import { GetNotificationDto } from './dto/get-notification.dto';
 
 @Controller('notifications')
 @ApiTags('Notifications')
+@ApiBearerAuth()
 export class NotificationController {
     private readonly logger = new Logger(NotificationController.name);
 

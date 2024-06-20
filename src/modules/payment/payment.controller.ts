@@ -17,6 +17,7 @@ import {
 import {
     ApiAcceptedResponse,
     ApiBadRequestResponse,
+    ApiBearerAuth,
     ApiTags,
 } from '@nestjs/swagger';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
@@ -26,11 +27,10 @@ import { subscriptionExample } from './swagger/subscription.example';
 import { paymentMethodExample } from './swagger/payment-method.example';
 
 @ApiTags('Payment')
+@ApiBearerAuth()
 @Controller('payment')
 export class PaymentController {
-    constructor(
-        private readonly stripeService: StripeService,
-    ) {}
+    constructor(private readonly stripeService: StripeService) {}
 
     @Post('payment-method')
     @ApiAcceptedResponse({

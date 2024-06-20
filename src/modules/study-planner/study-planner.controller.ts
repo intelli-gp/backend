@@ -17,6 +17,7 @@ import { GetCurrentUser } from '../auth/ParamDecorator';
 import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
 import {
     ApiBadRequestResponse,
+    ApiBearerAuth,
     ApiOkResponse,
     ApiOperation,
     ApiTags,
@@ -28,6 +29,7 @@ import UpdateTaskDto from './dto/update-task.dto';
 // TODO: add swagger example for the return object for each output from each controller
 @Controller('study-planner')
 @ApiTags('study-planner')
+@ApiBearerAuth()
 export class StudyPlannerController {
     constructor(private readonly studyPlannerService: StudyPlannerService) {}
 
@@ -125,7 +127,6 @@ export class StudyPlannerController {
         );
     }
 
-    // TODO: Pipe need to return custom error message
     @Patch(':task_id')
     @HttpCode(HttpStatus.OK)
     @HttpCode(HttpStatus.BAD_REQUEST)
@@ -156,7 +157,6 @@ export class StudyPlannerController {
         );
     }
 
-    // TODO: Pipe need to return custom error message
     @Delete(':task_id')
     @HttpCode(HttpStatus.OK)
     @HttpCode(HttpStatus.BAD_REQUEST)

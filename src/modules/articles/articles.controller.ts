@@ -17,7 +17,7 @@ import {
 } from '../auth/ParamDecorator';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
 import { SerializedArticle } from './serialized-types/article.serialized';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import {
     CreateArticleExample,
@@ -60,6 +60,7 @@ export class ArticlesController {
     }
 
     // TODO: look up convention to name similar endpoints
+    @ApiBearerAuth()
     @Get('/created')
     @ApiResponse({
         status: 200,
@@ -79,6 +80,7 @@ export class ArticlesController {
         );
     }
 
+    @ApiBearerAuth()
     @ApiResponse({
         status: 201,
         description: 'Returns created article',
@@ -96,12 +98,12 @@ export class ArticlesController {
         return sendSuccessResponse(new SerializedArticle(createdArticle));
     }
 
+    @ApiBearerAuth()
     @ApiResponse({
         status: 200,
         description: 'Returns article',
         schema: swaggerSuccessExample(null, CreateArticleExample),
     })
-    // @Public()
     @Get('/:articleId([0-9]+)')
     async getArticle(
         @Param() articleData: DeleteArticleDto,
@@ -114,6 +116,7 @@ export class ArticlesController {
         return sendSuccessResponse(new SerializedArticle(article));
     }
 
+    @ApiBearerAuth()
     @Get('/bookmarked')
     async getBookmarkedArticles(
         @GetCurrentUser('user_id') userId: number,
@@ -137,6 +140,7 @@ export class ArticlesController {
         );
     }
 
+    @ApiBearerAuth()
     @Post('/:articleId([0-9]+)/bookmark')
     async toggleBookmarkArticle(
         @GetCurrentUser('user_id') userId: number,
@@ -149,6 +153,7 @@ export class ArticlesController {
         return sendSuccessResponse('Article bookmarked successfully');
     }
 
+    @ApiBearerAuth()
     @ApiResponse({
         status: 200,
         description: 'Toggle like on article',
@@ -167,6 +172,7 @@ export class ArticlesController {
         return sendSuccessResponse(new SerializedUser(articleLike.user));
     }
 
+    @ApiBearerAuth()
     @Post('/:articleId([0-9]+)/comment/:commentId([0-9]+)/toggle-like')
     async toggleLikeOnArticleComment(
         @GetCurrentUser('user_id') userId: number,
@@ -179,6 +185,7 @@ export class ArticlesController {
         return sendSuccessResponse(new SerializedUser(commentLike.user));
     }
 
+    @ApiBearerAuth()
     @ApiResponse({
         status: 201,
         description: 'Returns created comment',
@@ -202,6 +209,7 @@ export class ArticlesController {
         );
     }
 
+    @ApiBearerAuth()
     @ApiResponse({
         status: 200,
         description: 'Returns updated comment',
@@ -227,6 +235,7 @@ export class ArticlesController {
         );
     }
 
+    @ApiBearerAuth()
     @ApiResponse({
         status: 200,
         description: 'Returns confirmation for deletion',
@@ -244,6 +253,7 @@ export class ArticlesController {
         return sendSuccessResponse('Comment deleted successfully');
     }
 
+    @ApiBearerAuth()
     @ApiResponse({
         status: 200,
         description: 'Returns updated article',
@@ -263,6 +273,7 @@ export class ArticlesController {
         return sendSuccessResponse(new SerializedArticle(updatedArticle));
     }
 
+    @ApiBearerAuth()
     @ApiResponse({
         status: 200,
         description: 'Return confirmation for deletion',

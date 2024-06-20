@@ -15,7 +15,7 @@ import { sendSuccessResponse } from 'src/utils/response-handler/success.response
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetCurrentUser } from '../auth/ParamDecorator';
 import { Prisma, user } from '@prisma/client';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { SwaggerLoginExample } from '../auth/swagger-examples';
 import { GetSingleUserByIdDto, GetSingleUserDto } from './dto/get-user.dto';
@@ -25,6 +25,7 @@ import { UpdateMuteSettingsDto } from './dto/update-mute-settings.dto';
 
 @Controller('users')
 @ApiTags('Users')
+@ApiBearerAuth()
 export class UsersController {
     private readonly usersControllerLogger = new Logger(UsersController.name);
     constructor(private readonly usersService: UsersService) {}

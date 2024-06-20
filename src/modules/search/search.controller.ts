@@ -6,7 +6,7 @@ import { SerializedArticle } from '../articles/serialized-types/article.serializ
 import { SerializedUser } from '../users/serialized-types/serialized-user';
 import { SerializedChatGroup } from '../chat-groups/serialized-types/chat-group/chat-group.serializer';
 import { sendSuccessResponse } from '../../utils/response-handler/success.response-handler';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import {
     articlesArray,
@@ -24,6 +24,7 @@ import { Prisma, group } from '@prisma/client';
 
 @Controller('search')
 @ApiTags('Search')
+@ApiBearerAuth()
 export class SearchController {
     constructor(
         private searchService: SearchService,
@@ -36,7 +37,6 @@ export class SearchController {
         description: 'Returns users array',
         schema: swaggerSuccessExample(null, usersArray),
     })
-    // @Public()
     async searchUsers(@Query() searchDto: SearchDto) {
         let { offset, limit } = searchDto;
         let usersSearchResult = await this.searchService.searchUsers(
@@ -55,7 +55,6 @@ export class SearchController {
         description: 'Returns articles array',
         schema: swaggerSuccessExample(null, articlesArray),
     })
-    // @Public()
     async searchArticles(@Query() searchDto: SearchDto) {
         let { offset, limit } = searchDto;
         let articleSearchResult = await this.searchService.searchArticles(
@@ -80,7 +79,6 @@ export class SearchController {
         description: 'Returns groups array',
         schema: swaggerSuccessExample(null, groupsArray),
     })
-    // @Public()
     async searchGroups(@Query() searchDto: SearchDto) {
         let { offset, limit } = searchDto;
         let { data: groupsSearchResult, totalEntityCount } =
@@ -126,7 +124,6 @@ export class SearchController {
         description: 'Returns general search result',
         schema: swaggerSuccessExample(null, generalSearchExample),
     })
-    // @Public()
     async generalSearch(@Query() searchDto: SearchDto) {
         let { offset, limit } = searchDto;
         let generalSearchResult = await this.searchService.generalSearch(
@@ -179,7 +176,6 @@ export class SearchController {
         description: 'Returns suggestions array',
         schema: swaggerSuccessExample(null, autoCompleteExample),
     })
-    // @Public()
     async autocomplete(
         @Query('searchTerm') searchTerm: string,
         @Query('type') type: SUGGESTION_TYPE,

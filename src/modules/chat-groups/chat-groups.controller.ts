@@ -21,16 +21,18 @@ import {
 import { SerializedChatGroup } from './serialized-types/chat-group/chat-group.serializer';
 import { GetCurrentUser } from '../auth/ParamDecorator';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { multipleGroupsExample, singleGroupExample } from './swagger-examples';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 
 @Controller('chat-groups')
 @ApiTags('Chat Groups')
+@ApiBearerAuth()
 export class ChatGroupsController {
     private chatGroupControllerLogger = new Logger('ChatGroupsController');
     constructor(private readonly chatGroupsService: ChatGroupsService) {}
+
     @Post()
     @ApiResponse({
         status: 201,
@@ -48,6 +50,7 @@ export class ChatGroupsController {
         this.chatGroupControllerLogger.log(chatGroup);
         return sendSuccessResponse(new SerializedChatGroup(chatGroup));
     }
+
     @Get()
     @ApiResponse({
         status: 200,
@@ -149,6 +152,7 @@ export class ChatGroupsController {
         return sendSuccessResponse('User joined the group successfully');
     }
 
+    @ApiBearerAuth()
     @Patch('/leave')
     async leaveChatGroup(
         @Body() dto: JoinChatGroupDto,
