@@ -26,6 +26,7 @@ import { validateConfig } from './utils/config-validation.schema';
 import { SecondFactorAtGuard } from './modules/auth/guards/2fa-access-jwt.guard';
 import { AiServiceModule } from './modules/ai-service/ai-service.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { ScheduledTasksModule } from './modules/scheduled-tasks/scheduled-tasks.module';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -59,6 +60,7 @@ import { PaymentModule } from './modules/payment/payment.module';
         RecommenderSystemModule,
         AiServiceModule,
         PaymentModule,
+        ScheduledTasksModule,
     ],
     providers: [
         DbInitializationService,
