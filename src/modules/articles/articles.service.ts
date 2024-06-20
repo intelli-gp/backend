@@ -306,8 +306,18 @@ export class ArticlesService {
             },
         });
 
+        let authorData = null;
+        if (articleComment.article.user.user_id !== userId)
+            authorData = {
+                recipientId: articleComment.article.user.user_id,
+                isMuted:
+                    articleComment.article.user
+                        .is_article_notifications_muted ||
+                    articleComment.article.user.is_notifications_muted,
+            };
+
         const notificationRecipients = this.getArticleNotificationRecipients(
-            articleComment.article.user.user_id,
+            authorData,
             articleComment.article.user.followed_by,
             articleComment.user.followed_by,
         );
@@ -454,10 +464,20 @@ export class ArticlesService {
                 },
             });
 
+            let authorData = null;
+            if (articleLike.article.user.user_id !== userId)
+                authorData = {
+                    recipientId: articleLike?.article?.user?.user_id,
+                    isMuted:
+                        articleLike?.article.user
+                            ?.is_article_notifications_muted ||
+                        articleLike?.article.user?.is_notifications_muted,
+                };
+
             // no need to add a filter here bec a user shouldnt be able to follow himself
             const notificationRecipients =
                 this.getArticleNotificationRecipients(
-                    articleLike.article.user.user_id,
+                    authorData,
                     articleLike.article.user.followed_by,
                     articleLike.user.followed_by,
                 );
@@ -652,17 +672,17 @@ export class ArticlesService {
     }
 
     private getArticleNotificationRecipients(
-        authorId: number,
+        authorData: NotificationRecipient,
         authorFollowers: Prisma.followsWhereInput[],
         notificationSenderFollowers?: follows[],
     ): NotificationRecipient[] {
         const notificationRecipients: NotificationRecipient[] = [];
-        // TODO: send author status
-        if (authorId)
+        if (authorData) {
             notificationRecipients.push({
-                recipientId: authorId,
-                isMuted: false,
+                recipientId: authorData.recipientId,
+                isMuted: authorData.isMuted,
             });
+        }
 
         if (!notificationSenderFollowers) {
             const authorFollowerIds = authorFollowers.map((f) => {
