@@ -178,6 +178,10 @@ export class ConfigSchema {
     @IsNotEmpty()
     @IsString()
     PRO_YEARLY_SUBSCRIPTION_PRICE_ID: string;
+
+    @IsNotEmpty()
+    @IsString()
+    GEMINI_API_KEY: string;
 }
 
 export function validateConfig(config: ConfigSchema) {

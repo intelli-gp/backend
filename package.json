@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.13.1",
+    "@google/generative-ai": "^0.13.0",
     "@nestjs/axios": "^3.0.2",
     "@nestjs/cache-manager": "^2.1.1",
     "@nestjs/common": "^10.0.0",
