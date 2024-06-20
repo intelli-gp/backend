@@ -14,6 +14,7 @@ import {
       const client: Socket = context.switchToWs().getClient();
   
       if (client.handshake.auth.authFailed) {
+        client.handshake.auth.authFailed = false;
         return of({
           error: 'AuthFailedError',
           message: 'Authentication failed',
