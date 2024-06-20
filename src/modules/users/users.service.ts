@@ -338,18 +338,18 @@ export class UsersService {
 
         const data: Record<string, any> = {};
 
-        if (settings.IsAllNotificationsMuted) {
+        if (settings.IsAllNotificationsMuted !== undefined) {
             data.is_notifications_muted = settings.IsAllNotificationsMuted;
         }
-        if (settings.IsGroupNotificationsMuted) {
+        if (settings.IsGroupNotificationsMuted !== undefined) {
             data.is_group_notifications_muted =
                 settings.IsGroupNotificationsMuted;
         }
-        if (settings.IsArticleNotificationsMuted) {
+        if (settings.IsArticleNotificationsMuted !== undefined) {
             data.is_article_notifications_muted =
                 settings.IsArticleNotificationsMuted;
         }
-        if (settings.IsFollowNotificationsMuted) {
+        if (settings.IsFollowNotificationsMuted !== undefined) {
             data.is_follow_notifications_muted =
                 settings.IsFollowNotificationsMuted;
         }

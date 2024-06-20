@@ -12,6 +12,7 @@ export const WsAuthMiddleware = (): WsAuthMiddlewareArgs => {
     return async (client, next) => {
         try {
             const WsAuthMiddlewareLogger = new Logger('WsAuthMiddleware');
+            WsAuthMiddlewareLogger.debug('Validating WS JWT in middleware');
             const payload = WsJwtGuard.validateToken(client);
 
             const prismaService = new PrismaService(new ConfigService());

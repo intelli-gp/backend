@@ -40,14 +40,21 @@ import { UsersService } from 'src/modules/users/users.service';
 import { Reflector } from '@nestjs/core';
 import { SerializedReadMessageInfo } from '../serialized-types/messages/read-messages.serializer';
 import { MessageReadReceipt } from './types/message-read';
+import { AuthFailedInterceptor } from '../interceptors/auth-failed.interceptor';
 
 @Injectable()
 @WebSocketGateway({
     namespace: 'chat-groups',
     cors: true,
 })
-@UseFilters(new WebsocketExceptionsFilter(), new WsPrismaExceptionFilter())
-@UseInterceptors(new ClassSerializerInterceptor(new Reflector()))
+@UseFilters(
+    new WebsocketExceptionsFilter(new Reflector()),
+    new WsPrismaExceptionFilter(),
+)
+@UseInterceptors(
+    new ClassSerializerInterceptor(new Reflector()),
+    AuthFailedInterceptor,
+)
 /**
  We use the guard even though we supplied a middleware before connecting for an 
  extra layer of protection after connection each message sent will be checked for
@@ -136,7 +143,6 @@ export class ChatGroupsGateway {
         });
     }
 
-    @Public()
     @SubscribeMessage('refreshToken')
     async refreshToken(
         @ConnectedSocket() client: Socket,
@@ -146,7 +152,7 @@ export class ChatGroupsGateway {
 
         client.handshake.auth.token = messageData.accessToken;
 
-        client.emit('tokenRefreshed', 'token refreshed successfully');
+        return 'tokenRefreshed successfully';
     }
 
     @SubscribeMessage('createMessage')
