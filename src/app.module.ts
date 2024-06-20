@@ -18,7 +18,6 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { SearchModule } from './modules/search/search.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { PaymentMethodModule } from './modules/payment-method/payment-method.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { DbInitializationService } from './db-initialization.service';
 import { RecommenderSystemModule } from './modules/recommender-system/recommender-system.module';
@@ -54,7 +53,6 @@ import { ScheduledTasksModule } from './modules/scheduled-tasks/scheduled-tasks.
         StudyPlannerModule,
         ChatGroupsModule,
         NotificationModule,
-        PaymentMethodModule,
         SearchModule,
         CoursesModule,
         RecommenderSystemModule,
