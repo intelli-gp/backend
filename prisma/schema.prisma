@@ -191,9 +191,9 @@ model level {
 
 model message_ai {
   message_ai_id Int       @id @default(autoincrement())
-  content       String    @db.VarChar(255)
+  prompt        String
+  reply         String
   created_at    DateTime? @default(now())
-  updated_at    DateTime? @updatedAt
   user_id       Int
   user          user      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }

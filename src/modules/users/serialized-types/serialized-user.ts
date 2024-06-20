@@ -13,6 +13,7 @@ import { SerializedChatGroup } from 'src/modules/chat-groups/serialized-types/ch
 import { SerializedPaymentMethod } from 'src/modules/payment-method/serialized-types/serialized-payment-method';
 
 export class SerializedUser {
+    
     ID: number;
 
     FullName: string;

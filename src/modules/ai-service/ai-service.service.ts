@@ -4,6 +4,7 @@ import { ReceivedChatResponse } from './types';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ConfigService } from '@nestjs/config';
 import { ConfigSchema } from 'src/utils/config-validation.schema';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AiServiceService {
@@ -12,6 +13,7 @@ export class AiServiceService {
     constructor(
         private readonly aiServiceApi: HttpService,
         private readonly configService: ConfigService<ConfigSchema>,
+        private readonly prismaService: PrismaService,
     ) {
         const genAI = new GoogleGenerativeAI(
             this.configService.get('GEMINI_API_KEY'),
@@ -22,7 +24,7 @@ export class AiServiceService {
         });
     }
 
-    async chatWithChatbot(message: string) {
+    async chatWithChatbot(message: string, userId: number) {
         this.logger.log('Chat with chatbot');
         // const { data }: { data: ReceivedChatResponse[] } =
         //     await this.aiServiceApi.axiosRef.post('/webhooks/rest/webhook', {
@@ -34,6 +36,30 @@ export class AiServiceService {
         const result = await this.generativeModel.generateContent(message);
         const res = await result.response;
 
+        await this.prismaService.message_ai.create({
+            data: {
+                prompt: message,
+                reply: res.text,
+                user_id: userId,
+            },
+        });
+
         return res.text;
+    }
+
+    async listMessages(userId: number) {
+        return this.prismaService.message_ai.findMany({
+            where: {
+                user_id: userId,
+            },
+            include: {
+                user: {
+                    select: {
+                        image: true,
+                        username: true,
+                    },
+                },
+            },
+        });
     }
 }
