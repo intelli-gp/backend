@@ -286,14 +286,22 @@ export class ArticlesService {
             include: {
                 user: {
                     include: {
-                        followed_by: true,
+                        followed_by: {
+                            include: {
+                                follower: true,
+                            },
+                        },
                     },
                 },
                 article: {
                     include: {
                         user: {
                             include: {
-                                followed_by: true,
+                                followed_by: {
+                                    include: {
+                                        follower: true,
+                                    },
+                                },
                             },
                         },
                     },
@@ -451,14 +459,22 @@ export class ArticlesService {
                         include: {
                             user: {
                                 include: {
-                                    followed_by: true,
+                                    followed_by: {
+                                        include: {
+                                            follower: true,
+                                        },
+                                    },
                                 },
                             },
                         },
                     },
                     user: {
                         include: {
-                            followed_by: true,
+                            followed_by: {
+                                include: {
+                                    follower: true,
+                                },
+                            },
                         },
                     },
                 },
@@ -689,9 +705,9 @@ export class ArticlesService {
                 return {
                     recipientId: f.follower_id as number,
                     isMuted:
-                        (f.follower.is_notifications_muted as boolean) ||
+                        (f.follower?.is_notifications_muted as boolean) ||
                         (f.follower
-                            .is_article_notifications_muted as boolean) ||
+                            ?.is_article_notifications_muted as boolean) ||
                         false,
                 };
             });
@@ -710,9 +726,9 @@ export class ArticlesService {
                 return {
                     recipientId: f.follower_id as number,
                     isMuted:
-                        (f.follower.is_notifications_muted as boolean) ||
+                        (f.follower?.is_notifications_muted as boolean) ||
                         (f.follower
-                            .is_article_notifications_muted as boolean) ||
+                            ?.is_article_notifications_muted as boolean) ||
                         false,
                 };
             });
