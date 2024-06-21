@@ -35,16 +35,15 @@ export class AiServiceService {
 
         const result = await this.generativeModel.generateContent(message);
         const res = await result.response;
+        const replyContent = res.text();
 
-        await this.prismaService.message_ai.create({
+        return await this.prismaService.message_ai.create({
             data: {
                 prompt: message,
-                reply: res.text,
+                reply: replyContent,
                 user_id: userId,
             },
         });
-
-        return res.text;
     }
 
     async listMessages(userId: number) {
