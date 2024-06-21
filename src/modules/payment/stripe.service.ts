@@ -25,6 +25,14 @@ export class StripeService {
         });
     }
 
+    async checkAndAssignDefaultCreditCard(stripeCustomerId: string) {
+        // Check if there is more than one card and if not set the only card as default
+        const paymentMethods = await this.listCreditCardsForCustomer(stripeCustomerId);
+        if (paymentMethods.length === 1) {
+            await this.setCreditCardAsDefaultForCustomer(paymentMethods[0].id, stripeCustomerId);
+        }
+    }
+
     public async createCustomer(
         name: string,
         email: string,
@@ -50,6 +58,8 @@ export class StripeService {
             },
         );
 
+        await this.checkAndAssignDefaultCreditCard(customerStripeId);
+
         return paymentMethod;
     }
 
@@ -66,7 +76,8 @@ export class StripeService {
         ) {
             throw new BadRequestException('Cannot delete default credit card');
         }
-        return this.stripe.paymentMethods.detach(paymentMethodId);
+        
+        return await this.stripe.paymentMethods.detach(paymentMethodId);
     }
 
     public async listCreditCardsForCustomer(
