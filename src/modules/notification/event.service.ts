@@ -79,7 +79,9 @@ export class EventsService {
          */
         this.setWithTTL('sse-user-' + userId, clientEmitter, TTLTime);
 
-        clientEmitter.emit('notifications', { data }, isMuted);
+        const modifiedData = { ...data, isMuted };
+
+        clientEmitter.emit('notifications', { data: modifiedData });
     }
 
     async emit(

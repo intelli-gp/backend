@@ -300,6 +300,11 @@ export class NotificationService {
             `Emitting notification to ${recipients.length} users`,
         );
 
+        this.NotificationServiceLogger.debug({
+            recipients,
+            notificationData,
+        });
+
         // Create the notification entity
         if (store) {
             let entityId = 0;
@@ -328,16 +333,12 @@ export class NotificationService {
                 recipients.map(async ({ recipientId, isMuted }, index) => {
                     await this.eventsService.emitToUser(
                         recipientId,
-                        createdNotifications[index],
+                        notificationData,
                         isMuted,
                     );
                 }),
             );
         } else {
-            this.NotificationServiceLogger.debug({
-                recipients,
-                notificationData,
-            });
             this.NotificationServiceLogger.debug('Emitting notification event');
             this.eventsService.emit(recipients, notificationData);
         }

@@ -479,8 +479,6 @@ export class UsersService {
                 full_name: true,
                 username: true,
                 image: true,
-                is_notifications_muted: true,
-                is_follow_notifications_muted: true,
             },
             data: {
                 following_count: {
@@ -494,7 +492,7 @@ export class UsersService {
             },
         });
 
-        await this.prismaService.user.update({
+        const followedUser = await this.prismaService.user.update({
             where: { user_id: followedId },
             data: {
                 followers_count: {
@@ -508,8 +506,8 @@ export class UsersService {
             {
                 recipientId: followedId,
                 isMuted:
-                    user.is_notifications_muted ||
-                    user.is_follow_notifications_muted,
+                    followedUser.is_notifications_muted ||
+                    followedUser.is_follow_notifications_muted,
             },
         ];
 
