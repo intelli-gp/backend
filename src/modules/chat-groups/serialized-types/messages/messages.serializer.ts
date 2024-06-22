@@ -30,6 +30,8 @@ export class SerializedMessage {
 
     Reactions: SerializedMessageReaction[];
 
+    IsEdited: boolean;
+
     @Exclude()
     reply_to: number;
 
@@ -57,6 +59,9 @@ export class SerializedMessage {
         this.Reactions = (
             partial?.message_reactions as message_reaction[]
         )?.map((reaction) => new SerializedMessageReaction(reaction));
+
+        this.IsEdited = partial?.updated_at !== partial?.created_at;
+
 
         if (!options?.isReply && partial?.replied_to_message) {
             this.RepliedToMessage = new SerializedMessage(
