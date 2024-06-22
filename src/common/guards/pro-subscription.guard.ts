@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -13,6 +13,6 @@ export class ProSubscriptionGuard implements CanActivate {
             return user.plan_id == 2;
         }
 
-        return false;
+        throw new ForbiddenException('You need to have a pro subscription to access this feature');
     }
 }
