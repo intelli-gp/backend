@@ -54,14 +54,23 @@ export class CoursesService {
             take: maxTags,
         });
 
+        this.coursesServiceLogger.debug({
+            userTagsFromSystem: userTags,
+        });
+
         if (userTags.length < maxTags || !userTags) {
             const lengthDiff = maxTags - userTags.length;
-            const nonSystemUserTags = await this.prismaService.tag.findMany({
+            const nonSystemUserTags = await this.prismaService.user_tag.findMany({
+                where: { user_id: userId },
                 select: { tag_name: true },
                 take: lengthDiff,
             });
             userTags = [...userTags, ...nonSystemUserTags];
         }
+
+        this.coursesServiceLogger.debug({
+            userTagsTotal: userTags,
+        });
 
         // TODO: this approach needs to change because once the tags increase udemy does not replyyes
         // We set a max Size to at least get some results
@@ -156,7 +165,7 @@ export class CoursesService {
 
         const cleanUrl = `/courses/?search=${encodeURIComponent(
             searchQuery,
-        )}&ordering=most-reviewed&ratings=4&page_size=${+paginationData.limit}&page=${
+        )}&ordering=relevance&ratings=4&page_size=${+paginationData.limit}&page=${
             +paginationData.offset || 1
         }${
             category ? `&category=${encodeURIComponent(category)}` : ''
