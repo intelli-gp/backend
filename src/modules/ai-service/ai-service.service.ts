@@ -18,7 +18,7 @@ export class AiServiceService {
     private generativeModel;
 
     private machineLearningVideo =
-        'https://graduationproject2017.blob.core.windows.net/videos/2024-06-22_17:45:27app/data/generated/VideoGeneration/2024-06-22_17:39:26/output_video.mp4?se=2024-06-22T18%3A45%3A27Z&sp=r&sv=2024-05-04&sr=b&sig=HYbwiSejyIBzHk3hNhKJTWYPrzAuqOIQlQCJ9riqOUw%3D';
+        'https://asset.cloudinary.com/demxyvw8w/e530bab9ebc308e4b7fb22882b33de79';
 
     private dockerVideo = 'Docker video';
 
