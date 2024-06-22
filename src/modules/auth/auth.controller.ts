@@ -53,6 +53,7 @@ import { SwaggerFailureResponseExample } from 'src/common/swagger-examples/failu
 import { user } from '@prisma/client';
 import { OtpDto } from './dto/otp.dto';
 import { SecondFactorRtGuard } from './guards/2fa-refresh.jwt.guard';
+import { ProSubscriptionGuard } from 'src/common/guards/pro-subscription.guard';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -103,7 +104,6 @@ export class AuthController {
         await this.authService.sendVerificationMail(username, null);
         return sendSuccessResponse(null);
     }
-
 
     @Public()
     @SecondFactorPublic()
@@ -359,5 +359,13 @@ export class AuthController {
         return sendSuccessResponse({
             access_token: tokens.accessToken,
         });
+    }
+
+    // Forbidden
+    @ApiExcludeEndpoint()
+    @UseGuards(ProSubscriptionGuard)
+    @Get('forbidden')
+    forbidden() {
+        return 'Forbidden route';
     }
 }
