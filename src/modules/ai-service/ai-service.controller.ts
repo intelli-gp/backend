@@ -3,7 +3,7 @@ import { ApiAcceptedResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AiServiceService } from './ai-service.service';
 import { SendMessageDto } from './dto';
 import { sendSuccessResponse } from 'src/utils/response-handler/success.response-handler';
-import { GetCurrentUser } from '../auth/ParamDecorator';
+import { GetCurrentUser, Public } from '../auth/ParamDecorator';
 import { SerializedChatbotMessages } from './serialized-types/chatbot_messages.serializer';
 import { swaggerSuccessExample } from 'src/utils/swagger/example-generator';
 import { ChatbotMessageExample } from './swagger-examples/chatbot-message.example';
@@ -45,5 +45,12 @@ export class AiServiceController {
         return sendSuccessResponse(
             messages.map((message) => new SerializedChatbotMessages(message)),
         );
+    }
+
+    @Post('video')
+    async generateVideo(@Body() data: SendMessageDto) {
+        return sendSuccessResponse({
+            Url: await this.aiServiceService.generateVideo(data.Content),
+        });
     }
 }
