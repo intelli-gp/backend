@@ -700,6 +700,8 @@ export class ArticlesService {
             });
         }
 
+        // if the author triggered the notification only send to his followers
+        // else send to the common followers of the author and the notification sender
         if (!notificationSenderFollowers) {
             const authorFollowerIds = authorFollowers.map((f) => {
                 return {
