@@ -17,18 +17,14 @@ export class AiServiceService {
     private readonly logger = new Logger(AiServiceService.name);
     private generativeModel;
 
-    private machineLearningVideo =
-        'https://asset.cloudinary.com/demxyvw8w/e530bab9ebc308e4b7fb22882b33de79';
+    private videosArray = {
+        machineLearning:
+            'https://res.cloudinary.com/demxyvw8w/video/upload/v1719085758/machine-learning-long_qsbix3.mp4',
+        docker: 'https://res.cloudinary.com/demxyvw8w/video/upload/v1719085825/docker_f3bilw.mp4',
+        stockMarket:
+            'https://res.cloudinary.com/demxyvw8w/video/upload/v1719088497/stock_market_dlt4gm.mp4',
+    };
 
-    private dockerVideo = 'Docker video';
-
-    private stockMarketVideo = 'Stock market video';
-
-    private videosArray = [
-        this.machineLearningVideo,
-        this.dockerVideo,
-        this.stockMarketVideo,
-    ];
     constructor(
         private readonly aiServiceApi: HttpService,
         private readonly configService: ConfigService<ConfigSchema>,
@@ -85,11 +81,11 @@ export class AiServiceService {
         // Should save videos generated and link them to user
         prompt = prompt.toLowerCase();
         if (prompt.includes('machine')) {
-            return this.videosArray[0];
+            return this.videosArray.machineLearning;
         } else if (prompt.includes('docker') || prompt.includes('container')) {
-            return this.videosArray[1];
+            return this.videosArray.docker;
         } else if (prompt.includes('stock') || prompt.includes('market')) {
-            return this.videosArray[2];
+            return this.videosArray.stockMarket;
         } else {
             await wait(10000);
             throw new GatewayTimeoutException('Video generation timeout');
