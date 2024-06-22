@@ -44,5 +44,6 @@ export class SerializedTask {
         this.Status = partial.status;
         this.StartDate = partial.start_date;
         this.DueDate = partial.due_date;
+        this.Color = partial?.color;
     }
 }
