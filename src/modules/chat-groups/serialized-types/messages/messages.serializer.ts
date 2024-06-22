@@ -60,7 +60,7 @@ export class SerializedMessage {
             partial?.message_reactions as message_reaction[]
         )?.map((reaction) => new SerializedMessageReaction(reaction));
 
-        this.IsEdited = partial?.updated_at !== partial?.created_at;
+        this.IsEdited = partial?.updated_at.toString() !== partial?.created_at.toString();
 
 
         if (!options?.isReply && partial?.replied_to_message) {
