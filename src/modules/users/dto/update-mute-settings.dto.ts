@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean } from 'class-validator';
+import { IsBoolean, IsOptional } from 'class-validator';
 
 export class UpdateMuteSettingsDto {
     @ApiProperty({
@@ -7,6 +7,7 @@ export class UpdateMuteSettingsDto {
         example: true,
     })
     @IsBoolean()
+    @IsOptional()
     IsAllNotificationsMuted: boolean;
 
     @ApiProperty({
@@ -14,6 +15,7 @@ export class UpdateMuteSettingsDto {
         example: true,
     })
     @IsBoolean()
+    @IsOptional()
     IsGroupNotificationsMuted: boolean;
 
     @ApiProperty({
@@ -21,6 +23,7 @@ export class UpdateMuteSettingsDto {
         example: true,
     })
     @IsBoolean()
+    @IsOptional()
     IsArticleNotificationsMuted: boolean;
 
     @ApiProperty({
@@ -28,5 +31,6 @@ export class UpdateMuteSettingsDto {
         example: true,
     })
     @IsBoolean()
+    @IsOptional()
     IsFollowNotificationsMuted: boolean;
 }
