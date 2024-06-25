@@ -150,7 +150,7 @@ export class StripeService {
                         price: priceId,
                     },
                 ],
-                description: 'Mujedd Premium',
+                description: 'Premium',
             });
 
             await this.usersService.changeUserPlan(userId, 'pro');
