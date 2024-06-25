@@ -3,6 +3,7 @@ import {
     Controller,
     Delete,
     Get,
+    Logger,
     Param,
     Patch,
     Post,
@@ -30,6 +31,7 @@ import { paymentMethodExample } from './swagger/payment-method.example';
 @ApiBearerAuth()
 @Controller('payment')
 export class PaymentController {
+    private readonly logger = new Logger(PaymentController.name);
     constructor(private readonly stripeService: StripeService) {}
 
     @Post('payment-method')
@@ -134,6 +136,8 @@ export class PaymentController {
     ) {
         const subscription =
             await this.stripeService.getCustomerSubscriptions(stripeCustomerId);
+
+        this.logger.debug(subscription);
 
         const result =
             subscription.data.length === 0

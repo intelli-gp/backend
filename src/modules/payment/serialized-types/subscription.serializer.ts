@@ -11,6 +11,13 @@ export class SerializedSubscription {
 
     @ApiProperty({
         type: String,
+        description: 'The title of the subscription',
+        example: 'Basic Plan',
+    })
+    Title: string;
+
+    @ApiProperty({
+        type: String,
         description: 'The interval of the subscription',
         example: 'monthly',
     })
@@ -53,6 +60,8 @@ export class SerializedSubscription {
 
     constructor(subscription: Stripe.Subscription) {
         this.ID = subscription?.id;
+
+        this.Title = subscription?.description;
 
         this.Interval =
             subscription?.items?.data?.[0]?.plan?.interval === 'month'

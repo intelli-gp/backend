@@ -27,9 +27,13 @@ export class StripeService {
 
     async checkAndAssignDefaultCreditCard(stripeCustomerId: string) {
         // Check if there is more than one card and if not set the only card as default
-        const paymentMethods = await this.listCreditCardsForCustomer(stripeCustomerId);
+        const paymentMethods =
+            await this.listCreditCardsForCustomer(stripeCustomerId);
         if (paymentMethods.length === 1) {
-            await this.setCreditCardAsDefaultForCustomer(paymentMethods[0].id, stripeCustomerId);
+            await this.setCreditCardAsDefaultForCustomer(
+                paymentMethods[0].id,
+                stripeCustomerId,
+            );
         }
     }
 
@@ -76,7 +80,7 @@ export class StripeService {
         ) {
             throw new BadRequestException('Cannot delete default credit card');
         }
-        
+
         return await this.stripe.paymentMethods.detach(paymentMethodId);
     }
 
@@ -146,7 +150,7 @@ export class StripeService {
                         price: priceId,
                     },
                 ],
-                description: 'Professional subscription',
+                description: 'Mujedd Premium',
             });
 
             await this.usersService.changeUserPlan(userId, 'pro');
