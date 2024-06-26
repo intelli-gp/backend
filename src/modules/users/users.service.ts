@@ -560,19 +560,6 @@ export class UsersService {
         return user.following_count;
     }
 
-    async changeUserPlan(userId: number, plan: 'free' | 'pro') {
-        const planMap = {
-            free: 1,
-            pro: 2,
-        };
-        await this.prismaService.user.update({
-            where: { user_id: userId },
-            data: {
-                plan_id: planMap[plan],
-            },
-        });
-    }
-
     /** Tokens */
 
     async clearUsersRefreshTokens() {

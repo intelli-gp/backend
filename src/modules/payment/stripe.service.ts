@@ -153,7 +153,6 @@ export class StripeService {
                 description: 'Premium',
             });
 
-            await this.usersService.changeUserPlan(userId, 'pro');
             return addedSub;
         } catch (error) {
             if (error?.code === StripeError.ResourceMissing) {
@@ -172,10 +171,6 @@ export class StripeService {
             },
         );
 
-        // const subscriptionEndTime = canceledSub.current_period_end;
-
-        // Assign this to be a cronJob that occurs at the end of the subscription
-        await this.usersService.changeUserPlan(userId, 'free');
         return canceledSub;
     }
 
